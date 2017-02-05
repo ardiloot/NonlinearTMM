@@ -33,7 +33,9 @@ namespace TMM {
 		return res;
 	}
 
+	typedef std::function<void(const Eigen::ArrayXcd&, const Eigen::ArrayXcd&, Eigen::MatrixXcd&)> OuterProductSSEEigenFunc;
 	void OuterProductSSEEigenComplex(const Eigen::ArrayXcd& X, const Eigen::ArrayXcd& Y, Eigen::MatrixXcd& R);
+	void OuterProductSSEEigenComplexAdd(const Eigen::ArrayXcd& X, const Eigen::ArrayXcd& Y, Eigen::MatrixXcd& R);
 	void OuterProductGoodEigenComplex(const Eigen::ArrayXcd& X, const Eigen::ArrayXcd& Y, Eigen::MatrixXcd& R);
 
 	//---------------------------------------------------------------
@@ -89,8 +91,10 @@ namespace TMM {
 	public:
 		Eigen::MatrixXcd Ex, Ey, Ez, Hx, Hy, Hz;
 		FieldsZX(int n, int m, Polarization pol_);
+		void SetZero();
 		Polarization GetPol();
-		void SetFields(const FieldsZ &F, const Eigen::ArrayXcd &phaseX, Polarization pol);
+		void SetFields(const FieldsZ &f, const Eigen::ArrayXcd &phaseX, bool add = false);
+		void AddFields(const FieldsZ &f, const Eigen::ArrayXcd &phaseX);
 	};
 
 	//---------------------------------------------------------------
@@ -131,6 +135,7 @@ namespace TMM {
 		SweepResultNonlinearTMM* Sweep(TMMParam param, const Eigen::Map<Eigen::ArrayXd> &values);
 		FieldsZ* GetFields(const Eigen::Map<Eigen::ArrayXd> &zs, WaveDirection dir = TOT);
 		FieldsZX* GetFields2D(const Eigen::Map<Eigen::ArrayXd> &zs, const Eigen::Map<Eigen::ArrayXd> &xs, WaveDirection dir = TOT);
+		FieldsZX* IntegrateFields2D(TMMParam param, const Eigen::Map<Eigen::ArrayXd> &values, const Eigen::Map<Eigen::ArrayXcd> &E0s, const Eigen::Map<Eigen::ArrayXd> &dxs, const Eigen::Map<Eigen::ArrayXd> &zs, const Eigen::Map<Eigen::ArrayXd> &xs, WaveDirection dir = TOT);
 		double GetAbsorbedPower();
 
 

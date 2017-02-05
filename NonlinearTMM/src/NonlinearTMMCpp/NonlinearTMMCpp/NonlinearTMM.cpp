@@ -20,6 +20,26 @@ namespace TMM {
 		}
 	}
 
+	void OuterProductSSEEigenComplexAdd(const Eigen::ArrayXcd & X, const Eigen::ArrayXcd & Y, Eigen::MatrixXcd & R) {
+		// Identical to previous, but add to result (performance)
+		register dcomplex* ptrR = &R(0, 0);
+		const register dcomplex* ptrX = (dcomplex*)&X(0);
+		const register dcomplex* ptrY = (dcomplex*)&Y(0);
+		const register int n = X.size();
+		const register int m = Y.size();
+
+		for (int i = 0; i < n; i++) {
+			register int k = i * m;
+			register dcomplex v = ptrX[i];
+			for (int j = 0; j < m; j++) {
+				register int k2 = k + j;
+				register dcomplex w = ptrY[j];
+				ptrR[k2] += multSSE(v, w);
+			}
+		}
+	}
+
+
 	void OuterProductGoodEigenComplex(const Eigen::ArrayXcd & X, const Eigen::ArrayXcd & Y, Eigen::MatrixXcd & R) {
 		dcomplex* ptrR = &R(0, 0);
 		dcomplex* ptrX = (dcomplex*)&X(0);
@@ -79,33 +99,55 @@ namespace TMM {
 		// Fields not zereod because of performance
 	}
 
+	void FieldsZX::SetZero() {
+		Ex.setZero();
+		Ey.setZero();
+		Ez.setZero();
+		Hx.setZero();
+		Hy.setZero();
+		Hz.setZero();
+	}
+
 	Polarization FieldsZX::GetPol() {
 		return pol;
 	}
 
-	void FieldsZX::SetFields(const FieldsZ & F, const Eigen::ArrayXcd & phaseX, Polarization pol) {
-		int n = F.E.rows();
+	void FieldsZX::SetFields(const FieldsZ & f, const Eigen::ArrayXcd & phaseX, bool add) {
+		int n = f.E.rows();
 		int m = phaseX.size();
+
+		// Select function
+		OuterProductSSEEigenFunc func;
+		if (add) {
+			func = OuterProductSSEEigenComplexAdd;
+		}
+		else {
+			func = OuterProductSSEEigenComplex;
+		}
 
 		// Parallelisation has no/small effect
 		switch (pol)
 		{
 		case TMM::P_POL:
-			OuterProductSSEEigenComplex(phaseX, F.E.col(0), Ex);
-			OuterProductSSEEigenComplex(phaseX, F.E.col(2), Ez);
-			OuterProductSSEEigenComplex(phaseX, F.H.col(1), Hy);
+			func(phaseX, f.E.col(0), Ex);
+			func(phaseX, f.E.col(2), Ez);
+			func(phaseX, f.H.col(1), Hy);
 			// S-pol fields stay undefined because of performance
 			break;
 		case TMM::S_POL:
-			OuterProductSSEEigenComplex(phaseX, F.E.col(1), Ey);
-			OuterProductSSEEigenComplex(phaseX, F.H.col(0), Hx);
-			OuterProductSSEEigenComplex(phaseX, F.H.col(2), Hz);
+			func(phaseX, f.E.col(1), Ey);
+			func(phaseX, f.H.col(0), Hx);
+			func(phaseX, f.H.col(2), Hz);
 			// P-pol fields stay undefined because of performance
 			break;
 		default:
 			throw std::invalid_argument("Unknown polarization.");
 			break;
 		}
+	}
+
+	void FieldsZX::AddFields(const FieldsZ & f, const Eigen::ArrayXcd & phaseX) {
+		SetFields(f, phaseX, true);
 	}
 
 	void NonlinearTMM::CheckPrerequisites(TMMParam toIgnore) {
@@ -413,11 +455,43 @@ namespace TMM {
 
 		// Allocate space (deletion is the responsibility of the caller!)
 		FieldsZX *res = new FieldsZX(zs.size(), xs.size(), pol);
+		double kx = layers[0].kx;
 
-		FieldsZ *F = GetFields(zs, dir);
-		Eigen::ArrayXcd phaseX = (constI * layers[0].kx * xs).exp();
-		res->SetFields(*F, phaseX, pol);
-		delete F;
+		FieldsZ *f = GetFields(zs, dir);
+		Eigen::ArrayXcd phaseX = (constI * kx * xs).exp();
+		res->SetFields(*f, phaseX);
+		delete f;
+		return res;
+	}
+
+	FieldsZX * NonlinearTMM::IntegrateFields2D(TMMParam param, const Eigen::Map<Eigen::ArrayXd>& values, const Eigen::Map<Eigen::ArrayXcd>& E0s, const Eigen::Map<Eigen::ArrayXd>& dxs, const Eigen::Map<Eigen::ArrayXd>& zs, const Eigen::Map<Eigen::ArrayXd>& xs, WaveDirection dir) {
+		CheckPrerequisites(param);
+
+		if (E0s.size() != values.size() || dxs.size() != values.size()) {
+			throw std::invalid_argument("Arrays (values, E0s, dxs) must have the same length.");
+		}
+
+		// Allocate space (deletion is the responsibility of the caller!)
+		FieldsZX *res = new FieldsZX(zs.size(), xs.size(), pol);
+		res->SetZero(); // We are summing up
+
+#pragma omp parallel
+		{
+			NonlinearTMM tmmThread = *this;
+			tmmThread.SetParam(PARAM_OVERRIDE_E0, true);
+#pragma omp for
+			for (int i = 0; i < values.size(); i++) {
+				tmmThread.SetParam(param, values(i));
+				tmmThread.SetParam(PARAM_E0, E0s(i));
+				tmmThread.Solve();
+
+				double kx = tmmThread.GetLayer(0)->kx;
+				FieldsZ *f = tmmThread.GetFields(zs, dir);
+				Eigen::ArrayXcd phaseX = (constI * kx * xs).exp() * dxs(i);
+				res->AddFields(*f, phaseX);
+				delete f;
+			}
+		}
 		return res;
 	}
 
