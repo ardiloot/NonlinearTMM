@@ -420,6 +420,17 @@ namespace TMM {
 		delete F;
 		return res;
 	}
+
+	double NonlinearTMM::GetAbsorbedPower() {
+		if (!solved) {
+			throw std::runtime_error("NonlinearTMM must be solved first.");
+		}
+		double res = 0.0;
+		for (int i = 0; i < layers.size(); i++) {
+			res += layers[i].GetAbsorbedPower();
+		}
+		return res;
+	}
 	
 	void NonlinearTMM::SetParam(TMMParam param, bool value) {
 		switch (param)

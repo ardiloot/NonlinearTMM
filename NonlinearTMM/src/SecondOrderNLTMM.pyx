@@ -301,6 +301,15 @@ cdef class _NonlinearLayer:
         hw = _HomogeneousWave()
         hw._Init(self._thisptr.GetHw())
         self.hw = hw
+        
+    def GetPowerFlow(self, double z):
+        return self._thisptr.GetPowerFlow(z);
+    
+    def GetAbsorbedPower(self):
+        return self._thisptr.GetAbsorbedPower();
+    
+    def GetSrcPower(self):
+        return self._thisptr.GetSrcPower();
     
 #===============================================================================
 # NonlinearTMM
@@ -386,6 +395,9 @@ cdef class NonlinearTMM:
         res = _FieldsZX()
         res._Init(resCpp)
         return res
+    
+    def GetAbsorbedPower(self):
+        return self._thisptr.GetAbsorbedPower();
     
     # Getters
     #--------------------------------------------------------------------------- 

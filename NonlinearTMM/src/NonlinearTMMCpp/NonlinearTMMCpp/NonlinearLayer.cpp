@@ -130,7 +130,12 @@ namespace TMM{
 			throw std::runtime_error("Homogeneous wave must be solved first");
 		}
 		Array2cd U = layer->U0;
-		if (z != 0.0) {
+		if (z == 0.0) {
+			// No phase correction
+		} else if (z == layer->d) {
+			// Phase at the end of the layer is precalculated
+			U *= phase;
+		} else {
 			U *= (constI * kz * z).exp();
 		}
 		return U;
@@ -210,7 +215,12 @@ namespace TMM{
 		}
 
 		Array2cd U = By;
-		if (z != 0.0) {
+		if (z == 0.0) {
+			// Phase is one
+		} else if (z == layer->d) {
+			// Phase at the end of the layer is precalculated
+			U *= (phaseS - layer->hw.phase);
+		} else {
 			U *= ((constI * kSz * z).exp() - (constI * layer->hw.kz * z).exp());
 		}
 		return U;
@@ -311,7 +321,14 @@ namespace TMM{
 		Array2cd expKSz = Array2cd::Ones();
 		Array2cd expKAz = Array2cd::Ones();
 
-		if (z != 0.0) {
+		if (z == 0.0) {
+			// Phase is 1
+		}
+		else if (z == d) {
+			// End of layer phases are precalculated
+			expKSz = iws.phaseS;
+			expKAz = iwa.phaseS;
+		} else {
 			expKSz = (constI * iws.kSz * z).exp();
 			expKAz = (constI * iwa.kSz * z).exp();
 		}
@@ -342,6 +359,68 @@ namespace TMM{
 		else {
 			throw std::runtime_error("Unknown polarization.");
 		}
+		return res;
+	}
+
+	double NonlinearLayer::GetPowerFlow(double z) {
+		if (!solved) {
+			throw std::runtime_error("NonlinearLayer must be solved first.");
+		}
+		Fields f = GetFields(z, TOT);
+		double Sz = 0.5 * real(f.E(0) * std::conj(f.H(1)) - f.E(1) * std::conj(f.H(0)));
+		return Sz;
+	}
+
+	double NonlinearLayer::GetAbsorbedPower() {
+		if (!solved) {
+			throw std::runtime_error("NonlinearLayer must be solved first.");
+		}
+
+		if (abs(imag(eps)) < 1e-20) {
+			//Layer not absorbing
+			return 0.0;
+		}
+
+		if (IsNonlinear()) {
+			throw std::runtime_error("Absorbed power calculation is not allowed in nonlinear media.");
+		}
+
+		dcomplex kzF = hw.kz(F);
+		dcomplex dk1 = kzF - std::conj(kzF);
+		dcomplex dk2 = kzF + std::conj(kzF);
+		dcomplex intValue1 = -constI * (std::exp(constI * dk1 * d) - 1.0) / dk1;
+		dcomplex intValue2 = -constI * (std::exp(constI * dk2 * d) - 1.0) / dk2;
+		dcomplex intValue3 = constI * (std::exp(-constI * dk2 * d) - 1.0) / dk2;
+		dcomplex intValue4 = constI * (std::exp(-constI * dk1 * d) - 1.0) / dk1;
+
+		Vector3cd E0F = GetFields(0.0, F).E;
+		Vector3cd E0B = GetFields(0.0, B).E;
+		Vector3cd E0FC = E0F.conjugate();
+		Vector3cd E0BC = E0B.conjugate();
+
+		// E0F.dot(E0FC) provided wrong results
+		dcomplex dot1 = E0F(0) * E0FC(0) + E0F(1) * E0FC(1) + E0F(2) * E0FC(2);
+		dcomplex dot2 = E0F(0) * E0BC(0) + E0F(1) * E0BC(1) + E0F(2) * E0BC(2);
+		dcomplex dot3 = E0B(0) * E0FC(0) + E0B(1) * E0FC(1) + E0B(2) * E0FC(2);
+		dcomplex dot4 = E0B(0) * E0BC(0) + E0B(1) * E0BC(1) + E0B(2) * E0BC(2);
+		dcomplex intValue = dot1 * intValue1 + dot2 * intValue2 + dot3 * intValue3 + dot4 * intValue4;
+		double res = 0.5 * constEps0 * imag(eps) * omega * real(intValue);
+
+		return res;
+	}
+
+	double NonlinearLayer::GetSrcPower() {
+		if (!solved) {
+			throw std::runtime_error("NonlinearTMM must be solved first.");
+		}
+
+		double absorbed = GetAbsorbedPower();
+		double deltaS = 0.0;
+		if (!std::isinf(d)) {
+			deltaS = GetPowerFlow(d) - GetPowerFlow(0.0);
+		}
+
+		double res = absorbed + deltaS;
 		return res;
 	}
 

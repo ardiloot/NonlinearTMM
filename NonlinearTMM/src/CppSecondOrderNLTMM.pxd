@@ -65,6 +65,9 @@ cdef extern from "NonlinearLayer.h" namespace "TMM":
 
     cdef cppclass NonlinearLayerCpp "TMM::NonlinearLayer":
         HomogeneousWaveCpp* GetHw() except +
+        double GetPowerFlow(double z) except +
+        double GetAbsorbedPower() except +
+        double GetSrcPower() except +
         
 #===============================================================================
 # NonlinearTMM.h
@@ -97,6 +100,7 @@ cdef extern from "NonlinearTMM.h" namespace "TMM":
         SweepResultNonlinearTMMCpp* Sweep(TMMParamCpp param, Map[ArrayXd] &) except +
         FieldsZCpp* GetFields(Map[ArrayXd] &, WaveDirectionCpp dir) except +
         FieldsZXCpp* GetFields2D(Map[ArrayXd] &, Map[ArrayXd] &, WaveDirectionCpp dir) except +
+        double GetAbsorbedPower() except +
 
         void SetParam(TMMParamCpp param, bool value) except +
         void SetParam(TMMParamCpp param, int value) except +

@@ -133,7 +133,8 @@ namespace TMM {
 		HomogeneousWave* GetHw();
 		Array2cd GetMainFields(double z) const;
 		Fields GetFields(double z, WaveDirection dir = TOT) const;
-		
-		
+		double GetPowerFlow(double z);
+		double GetAbsorbedPower();
+		double GetSrcPower();
 	};
 }
