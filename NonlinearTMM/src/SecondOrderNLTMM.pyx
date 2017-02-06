@@ -396,6 +396,19 @@ cdef class NonlinearTMM:
         res._Init(resCpp)
         return res
     
+    def IntegrateFields2D(self, str paramStr, np.ndarray[double, ndim = 1] values, \
+            np.ndarray[double complex, ndim = 1] E0s, np.ndarray[double, ndim = 1] intValues, \
+            np.ndarray[double, ndim = 1] zs, np.ndarray[double, ndim = 1] xs, str dirStr = "total"):
+        
+        cdef FieldsZXCpp *resCpp;
+        cdef WaveDirectionCpp direction = WaveDirectionFromStr(dirStr)
+        resCpp = self._thisptr.IntegrateFields2D(TmmParamFromStr(paramStr), \
+            Map[ArrayXd](values), Map[ArrayXcd](E0s), Map[ArrayXd](intValues), \
+            Map[ArrayXd](zs), Map[ArrayXd](xs), direction)
+        res = _FieldsZX()
+        res._Init(resCpp)
+        return res
+    
     def GetAbsorbedPower(self):
         return self._thisptr.GetAbsorbedPower();
     

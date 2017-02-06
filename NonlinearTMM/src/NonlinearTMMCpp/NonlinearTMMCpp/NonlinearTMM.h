@@ -135,7 +135,7 @@ namespace TMM {
 		SweepResultNonlinearTMM* Sweep(TMMParam param, const Eigen::Map<Eigen::ArrayXd> &values);
 		FieldsZ* GetFields(const Eigen::Map<Eigen::ArrayXd> &zs, WaveDirection dir = TOT);
 		FieldsZX* GetFields2D(const Eigen::Map<Eigen::ArrayXd> &zs, const Eigen::Map<Eigen::ArrayXd> &xs, WaveDirection dir = TOT);
-		FieldsZX* IntegrateFields2D(TMMParam param, const Eigen::Map<Eigen::ArrayXd> &values, const Eigen::Map<Eigen::ArrayXcd> &E0s, const Eigen::Map<Eigen::ArrayXd> &dxs, const Eigen::Map<Eigen::ArrayXd> &zs, const Eigen::Map<Eigen::ArrayXd> &xs, WaveDirection dir = TOT);
+		FieldsZX* IntegrateFields2D(TMMParam param, const Eigen::Map<Eigen::ArrayXd> &values, const Eigen::Map<Eigen::ArrayXcd> &E0s, const Eigen::Map<Eigen::ArrayXd> &intVar, const Eigen::Map<Eigen::ArrayXd> &zs, const Eigen::Map<Eigen::ArrayXd> &xs, WaveDirection dir = TOT);
 		double GetAbsorbedPower();
 
 

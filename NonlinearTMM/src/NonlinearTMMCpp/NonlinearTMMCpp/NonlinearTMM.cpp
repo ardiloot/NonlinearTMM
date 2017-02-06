@@ -464,10 +464,10 @@ namespace TMM {
 		return res;
 	}
 
-	FieldsZX * NonlinearTMM::IntegrateFields2D(TMMParam param, const Eigen::Map<Eigen::ArrayXd>& values, const Eigen::Map<Eigen::ArrayXcd>& E0s, const Eigen::Map<Eigen::ArrayXd>& dxs, const Eigen::Map<Eigen::ArrayXd>& zs, const Eigen::Map<Eigen::ArrayXd>& xs, WaveDirection dir) {
+	FieldsZX * NonlinearTMM::IntegrateFields2D(TMMParam param, const Eigen::Map<Eigen::ArrayXd>& values, const Eigen::Map<Eigen::ArrayXcd>& E0s, const Eigen::Map<Eigen::ArrayXd>& intVar, const Eigen::Map<Eigen::ArrayXd>& zs, const Eigen::Map<Eigen::ArrayXd>& xs, WaveDirection dir) {
 		CheckPrerequisites(param);
 
-		if (E0s.size() != values.size() || dxs.size() != values.size()) {
+		if (E0s.size() != values.size() || intVar.size() != values.size()) {
 			throw std::invalid_argument("Arrays (values, E0s, dxs) must have the same length.");
 		}
 
@@ -475,19 +475,34 @@ namespace TMM {
 		FieldsZX *res = new FieldsZX(zs.size(), xs.size(), pol);
 		res->SetZero(); // We are summing up
 
-#pragma omp parallel
+		#pragma omp parallel
 		{
 			NonlinearTMM tmmThread = *this;
 			tmmThread.SetParam(PARAM_OVERRIDE_E0, true);
-#pragma omp for
+			#pragma omp for
 			for (int i = 0; i < values.size(); i++) {
+				
+				// Solve TMM
 				tmmThread.SetParam(param, values(i));
 				tmmThread.SetParam(PARAM_E0, E0s(i));
 				tmmThread.Solve();
 
+				// Determine integration step
 				double kx = tmmThread.GetLayer(0)->kx;
+				double dIntVar;
+				if (intVar.size() == 1) {
+					dIntVar = 1.0;
+				} else if (i == 0) {
+					dIntVar = intVar(1) - intVar(0);
+				} else if (i + 1 == intVar.size()) {
+					dIntVar = intVar(intVar.size() - 1) - intVar(intVar.size() - 2);
+				} else {
+					dIntVar = 0.5 * (intVar(i + 1) - intVar(i - 1));
+				}
+	
+				// Integrate fields
 				FieldsZ *f = tmmThread.GetFields(zs, dir);
-				Eigen::ArrayXcd phaseX = (constI * kx * xs).exp() * dxs(i);
+				Eigen::ArrayXcd phaseX = (constI * kx * xs).exp() * dIntVar;
 				res->AddFields(*f, phaseX);
 				delete f;
 			}

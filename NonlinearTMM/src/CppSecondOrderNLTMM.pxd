@@ -100,6 +100,7 @@ cdef extern from "NonlinearTMM.h" namespace "TMM":
         SweepResultNonlinearTMMCpp* Sweep(TMMParamCpp param, Map[ArrayXd] &) except +
         FieldsZCpp* GetFields(Map[ArrayXd] &, WaveDirectionCpp dir) except +
         FieldsZXCpp* GetFields2D(Map[ArrayXd] &, Map[ArrayXd] &, WaveDirectionCpp dir) except +
+        FieldsZXCpp* IntegrateFields2D(TMMParamCpp, Map[ArrayXd] &, Map[ArrayXcd] &, Map[ArrayXd] &, Map[ArrayXd] &, Map[ArrayXd] &, WaveDirectionCpp) except +
         double GetAbsorbedPower() except +
 
         void SetParam(TMMParamCpp param, bool value) except +
