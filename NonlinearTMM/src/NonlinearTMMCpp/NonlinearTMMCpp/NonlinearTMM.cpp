@@ -289,6 +289,75 @@ namespace TMM {
 		}
 	}
 
+	double NonlinearTMM::IntegrateWavePower(int layerNr, const Eigen::ArrayXcd & Us, const Eigen::ArrayXd & kxs, const Eigen::ArrayXcd & kzs, double x0, double x1, double z, double Ly) const {
+		double integValue2dRe = 0.0;
+		double integValue2dIm = 0.0;
+		//#pragma omp parallel for default(shared) reduction(+:integValue2dRe,integValue2dIm)
+		for (int i = 0; i < kxs.size(); i++) {
+			double kx = kxs(i);
+			dcomplex kz = kzs(i);
+			dcomplex U = Us(i);
+			dcomplex integValue1d = 0.0;
+			for (int j = 0; j < kxs.size(); j++) {
+				double kxP = kxs(j);
+				dcomplex kzP = kzs(j);
+				dcomplex UP = Us(j);
+				dcomplex dk = kx - kxP;
+
+				// Fx
+				dcomplex Fx;
+				if (i == j) {
+					Fx = x1 - x0;
+				}
+				else {
+					Fx = -constI * (std::exp(constI * dk * x1) - std::exp(constI * dk * x0)) / dk; // almost all time spent here
+				}
+
+				// Fz
+				dcomplex Fz = std::exp(constI * (kz - kzP) * z);
+
+				// Integrate
+				double dkxP = GetDifferential(kxs, j);
+				switch (pol)
+				{
+				case TMM::P_POL:
+					integValue1d += std::conj(UP) * Fx * kz * Fz * dkxP;
+					break;
+				case TMM::S_POL:
+					integValue1d += std::conj(UP) * Fx * kzP * Fz * dkxP;
+					break;
+				default:
+					throw std::invalid_argument("Invalid polarization");
+					break;
+				}
+			}
+			double dkx = GetDifferential(kxs, i);
+			dcomplex tmpRes = U * integValue1d * dkx;
+			integValue2dRe += real(tmpRes);
+			integValue2dIm += imag(tmpRes);
+		}
+
+		// Polarization specific multipliers
+		dcomplex integValue2d(integValue2dRe, integValue2dIm);
+		double omega = WlToOmega(wl);
+		double res;
+
+		switch (pol)
+		{
+		case TMM::P_POL:
+			res = Ly / (2.0 * omega * constEps0) * std::real(integValue2d / layers[layerNr].eps);
+			break;
+		case TMM::S_POL:
+			res = Ly / (2.0 * omega * constMu0) * real(integValue2d);
+			break;
+		default:
+			throw std::invalid_argument("Invalid polarization");
+			break;
+		}
+
+		return res;
+	}
+
 	NonlinearTMM::NonlinearTMM() {
 		wl = constNAN;
 		beta = constNAN;
@@ -487,20 +556,9 @@ namespace TMM {
 				tmmThread.SetParam(PARAM_E0, E0s(i));
 				tmmThread.Solve();
 
-				// Determine integration step
-				double kx = tmmThread.GetLayer(0)->kx;
-				double dIntVar;
-				if (intVar.size() == 1) {
-					dIntVar = 1.0;
-				} else if (i == 0) {
-					dIntVar = intVar(1) - intVar(0);
-				} else if (i + 1 == intVar.size()) {
-					dIntVar = intVar(intVar.size() - 1) - intVar(intVar.size() - 2);
-				} else {
-					dIntVar = 0.5 * (intVar(i + 1) - intVar(i - 1));
-				}
-	
 				// Integrate fields
+				double kx = tmmThread.GetLayer(0)->kx;
+				double dIntVar = GetDifferential(intVar, i);
 				FieldsZ *f = tmmThread.GetFields(zs, dir);
 				Eigen::ArrayXcd phaseX = (constI * kx * xs).exp() * dIntVar;
 				res->AddFields(*f, phaseX);
@@ -519,6 +577,53 @@ namespace TMM {
 			res += layers[i].GetAbsorbedPower();
 		}
 		return res;
+	}
+
+	pairdd NonlinearTMM::GetPowerFlowsForWave(const Eigen::Map<Eigen::ArrayXd>& betas, const Eigen::Map<Eigen::ArrayXcd>& E0s, int layerNr, double x0, double x1, double z, double Ly, WaveDirection dir) {
+		CheckPrerequisites(PARAM_BETA);
+		if (betas.size() != E0s.size()) {
+			throw std::invalid_argument("betas and E0s must have same length.");
+		}
+
+		if (layerNr < 0 || layerNr > layers.size()) {
+			throw std::invalid_argument("Invalid layer index.");
+		}
+
+		// Init memory
+		Eigen::MatrixX2cd Us(betas.size(), 2);
+		Eigen::MatrixX2cd kzs(betas.size(), 2);
+
+		// Solve for every beta
+		SetParam(PARAM_OVERRIDE_E0, true); // TODO: change back
+		for (int i = 0; i < betas.size(); i++) {
+			SetParam(PARAM_BETA, betas(i));
+			SetParam(PARAM_E0, E0s(i));
+			Solve();
+			Us.row(i) = layers[layerNr].GetMainFields(0.0);
+			kzs.row(i) = layers[layerNr].hw.kz;
+		}
+
+		// Integrate powers
+		Eigen::ArrayXd kxs(betas.size());
+		kxs = betas * layers[0].k0;
+		double PF = constNAN, PB = constNAN;
+		switch (dir)
+		{
+		case TMM::F:
+			PF = IntegrateWavePower(layerNr, Us.col(F), kxs, kzs.col(F), x0, x1, z, Ly);
+			break;
+		case TMM::B:
+			PB = -IntegrateWavePower(layerNr, Us.col(B), kxs, kzs.col(B), x0, x1, z, Ly);
+			break;
+		case TMM::TOT:
+			PF = IntegrateWavePower(layerNr, Us.col(F), kxs, kzs.col(F), x0, x1, z, Ly);
+			PB = -IntegrateWavePower(layerNr, Us.col(B), kxs, kzs.col(B), x0, x1, z, Ly);
+			break;
+		default:
+			throw std::invalid_argument("Invalid direction.");
+			break;
+		}
+		return pairdd(PF, PB);
 	}
 	
 	void NonlinearTMM::SetParam(TMMParam param, bool value) {

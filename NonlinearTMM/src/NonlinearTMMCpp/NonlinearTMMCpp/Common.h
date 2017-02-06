@@ -20,6 +20,7 @@ namespace TMM {
 
 	typedef std::complex<double> dcomplex;
 	typedef Tensor<double, 3> Tensor3d;
+	typedef std::pair<double, double> pairdd;
 
 	//---------------------------------------------------------------
 	// Constants
@@ -47,7 +48,7 @@ namespace TMM {
 	double sqr(double a);
 	dcomplex sqr(dcomplex a);
 	template <typename T> T Interpolate(double x, const Eigen::ArrayXd & xs, const Eigen::Array<T, Eigen::Dynamic, 1> & ys);
-	
+	double GetDifferential(const Eigen::ArrayXd &intVar, int nr);
 
 	//---------------------------------------------------------------
 	// ENUMs

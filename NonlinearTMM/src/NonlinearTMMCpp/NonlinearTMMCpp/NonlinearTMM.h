@@ -124,6 +124,10 @@ namespace TMM {
 		void SolveAllTransferMatrices();
 		void SolveSystemMatrix();
 		void SolveIncReflTrans();
+		double IntegrateWavePower(int layerNr, const Eigen::ArrayXcd &Us, 
+			const Eigen::ArrayXd &kxs, const Eigen::ArrayXcd &kzs, 
+			double x0, double x1, double z, double Ly) const;
+
 
 	public:
 		NonlinearTMM();
@@ -137,7 +141,8 @@ namespace TMM {
 		FieldsZX* GetFields2D(const Eigen::Map<Eigen::ArrayXd> &zs, const Eigen::Map<Eigen::ArrayXd> &xs, WaveDirection dir = TOT);
 		FieldsZX* IntegrateFields2D(TMMParam param, const Eigen::Map<Eigen::ArrayXd> &values, const Eigen::Map<Eigen::ArrayXcd> &E0s, const Eigen::Map<Eigen::ArrayXd> &intVar, const Eigen::Map<Eigen::ArrayXd> &zs, const Eigen::Map<Eigen::ArrayXd> &xs, WaveDirection dir = TOT);
 		double GetAbsorbedPower();
-
+		pairdd GetPowerFlowsForWave(const Eigen::Map<Eigen::ArrayXd> &betas, const Eigen::Map<Eigen::ArrayXcd> &E0s, 
+			int layerNr, double x0, double x1, double z, double Ly, WaveDirection dir = TOT);
 
 		// Setters
 		void SetParam(TMMParam param, bool value);

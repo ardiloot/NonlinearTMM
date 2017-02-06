@@ -120,5 +120,22 @@ namespace TMM {
 	template dcomplex Interpolate<dcomplex>(double, const Eigen::ArrayXd &, const Eigen::ArrayXcd &);
 	template double Interpolate<double>(double, const Eigen::ArrayXd &, const Eigen::ArrayXd &);
 
+	double GetDifferential(const Eigen::ArrayXd & intVar, int nr) {
+		double dIntVar;
+		if (intVar.size() == 1) {
+			dIntVar = 1.0;
+		}
+		else if (nr == 0) {
+			dIntVar = intVar(1) - intVar(0);
+		}
+		else if (nr + 1 == intVar.size()) {
+			dIntVar = intVar(intVar.size() - 1) - intVar(intVar.size() - 2);
+		}
+		else {
+			dIntVar = 0.5 * (intVar(nr + 1) - intVar(nr - 1));
+		}
+		return dIntVar;
+	}
+
 
 };

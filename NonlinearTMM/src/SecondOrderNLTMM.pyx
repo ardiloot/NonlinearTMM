@@ -290,13 +290,17 @@ cdef class _HomogeneousWave:
 cdef class _NonlinearLayer:
     cdef NonlinearLayerCpp *_thisptr
     cdef readonly object hw
+    cdef object _parent;
+    cdef int _layerNr;
     
     def __cinit__(self):
         self._thisptr = NULL
         self.hw = None
     
-    cdef _Init(self, NonlinearLayerCpp *ptr):
+    cdef _Init(self, NonlinearLayerCpp *ptr, int layerNr, object parent):
         self._thisptr = ptr
+        self._parent = parent
+        self._layerNr = layerNr 
         
         hw = _HomogeneousWave()
         hw._Init(self._thisptr.GetHw())
@@ -310,7 +314,10 @@ cdef class _NonlinearLayer:
     
     def GetSrcPower(self):
         return self._thisptr.GetSrcPower();
-    
+     
+    def GetPowerFlowsForWave(self, object wave, double th0, double x0, double x1, double z, str dirStr = "total"):
+        return self._parent._GetPowerFlowsForWave(wave, th0, self._layerNr, x0, x1, z, dirStr)
+     
 #===============================================================================
 # NonlinearTMM
 #===============================================================================
@@ -356,7 +363,7 @@ cdef class NonlinearTMM:
         cdef int lastLayer = self._thisptr.LayersCount() - 1
         cdef NonlinearLayerCpp *layerptr = self._thisptr.GetLayer(lastLayer)
         layer = _NonlinearLayer()
-        layer._Init(layerptr)
+        layer._Init(layerptr, lastLayer, self)
         self.layers.append(layer)
         
     def SetParams(self, **kwargs):
@@ -411,6 +418,18 @@ cdef class NonlinearTMM:
     
     def GetAbsorbedPower(self):
         return self._thisptr.GetAbsorbedPower();
+    
+    def _GetPowerFlowsForWave(self, object wave, double th0, int layerNr, double x0, double x1, double z, str dirStr = "total"):
+        # NonlinearLayer has its own specific method
+        cdef double Ly = wave.Ly
+        cdef WaveDirectionCpp direction = WaveDirectionFromStr(dirStr)
+        wave.Solve(self.wl, th0)
+        
+        cdef pair[double, double] res;
+        res = self._thisptr.GetPowerFlowsForWave(Map[ArrayXd](wave.betas), \
+            Map[ArrayXcd](wave.expansionCoefsKx), layerNr, x0, x1, z, Ly, direction)
+        
+        return (res.first, res.second)
     
     # Getters
     #--------------------------------------------------------------------------- 

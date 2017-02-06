@@ -1,5 +1,6 @@
 from libcpp cimport bool
 from eigency.core cimport *
+from libcpp.pair cimport pair
 
 #===============================================================================
 # Common.h
@@ -102,6 +103,7 @@ cdef extern from "NonlinearTMM.h" namespace "TMM":
         FieldsZXCpp* GetFields2D(Map[ArrayXd] &, Map[ArrayXd] &, WaveDirectionCpp dir) except +
         FieldsZXCpp* IntegrateFields2D(TMMParamCpp, Map[ArrayXd] &, Map[ArrayXcd] &, Map[ArrayXd] &, Map[ArrayXd] &, Map[ArrayXd] &, WaveDirectionCpp) except +
         double GetAbsorbedPower() except +
+        pair[double, double] GetPowerFlowsForWave(Map[ArrayXd] &betas, Map[ArrayXcd] &E0s, int layerNr, double x0, double x1, double z, double Ly, WaveDirectionCpp dir) except +
 
         void SetParam(TMMParamCpp param, bool value) except +
         void SetParam(TMMParamCpp param, int value) except +
