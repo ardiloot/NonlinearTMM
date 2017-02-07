@@ -624,3 +624,21 @@ cdef class SecondOrderNLTMM:
         res._Init(resCpp)
         return res
         
+    def GetPowerFlowsGenForWave(self, object waveP1, object waveP2, double th0P1, double th0P2, int layerNr, double x0, double x1, double z, str dirStr = "total"):
+        # NonlinearLayer has its own specific method
+        
+        if (waveP1.Ly != waveP2.Ly):
+            raise ValueError("Waves musth have the same Ly")
+
+        cdef double Ly = waveP1.Ly
+        cdef WaveDirectionCpp direction = WaveDirectionFromStr(dirStr)
+        waveP1.Solve(self.P1.wl, th0P1)
+        waveP2.Solve(self.P2.wl, th0P2)
+        
+        cdef pair[double, double] res;
+        res = self._thisptr.GetPowerFlowsGenForWave(Map[ArrayXd](waveP1.betas), \
+            Map[ArrayXd](waveP2.betas), Map[ArrayXcd](waveP1.expansionCoefsKx), \
+            Map[ArrayXcd](waveP2.expansionCoefsKx), layerNr, x0, x1, z, Ly, direction)
+        
+        return (res.first, res.second)
+    

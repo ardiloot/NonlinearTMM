@@ -35,22 +35,6 @@ namespace TMM {
 	const double constNAN = std::numeric_limits<double>::quiet_NaN();
 
 	//---------------------------------------------------------------
-	// Functions
-	//---------------------------------------------------------------
-
-	double WlToOmega(double wl);
-	double OmegaToWl(double omega);
-	Eigen::Matrix3d RotationMatrixX(double phi);
-	Eigen::Matrix3d RotationMatrixY(double phi);
-	Eigen::Matrix3d RotationMatrixZ(double phi);
-	Tensor3d ApplyRotationMatrixToTensor(Tensor3d input, Eigen::Matrix3d R);
-	Tensor3d RotateTensor(Tensor3d &input, double phiX = 0, double phiY = 0, double phiZ = 0);
-	double sqr(double a);
-	dcomplex sqr(dcomplex a);
-	template <typename T> T Interpolate(double x, const Eigen::ArrayXd & xs, const Eigen::Array<T, Eigen::Dynamic, 1> & ys);
-	double GetDifferential(const Eigen::ArrayXd &intVar, int nr);
-
-	//---------------------------------------------------------------
 	// ENUMs
 	//---------------------------------------------------------------
 
@@ -90,5 +74,23 @@ namespace TMM {
 		PARAM_NOT_DEFINED,
 	};
 
+	//---------------------------------------------------------------
+	// Functions
+	//---------------------------------------------------------------
+
+	double WlToOmega(double wl);
+	double OmegaToWl(double omega);
+	Eigen::Matrix3d RotationMatrixX(double phi);
+	Eigen::Matrix3d RotationMatrixY(double phi);
+	Eigen::Matrix3d RotationMatrixZ(double phi);
+	Tensor3d ApplyRotationMatrixToTensor(Tensor3d input, Eigen::Matrix3d R);
+	Tensor3d RotateTensor(Tensor3d &input, double phiX = 0, double phiY = 0, double phiZ = 0);
+	double sqr(double a);
+	dcomplex sqr(dcomplex a);
+	template <typename T> T Interpolate(double x, const Eigen::ArrayXd & xs, const Eigen::Array<T, Eigen::Dynamic, 1> & ys);
+	double GetDifferential(const Eigen::ArrayXd &intVar, int nr);
+	double const IntegrateWavePower(int layerNr, Polarization pol, double wl, dcomplex epsLayer0, const Eigen::ArrayXcd &Us,
+		const Eigen::ArrayXd &kxs, const Eigen::ArrayXcd &kzs,
+		double x0, double x1, double z, double Ly);
 
 }

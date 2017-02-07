@@ -124,10 +124,6 @@ namespace TMM {
 		void SolveAllTransferMatrices();
 		void SolveSystemMatrix();
 		void SolveIncReflTrans();
-		double IntegrateWavePower(int layerNr, const Eigen::ArrayXcd &Us, 
-			const Eigen::ArrayXd &kxs, const Eigen::ArrayXcd &kzs, 
-			double x0, double x1, double z, double Ly) const;
-
 
 	public:
 		NonlinearTMM();

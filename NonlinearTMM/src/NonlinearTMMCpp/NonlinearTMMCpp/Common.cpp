@@ -137,5 +137,75 @@ namespace TMM {
 		return dIntVar;
 	}
 
+	double const IntegrateWavePower(int layerNr, Polarization pol, double wl, dcomplex epsLayer0, const Eigen::ArrayXcd & Us, const Eigen::ArrayXd & kxs, const Eigen::ArrayXcd & kzs, double x0, double x1, double z, double Ly) {
+
+		double integValue2dRe = 0.0;
+		double integValue2dIm = 0.0;
+		#pragma omp parallel for default(shared) reduction(+:integValue2dRe,integValue2dIm)
+		for (int i = 0; i < kxs.size(); i++) {
+			double kx = kxs(i);
+			dcomplex kz = kzs(i);
+			dcomplex U = Us(i);
+			dcomplex integValue1d = 0.0;
+			for (int j = 0; j < kxs.size(); j++) {
+				double kxP = kxs(j);
+				dcomplex kzP = kzs(j);
+				dcomplex UP = Us(j);
+				dcomplex dk = kx - kxP;
+
+				// Fx
+				dcomplex Fx;
+				if (i == j) {
+					Fx = x1 - x0;
+				}
+				else {
+					Fx = -constI * (std::exp(constI * dk * x1) - std::exp(constI * dk * x0)) / dk; // almost all time spent here
+				}
+
+				// Fz
+				dcomplex Fz = std::exp(constI * (kz - kzP) * z);
+
+				// Integrate
+				double dkxP = GetDifferential(kxs, j);
+				switch (pol)
+				{
+				case TMM::P_POL:
+					integValue1d += std::conj(UP) * Fx * kz * Fz * dkxP;
+					break;
+				case TMM::S_POL:
+					integValue1d += std::conj(UP) * Fx * kzP * Fz * dkxP;
+					break;
+				default:
+					throw std::invalid_argument("Invalid polarization");
+					break;
+				}
+			}
+			double dkx = GetDifferential(kxs, i);
+			dcomplex tmpRes = U * integValue1d * dkx;
+			integValue2dRe += real(tmpRes);
+			integValue2dIm += imag(tmpRes);
+		}
+
+		// Polarization specific multipliers
+		dcomplex integValue2d(integValue2dRe, integValue2dIm);
+		double omega = WlToOmega(wl);
+		double res;
+
+		switch (pol)
+		{
+		case TMM::P_POL:
+			res = Ly / (2.0 * omega * constEps0) * std::real(integValue2d / epsLayer0);
+			break;
+		case TMM::S_POL:
+			res = Ly / (2.0 * omega * constMu0) * real(integValue2d);
+			break;
+		default:
+			throw std::invalid_argument("Invalid polarization");
+			break;
+		}
+
+		return res;
+	}
+
 
 };

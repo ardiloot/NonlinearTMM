@@ -97,6 +97,7 @@ namespace TMM {
 		friend class HomogeneousWave;
 		friend class InhomogeneousWave;
 		friend class NonlinearTMM;
+		friend class SecondOrderNLTMM;
 	private:
 		double d;
 		Material *material;

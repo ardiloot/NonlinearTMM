@@ -138,5 +138,5 @@ cdef extern from "SecondOrderNLTMM.h" namespace "TMM":
         NonlinearTMMCpp* GetGen() except +
         SweepResultSecondOrderNLTMMCpp* Sweep(TMMParamCpp param, Map[ArrayXd] &, Map[ArrayXd] &) except +
         FieldsZXCpp * GetGenWaveFields2D(Map[ArrayXd]& betasP1, Map[ArrayXd]& betasP2, Map[ArrayXcd]& E0sP1, Map[ArrayXcd]& E0sP2,Map[ArrayXd]& zs, Map[ArrayXd]& xs, WaveDirectionCpp dir) except +
-        
+        pair[double, double] GetPowerFlowsGenForWave(Map[ArrayXd]& betasP1, Map[ArrayXd]& betasP2, Map[ArrayXcd]& E0sP1, Map[ArrayXcd]& E0sP2, int layerNr, double x0, double x1, double z, double Ly, WaveDirectionCpp dir) except +
     
