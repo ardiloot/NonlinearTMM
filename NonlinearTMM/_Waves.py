@@ -54,8 +54,8 @@ class PlaneWave(object):
         self.phis = np.array([0.0])
         self.kxs = np.array([self.k * np.sin(self.th0)])
         self.kzs = np.array([self.k * np.cos(self.th0)])
-        self.expansionCoefsPhi = np.array([self.E0])
-        self.expansionCoefsKx = np.array([self.E0])
+        self.expansionCoefsPhi = np.array([self.E0], dtype = complex)
+        self.expansionCoefsKx = np.array([self.E0], dtype = complex)
         self.betas = (self.kxs / self.k0).real
    
 #===============================================================================

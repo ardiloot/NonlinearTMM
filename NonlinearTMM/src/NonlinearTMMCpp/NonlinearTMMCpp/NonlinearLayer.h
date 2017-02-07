@@ -131,6 +131,8 @@ namespace TMM {
 		
 		Material * GetMaterial();
 		HomogeneousWave* GetHw();
+		double GetKx() const;
+		double GetK0() const;
 		Array2cd GetMainFields(double z) const;
 		Fields GetFields(double z, WaveDirection dir = TOT) const;
 		double GetPowerFlow(double z);

@@ -300,6 +300,20 @@ namespace TMM{
 		return &hw;
 	}
 
+	double NonlinearLayer::GetKx() const {
+		if (!solved) {
+			throw std::runtime_error("NonlinearLayer must be solved first.");
+		}
+		return kx;
+	}
+
+	double NonlinearLayer::GetK0() const {
+		if (!solved) {
+			throw std::runtime_error("NonlinearLayer must be solved first.");
+		}
+		return k0;
+	}
+
 	Array2cd NonlinearLayer::GetMainFields(double z) const
 	{
 		if (!solved) {

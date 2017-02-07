@@ -122,7 +122,7 @@ namespace TMM {
 
 	double GetDifferential(const Eigen::ArrayXd & intVar, int nr) {
 		double dIntVar;
-		if (intVar.size() == 1) {
+		if (intVar.size() <= 1) {
 			dIntVar = 1.0;
 		}
 		else if (nr == 0) {

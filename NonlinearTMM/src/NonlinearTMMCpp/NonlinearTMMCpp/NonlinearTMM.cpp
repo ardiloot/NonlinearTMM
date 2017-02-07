@@ -292,7 +292,7 @@ namespace TMM {
 	double NonlinearTMM::IntegrateWavePower(int layerNr, const Eigen::ArrayXcd & Us, const Eigen::ArrayXd & kxs, const Eigen::ArrayXcd & kzs, double x0, double x1, double z, double Ly) const {
 		double integValue2dRe = 0.0;
 		double integValue2dIm = 0.0;
-		//#pragma omp parallel for default(shared) reduction(+:integValue2dRe,integValue2dIm)
+		#pragma omp parallel for default(shared) reduction(+:integValue2dRe,integValue2dIm)
 		for (int i = 0; i < kxs.size(); i++) {
 			double kx = kxs(i);
 			dcomplex kz = kzs(i);
@@ -533,34 +533,39 @@ namespace TMM {
 		return res;
 	}
 
-	FieldsZX * NonlinearTMM::IntegrateFields2D(TMMParam param, const Eigen::Map<Eigen::ArrayXd>& values, const Eigen::Map<Eigen::ArrayXcd>& E0s, const Eigen::Map<Eigen::ArrayXd>& intVar, const Eigen::Map<Eigen::ArrayXd>& zs, const Eigen::Map<Eigen::ArrayXd>& xs, WaveDirection dir) {
-		CheckPrerequisites(param);
+	FieldsZX * NonlinearTMM::GetWaveFields2D(const Eigen::Map<Eigen::ArrayXd>& betas, const Eigen::Map<Eigen::ArrayXcd>& E0s, const Eigen::Map<Eigen::ArrayXd>& zs, const Eigen::Map<Eigen::ArrayXd>& xs, WaveDirection dir) {
+		CheckPrerequisites(PARAM_BETA);
 
-		if (E0s.size() != values.size() || intVar.size() != values.size()) {
-			throw std::invalid_argument("Arrays (values, E0s, dxs) must have the same length.");
+		if (E0s.size() != betas.size()) {
+			throw std::invalid_argument("Arrays (betas, E0s) must have the same length.");
+		}
+
+		if (mode == MODE_NONLINEAR) {
+			throw std::runtime_error("For nonlinear mode use the method of SecondOrderNLTMM");
 		}
 
 		// Allocate space (deletion is the responsibility of the caller!)
 		FieldsZX *res = new FieldsZX(zs.size(), xs.size(), pol);
 		res->SetZero(); // We are summing up
 
+		Eigen::ArrayXd kxs = betas * 2.0 * PI / wl;
+
 		#pragma omp parallel
 		{
 			NonlinearTMM tmmThread = *this;
 			tmmThread.SetParam(PARAM_OVERRIDE_E0, true);
 			#pragma omp for
-			for (int i = 0; i < values.size(); i++) {
+			for (int i = 0; i < betas.size(); i++) {
 				
 				// Solve TMM
-				tmmThread.SetParam(param, values(i));
+				tmmThread.SetParam(PARAM_BETA, betas(i));
 				tmmThread.SetParam(PARAM_E0, E0s(i));
 				tmmThread.Solve();
 
 				// Integrate fields
-				double kx = tmmThread.GetLayer(0)->kx;
-				double dIntVar = GetDifferential(intVar, i);
+				double dkx = GetDifferential(kxs, i);
 				FieldsZ *f = tmmThread.GetFields(zs, dir);
-				Eigen::ArrayXcd phaseX = (constI * kx * xs).exp() * dIntVar;
+				Eigen::ArrayXcd phaseX = (constI * kxs(i) * xs).exp() * dkx;
 				res->AddFields(*f, phaseX);
 				delete f;
 			}
@@ -581,6 +586,10 @@ namespace TMM {
 
 	pairdd NonlinearTMM::GetPowerFlowsForWave(const Eigen::Map<Eigen::ArrayXd>& betas, const Eigen::Map<Eigen::ArrayXcd>& E0s, int layerNr, double x0, double x1, double z, double Ly, WaveDirection dir) {
 		CheckPrerequisites(PARAM_BETA);
+		if (mode == MODE_NONLINEAR) {
+			throw std::runtime_error("For nonlinear mode use the method of SecondOrderNLTMM");
+		}
+
 		if (betas.size() != E0s.size()) {
 			throw std::invalid_argument("betas and E0s must have same length.");
 		}

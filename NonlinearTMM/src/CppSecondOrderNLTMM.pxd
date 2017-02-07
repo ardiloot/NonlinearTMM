@@ -101,7 +101,7 @@ cdef extern from "NonlinearTMM.h" namespace "TMM":
         SweepResultNonlinearTMMCpp* Sweep(TMMParamCpp param, Map[ArrayXd] &) except +
         FieldsZCpp* GetFields(Map[ArrayXd] &, WaveDirectionCpp dir) except +
         FieldsZXCpp* GetFields2D(Map[ArrayXd] &, Map[ArrayXd] &, WaveDirectionCpp dir) except +
-        FieldsZXCpp* IntegrateFields2D(TMMParamCpp, Map[ArrayXd] &, Map[ArrayXcd] &, Map[ArrayXd] &, Map[ArrayXd] &, Map[ArrayXd] &, WaveDirectionCpp) except +
+        FieldsZXCpp* GetWaveFields2D(Map[ArrayXd] &, Map[ArrayXcd] &, Map[ArrayXd] &, Map[ArrayXd] &, WaveDirectionCpp) except +
         double GetAbsorbedPower() except +
         pair[double, double] GetPowerFlowsForWave(Map[ArrayXd] &betas, Map[ArrayXcd] &E0s, int layerNr, double x0, double x1, double z, double Ly, WaveDirectionCpp dir) except +
 
@@ -137,5 +137,6 @@ cdef extern from "SecondOrderNLTMM.h" namespace "TMM":
         NonlinearTMMCpp* GetP2() except +
         NonlinearTMMCpp* GetGen() except +
         SweepResultSecondOrderNLTMMCpp* Sweep(TMMParamCpp param, Map[ArrayXd] &, Map[ArrayXd] &) except +
+        FieldsZXCpp * GetGenWaveFields2D(Map[ArrayXd]& betasP1, Map[ArrayXd]& betasP2, Map[ArrayXcd]& E0sP1, Map[ArrayXcd]& E0sP2,Map[ArrayXd]& zs, Map[ArrayXd]& xs, WaveDirectionCpp dir) except +
         
     

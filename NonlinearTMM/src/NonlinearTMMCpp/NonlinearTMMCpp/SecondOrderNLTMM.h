@@ -51,6 +51,7 @@ namespace TMM {
 		NonlinearTMM* GetP2();
 		NonlinearTMM* GetGen();
 		SweepResultSecondOrderNLTMM* Sweep(TMMParam param, const Eigen::Map<Eigen::ArrayXd> &valuesP1, const Eigen::Map<Eigen::ArrayXd> &valuesP2);
-		
+		FieldsZX * GetGenWaveFields2D(const Eigen::Map<Eigen::ArrayXd>& betasP1, const Eigen::Map<Eigen::ArrayXd>& betasP2, const Eigen::Map<Eigen::ArrayXcd>& E0sP1, const Eigen::Map<Eigen::ArrayXcd>& E0sP2, const Eigen::Map<Eigen::ArrayXd>& zs, const Eigen::Map<Eigen::ArrayXd>& xs, WaveDirection dir = TOT);
+
 	};
 }

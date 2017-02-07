@@ -403,14 +403,13 @@ cdef class NonlinearTMM:
         res._Init(resCpp)
         return res
     
-    def IntegrateFields2D(self, str paramStr, np.ndarray[double, ndim = 1] values, \
-            np.ndarray[double complex, ndim = 1] E0s, np.ndarray[double, ndim = 1] intValues, \
-            np.ndarray[double, ndim = 1] zs, np.ndarray[double, ndim = 1] xs, str dirStr = "total"):
+    def GetWaveFields2D(self, np.ndarray[double, ndim = 1] betas, \
+            np.ndarray[double complex, ndim = 1] E0s, np.ndarray[double, ndim = 1] zs, \
+            np.ndarray[double, ndim = 1] xs, str dirStr = "total"):
         
         cdef FieldsZXCpp *resCpp;
         cdef WaveDirectionCpp direction = WaveDirectionFromStr(dirStr)
-        resCpp = self._thisptr.IntegrateFields2D(TmmParamFromStr(paramStr), \
-            Map[ArrayXd](values), Map[ArrayXcd](E0s), Map[ArrayXd](intValues), \
+        resCpp = self._thisptr.GetWaveFields2D(Map[ArrayXd](betas), Map[ArrayXcd](E0s), \
             Map[ArrayXd](zs), Map[ArrayXd](xs), direction)
         res = _FieldsZX()
         res._Init(resCpp)
@@ -612,7 +611,16 @@ cdef class SecondOrderNLTMM:
         res = _SweepResultSecondOrderNLTMM()
         res._Init(resCpp);
         return res
+    
+    def GetGenWaveFields2D(self, np.ndarray[double, ndim = 1] betasP1, np.ndarray[double, ndim = 1] betasP2,
+                        np.ndarray[double complex, ndim = 1] E0sP1, np.ndarray[double complex, ndim = 1] E0sP2,
+                        np.ndarray[double, ndim = 1] zs, np.ndarray[double, ndim = 1] xs, str dirStr = "total"):
         
-        
-        
+        cdef FieldsZXCpp *resCpp;
+        cdef WaveDirectionCpp direction = WaveDirectionFromStr(dirStr)
+        resCpp = self._thisptr.GetGenWaveFields2D(Map[ArrayXd](betasP1), Map[ArrayXd](betasP2),
+            Map[ArrayXcd](E0sP1), Map[ArrayXcd](E0sP2), Map[ArrayXd](zs), Map[ArrayXd](xs), direction)
+        res = _FieldsZX()
+        res._Init(resCpp)
+        return res
         
