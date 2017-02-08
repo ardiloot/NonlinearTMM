@@ -152,12 +152,14 @@ namespace TMM {
 
 	void NonlinearTMM::CheckPrerequisites(TMMParam toIgnore) {
 		// Check params
-		if (toIgnore != PARAM_WL && isnan(wl)) {
-			throw std::invalid_argument("Wavelength is not set.");
-		}
+		if (mode != MODE_NONLINEAR) {
+			if (toIgnore != PARAM_WL && isnan(wl)) {
+				throw std::invalid_argument("Wavelength is not set.");
+			}
 
-		if (toIgnore != PARAM_BETA && isnan(beta)) {
-			throw std::invalid_argument("Beta is not set.");
+			if (toIgnore != PARAM_BETA && isnan(beta)) {
+				throw std::invalid_argument("Beta is not set.");
+			}
 		}
 
 		if (toIgnore != PARAM_POL && pol == NOT_DEFINED_POL) {

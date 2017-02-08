@@ -118,7 +118,6 @@ namespace TMM {
 		dcomplex inc, r, t;
 		bool solved;
 
-		void CheckPrerequisites(TMMParam toIgnore = PARAM_NOT_DEFINED);
 		Array2cd CalcTransferMatrixNL(int interfaceNr, const InhomogeneousWave &w1, const InhomogeneousWave &w2);
 		void SolveInterfaceTransferMatrix(int interfaceNr);
 		void SolveAllTransferMatrices();
@@ -130,6 +129,7 @@ namespace TMM {
 		void AddLayer(double d_, Material *material_);
 		NonlinearLayer* GetLayer(int layerNr);
 		int LayersCount() const;
+		void CheckPrerequisites(TMMParam toIgnore = PARAM_NOT_DEFINED);
 		void Solve();
 		PowerFlows GetPowerFlows();
 		double GetAbsorbedPower();
