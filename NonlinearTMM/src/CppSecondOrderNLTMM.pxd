@@ -66,6 +66,8 @@ cdef extern from "NonlinearLayer.h" namespace "TMM":
 
     cdef cppclass NonlinearLayerCpp "TMM::NonlinearLayer":
         HomogeneousWaveCpp* GetHw() except +
+        void SetThickness(double d_) except +
+        double GetThickness() except +
         double GetPowerFlow(double z) except +
         double GetAbsorbedPower() except +
         double GetSrcPower() except +

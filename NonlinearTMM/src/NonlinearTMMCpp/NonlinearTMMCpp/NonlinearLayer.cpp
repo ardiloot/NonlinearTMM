@@ -290,6 +290,14 @@ namespace TMM{
 		kpA = InhomogeneosWaveParams();
 	}
 
+	void NonlinearLayer::SetThickness(double d_) {
+		d = d_;
+	}
+
+	double NonlinearLayer::GetThickness() {
+		return d;
+	}
+
 	Material * NonlinearLayer::GetMaterial() {
 		// It is the responsibility of the user to ensure, that material ptr stays valid
 		return material;

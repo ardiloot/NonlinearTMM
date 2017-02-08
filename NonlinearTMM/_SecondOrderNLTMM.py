@@ -11,5 +11,20 @@ class SecondOrderNLTMM(_SecondOrderNLTMMCython.SecondOrderNLTMM):
             waveP1.expansionCoefsKx, waveP2.expansionCoefsKx, zs, xs, direction)
         return res
     
+    def SetLayerParams(self, layerNr, **kwargs):    
+        print (layerNr, len(self.P1.layers))
+        if layerNr < 0 or layerNr >= len(self.P1.layers):
+            raise ValueError("LayerNr invalid")
+        
+        if "d" in kwargs:
+            d = kwargs.pop("d")
+            self.P1.layers[layerNr].d = d
+            self.P2.layers[layerNr].d = d
+            self.Gen.layers[layerNr].d = d
+        
+        for k in kwargs:
+            raise ValueError("Unknown kwarg (%s)" % (k))
+    
+    
 if __name__ == "__main__":
     pass

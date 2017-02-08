@@ -317,7 +317,22 @@ cdef class _NonlinearLayer:
      
     def GetPowerFlowsForWave(self, object wave, double th0, double x0, double x1, double z, str dirStr = "total"):
         return self._parent._GetPowerFlowsForWave(wave, th0, self._layerNr, x0, x1, z, dirStr)
-     
+    
+    # Getter
+    #--------------------------------------------------------------------------- 
+    
+    @property
+    def d(self):
+        return self._thisptr.GetThickness()    
+            
+    # Setter
+    #--------------------------------------------------------------------------- 
+        
+    @d.setter
+    def d(self, value):  # @DuplicatedSignature
+        self._thisptr.SetThickness(value)
+    
+    
 #===============================================================================
 # NonlinearTMM
 #===============================================================================
@@ -589,7 +604,9 @@ cdef class SecondOrderNLTMM:
         
     def AddLayer(self, double d, Material material):
         # No copy of material is made
-        self._thisptr.AddLayer(d, material._thisptr)
+        self.P1.AddLayer(d, material)
+        self.P2.AddLayer(d, material)
+        self.Gen.AddLayer(d, material)
         
         # Cache material classes, avoids material dealloc
         self.materialsCache.append(material)
