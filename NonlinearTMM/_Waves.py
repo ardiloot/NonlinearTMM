@@ -16,7 +16,9 @@ mu0 = 1.2566370614e-6
 class PlaneWave(object):
     
     def __init__(self, params = [], **kwargs):
-        paramsThis = ["pwr", "overrideE0", "w0", "n", "Ly"]
+        paramsThis = ["pwr", "overrideE0", "w0", "n", "Ly", "wl", "pol"]
+        self.wl = None
+        self.pol = None
         self.overrideE0 = None #E0 specified in vacuum
         self.Ly = None
         self._params = paramsThis + params
@@ -32,15 +34,15 @@ class PlaneWave(object):
         
         
 
-    def Solve(self, wl, th0, **kwargs):
-        self.wl = wl
+    def Solve(self, th0, **kwargs):
         self.th0 = th0
         self.SetParams(**kwargs)
         
         self._Precalc()
         self._Solve()
 
-    def _Precalc(self): 
+    def _Precalc(self, **kwargs):
+        self.SetParams(**kwargs)
         if self.overrideE0 is None:
             self.I0 = self.pwr / (self.Ly * self.w0) 
             self.E0 = np.sqrt(2.0 * mu0 * const_c * self.I0) 

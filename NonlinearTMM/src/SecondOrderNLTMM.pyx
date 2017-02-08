@@ -418,7 +418,7 @@ cdef class NonlinearTMM:
         res._Init(resCpp)
         return res
     
-    def GetWaveFields2D(self, np.ndarray[double, ndim = 1] betas, \
+    def _GetWaveFields2D(self, np.ndarray[double, ndim = 1] betas, \
             np.ndarray[double complex, ndim = 1] E0s, np.ndarray[double, ndim = 1] zs, \
             np.ndarray[double, ndim = 1] xs, str dirStr = "total"):
         
@@ -430,6 +430,11 @@ cdef class NonlinearTMM:
         res._Init(resCpp)
         return res
     
+    def GetWaveFields2D(self, object wave, double th0, np.ndarray[double, ndim = 1] zs, np.ndarray[double, ndim = 1] xs, str direction = "total"):
+        wave.Solve(th0, wl = self.wl)
+        res = self._GetWaveFields2D(wave.betas, wave.expansionCoefsKx, zs, xs, direction)
+        return res
+    
     def GetAbsorbedPower(self):
         return self._thisptr.GetAbsorbedPower();
     
@@ -437,7 +442,7 @@ cdef class NonlinearTMM:
         # NonlinearLayer has its own specific method
         cdef double Ly = wave.Ly
         cdef WaveDirectionCpp direction = WaveDirectionFromStr(dirStr)
-        wave.Solve(self.wl, th0)
+        wave.Solve(th0, wl = self.wl)
         
         cdef pair[double, double] res;
         res = self._thisptr.GetPowerFlowsForWave(Map[ArrayXd](wave.betas), \
@@ -649,8 +654,8 @@ cdef class SecondOrderNLTMM:
 
         cdef double Ly = waveP1.Ly
         cdef WaveDirectionCpp direction = WaveDirectionFromStr(dirStr)
-        waveP1.Solve(self.P1.wl, th0P1)
-        waveP2.Solve(self.P2.wl, th0P2)
+        waveP1.Solve(th0P1, wl = self.P1.wl)
+        waveP2.Solve(th0P2, wl = self.P2.wl)
         
         cdef pair[double, double] res;
         res = self._thisptr.GetPowerFlowsGenForWave(Map[ArrayXd](waveP1.betas), \

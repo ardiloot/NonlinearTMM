@@ -5,14 +5,13 @@ __all__ = ["SecondOrderNLTMM"]
 class SecondOrderNLTMM(_SecondOrderNLTMMCython.SecondOrderNLTMM): 
     
     def GetGenWaveFields2D(self, waveP1, waveP2, th0P1, th0P2, zs, xs, direction = "total"):
-        waveP1.Solve(self.P1.wl, th0P1)
-        waveP2.Solve(self.P2.wl, th0P2)
+        waveP1.Solve(th0P1, wl = self.P1.wl)
+        waveP2.Solve(th0P2, wl = self.P2.wl)
         res = super().GetGenWaveFields2D(waveP1.betas, waveP2.betas, \
             waveP1.expansionCoefsKx, waveP2.expansionCoefsKx, zs, xs, direction)
         return res
     
     def SetLayerParams(self, layerNr, **kwargs):    
-        print (layerNr, len(self.P1.layers))
         if layerNr < 0 or layerNr >= len(self.P1.layers):
             raise ValueError("LayerNr invalid")
         
