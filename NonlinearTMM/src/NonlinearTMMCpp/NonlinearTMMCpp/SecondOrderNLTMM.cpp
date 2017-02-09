@@ -2,12 +2,13 @@
 
 namespace TMM {
 
-	SweepResultSecondOrderNLTMM::SweepResultSecondOrderNLTMM(int n) : P1(n), P2(n), Gen(n) {}
+	SweepResultSecondOrderNLTMM::SweepResultSecondOrderNLTMM(int n, int outmask, int layerNr_, double layerZ_) : 
+		P1(n, outmask, layerNr_, layerZ_), P2(n, outmask, layerNr_, layerZ_), Gen(n, outmask, layerNr_, layerZ_) {}
 
-	void SweepResultSecondOrderNLTMM::SetPowerFlows(int nr, const SecondOrderNLPowerFlows & pw) {
-		P1.SetPowerFlows(nr, pw.P1);
-		P2.SetPowerFlows(nr, pw.P2);
-		Gen.SetPowerFlows(nr, pw.Gen);
+	void SweepResultSecondOrderNLTMM::SetValues(int nr, SecondOrderNLTMM & tmm) {
+		P1.SetValues(nr, *tmm.GetP1());
+		P2.SetValues(nr, *tmm.GetP2());
+		Gen.SetValues(nr, *tmm.GetGen());
 	}
 
 	void SecondOrderNLTMM::UpdateGenParams()
@@ -152,7 +153,7 @@ namespace TMM {
 		return &tmmGen;
 	}
 
-	SweepResultSecondOrderNLTMM * SecondOrderNLTMM::Sweep(TMMParam param, const Eigen::Map<Eigen::ArrayXd>& valuesP1, const Eigen::Map<Eigen::ArrayXd>& valuesP2) {
+	SweepResultSecondOrderNLTMM * SecondOrderNLTMM::Sweep(TMMParam param, const Eigen::Map<Eigen::ArrayXd>& valuesP1, const Eigen::Map<Eigen::ArrayXd>& valuesP2, int outmask, int layerNr, double layerZ) {
 		if (valuesP1.size() != valuesP2.size()) {
 			throw std::invalid_argument("Value arrays must have the same size.");
 		}
@@ -162,7 +163,7 @@ namespace TMM {
 		tmmGen.CheckPrerequisites(param);
 
 		// Alloc memory for result (dealloc is responsibility of the user)
-		SweepResultSecondOrderNLTMM *res = new SweepResultSecondOrderNLTMM(valuesP1.size());
+		SweepResultSecondOrderNLTMM *res = new SweepResultSecondOrderNLTMM(valuesP1.size(), outmask, layerNr, layerZ);
 
 		#pragma omp parallel
 		{
@@ -181,8 +182,7 @@ namespace TMM {
 
 				// Solver
 				nlTMMCopy.Solve();
-				SecondOrderNLPowerFlows rr = nlTMMCopy.GetPowerFlows();
-				res->SetPowerFlows(i, rr);
+				res->SetValues(i, nlTMMCopy);
 			}
 		}
 		return res;

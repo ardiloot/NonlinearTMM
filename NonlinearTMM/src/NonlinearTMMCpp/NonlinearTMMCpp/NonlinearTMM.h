@@ -4,6 +4,7 @@
 #include "NonlinearLayer.h"
 
 namespace TMM {	
+	class NonlinearTMM;
 
 	//---------------------------------------------------------------
 	// Functions
@@ -60,12 +61,17 @@ namespace TMM {
 
 	class SweepResultNonlinearTMM {
 	private:
+		int outmask;
+		int layerNr;
+		double layerZ;
 	public:
 		Eigen::ArrayXcd inc, r, t;
-		Eigen::ArrayXd I, R, T;
+		Eigen::ArrayXd I, R, T, A;
+		Eigen::ArrayXd enh;
 
-		SweepResultNonlinearTMM(int n);
-		void SetPowerFlows(int nr, const PowerFlows& pw);
+		SweepResultNonlinearTMM(int n, int outmask_, int layerNr_, double layerZ_);
+		int GetOutmask();
+		void SetValues(int nr, NonlinearTMM &tmm);
 	};
 
 	//---------------------------------------------------------------
@@ -131,9 +137,10 @@ namespace TMM {
 		int LayersCount() const;
 		void CheckPrerequisites(TMMParam toIgnore = PARAM_NOT_DEFINED);
 		void Solve();
-		PowerFlows GetPowerFlows();
-		double GetAbsorbedPower();
-		SweepResultNonlinearTMM* Sweep(TMMParam param, const Eigen::Map<Eigen::ArrayXd> &values);
+		PowerFlows GetPowerFlows() const;
+		double GetAbsorbedPower() const;
+		double GetEnhancement(int layerNr, double z);
+		SweepResultNonlinearTMM* Sweep(TMMParam param, const Eigen::Map<Eigen::ArrayXd> &values, int outmask = 1, int layerNr = 0, double layerZ = 0);
 		FieldsZ* GetFields(const Eigen::Map<Eigen::ArrayXd> &zs, WaveDirection dir = TOT);
 		FieldsZX* GetFields2D(const Eigen::Map<Eigen::ArrayXd> &zs, const Eigen::Map<Eigen::ArrayXd> &xs, WaveDirection dir = TOT);
 		FieldsZX* GetWaveFields2D(const Eigen::Map<Eigen::ArrayXd> &betas, const Eigen::Map<Eigen::ArrayXcd> &E0s, const Eigen::Map<Eigen::ArrayXd> &zs, const Eigen::Map<Eigen::ArrayXd> &xs, WaveDirection dir = TOT);

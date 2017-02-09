@@ -32,6 +32,11 @@ cdef extern from "Common.h" namespace "TMM":
     cdef enum NonlinearProcessCpp "TMM::NonlinearProcess":
         SFG,
         DFG,
+        
+    cdef enum SweepOutputCpp "TMM::SweepOutput":
+        SWEEP_PWRFLOWS,
+        SWEEP_ABS,
+        SWEEP_ENH,
 
 #===============================================================================
 # Material.h
@@ -84,7 +89,9 @@ cdef extern from "NonlinearTMM.h" namespace "TMM":
         
     cdef cppclass SweepResultNonlinearTMMCpp "TMM::SweepResultNonlinearTMM":
         ArrayXcd inc, r, t;
-        ArrayXd I, R, T;
+        ArrayXd I, R, T, A, enh;
+        
+        int GetOutmask();
 
     cdef cppclass FieldsZCpp "TMM::FieldsZ":
         MatrixXcd E, H;
@@ -100,7 +107,7 @@ cdef extern from "NonlinearTMM.h" namespace "TMM":
         int LayersCount() except +
         void Solve() except +
         PowerFlowsCpp GetPowerFlows() except +
-        SweepResultNonlinearTMMCpp* Sweep(TMMParamCpp param, Map[ArrayXd] &) except +
+        SweepResultNonlinearTMMCpp* Sweep(TMMParamCpp param, Map[ArrayXd] &, int outmask, int layerNr, double layerZ) except +
         FieldsZCpp* GetFields(Map[ArrayXd] &, WaveDirectionCpp dir) except +
         FieldsZXCpp* GetFields2D(Map[ArrayXd] &, Map[ArrayXd] &, WaveDirectionCpp dir) except +
         FieldsZXCpp* GetWaveFields2D(Map[ArrayXd] &, Map[ArrayXcd] &, Map[ArrayXd] &, Map[ArrayXd] &, WaveDirectionCpp) except +
@@ -138,7 +145,7 @@ cdef extern from "SecondOrderNLTMM.h" namespace "TMM":
         NonlinearTMMCpp* GetP1() except +
         NonlinearTMMCpp* GetP2() except +
         NonlinearTMMCpp* GetGen() except +
-        SweepResultSecondOrderNLTMMCpp* Sweep(TMMParamCpp param, Map[ArrayXd] &, Map[ArrayXd] &) except +
+        SweepResultSecondOrderNLTMMCpp* Sweep(TMMParamCpp param, Map[ArrayXd] &, Map[ArrayXd] &, int outmask, int layerNr, double layerZ) except +
         FieldsZXCpp * GetGenWaveFields2D(Map[ArrayXd]& betasP1, Map[ArrayXd]& betasP2, Map[ArrayXcd]& E0sP1, Map[ArrayXcd]& E0sP2,Map[ArrayXd]& zs, Map[ArrayXd]& xs, WaveDirectionCpp dir) except +
         pair[double, double] GetPowerFlowsGenForWave(Map[ArrayXd]& betasP1, Map[ArrayXd]& betasP2, Map[ArrayXcd]& E0sP1, Map[ArrayXcd]& E0sP2, int layerNr, double x0, double x1, double z, double Ly, WaveDirectionCpp dir) except +
     

@@ -140,8 +140,9 @@ namespace TMM {
 
 		Array2cd GetMainFields(double z) const;
 		Fields GetFields(double z, WaveDirection dir = TOT) const;
-		double GetPowerFlow(double z);
-		double GetAbsorbedPower();
-		double GetSrcPower();
+		double GetPowerFlow(double z) const;
+		double GetAbsorbedPower() const;
+		double GetSrcPower() const;
+		double GetENorm(double z, WaveDirection dir = TOT) const;
 	};
 }

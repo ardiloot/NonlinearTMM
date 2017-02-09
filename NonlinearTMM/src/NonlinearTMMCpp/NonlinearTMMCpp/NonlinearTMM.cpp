@@ -73,16 +73,45 @@ namespace TMM {
 		return os;
 	}
 
-	SweepResultNonlinearTMM::SweepResultNonlinearTMM(int n) : inc(n), r(n), t(n), I(n), R(n), T(n) {
+	SweepResultNonlinearTMM::SweepResultNonlinearTMM(int n, int outmask_, int layerNr_, double layerZ_) : inc(n), r(n), t(n), I(n), R(n), T(n), A(n), enh(n) {
+		outmask = outmask_;
+		layerNr = layerNr_;
+		layerZ = layerZ_;
+		inc.setConstant(constNAN);
+		r.setConstant(constNAN);
+		t.setConstant(constNAN);
+		I.setConstant(constNAN);
+		R.setConstant(constNAN);
+		T.setConstant(constNAN);
+		A.setConstant(constNAN);
+		enh.setConstant(constNAN);
 	}
 
-	void SweepResultNonlinearTMM::SetPowerFlows(int nr, const PowerFlows& pw) {
-		inc(nr) = pw.inc;
-		r(nr) = pw.r;
-		t(nr) = pw.t;
-		I(nr) = pw.I;
-		R(nr) = pw.R;
-		T(nr) = pw.T;
+	int SweepResultNonlinearTMM::GetOutmask() {
+		return outmask;
+	}
+
+	void SweepResultNonlinearTMM::SetValues(int nr, NonlinearTMM & tmm) {
+
+		if (outmask & SWEEP_PWRFLOWS) {
+			PowerFlows pf = tmm.GetPowerFlows();
+			inc(nr) = pf.inc;
+			r(nr) = pf.r;
+			t(nr) = pf.t;
+			I(nr) = pf.I;
+			R(nr) = pf.R;
+			T(nr) = pf.T;
+		}
+
+		if (outmask & SWEEP_ABS) {
+			double A_ = tmm.GetAbsorbedPower();
+			A(nr) = A_;
+		}
+
+		if (outmask & SWEEP_ENH) {
+			double enh_ = tmm.GetEnhancement(layerNr, layerZ);
+			enh(nr) = enh_;
+		}
 	}
 
 	FieldsZ::FieldsZ(int n) : E(n, 3), H(n, 3) {
@@ -356,14 +385,14 @@ namespace TMM {
 		solved = true;
 	}
 
-	PowerFlows NonlinearTMM::GetPowerFlows() {
+	PowerFlows NonlinearTMM::GetPowerFlows() const {
 		if (!solved) {
 			throw std::runtime_error("NonlinearTMM must be solved first.");
 		}
 
 		double omega = WlToOmega(wl);
-		NonlinearLayer &l0 = layers[0];
-		NonlinearLayer &lL = layers[layers.size() - 1];
+		const NonlinearLayer &l0 = layers[0];
+		const NonlinearLayer &lL = layers[layers.size() - 1];
 
 		// Calc power flows
 		double I, R, T;
@@ -387,10 +416,13 @@ namespace TMM {
 		return res;
 	}
 
-	SweepResultNonlinearTMM * NonlinearTMM::Sweep(TMMParam param, const Eigen::Map<Eigen::ArrayXd>& values) {
+	SweepResultNonlinearTMM * NonlinearTMM::Sweep(TMMParam param, const Eigen::Map<Eigen::ArrayXd>& values, int outmask, int layerNr, double layerZ) {
 		CheckPrerequisites(param);
+		if (layerNr < 0 || layerNr > layers.size()) {
+			throw std::invalid_argument("Invalid layer index.");
+		}
 
-		SweepResultNonlinearTMM *res = new SweepResultNonlinearTMM(values.size());
+		SweepResultNonlinearTMM *res = new SweepResultNonlinearTMM(values.size(), outmask, layerNr, layerZ);
 
 		#pragma omp parallel
 		{
@@ -402,8 +434,7 @@ namespace TMM {
 			for (int i = 0; i < values.size(); i++) {
 				tmmThread.SetParam(param, values(i));
 				tmmThread.Solve();
-				PowerFlows rr = tmmThread.GetPowerFlows();
-				res->SetPowerFlows(i, rr);
+				res->SetValues(i, tmmThread);
 			}
 		}
 		return res;
@@ -506,7 +537,7 @@ namespace TMM {
 		return res;
 	}
 
-	double NonlinearTMM::GetAbsorbedPower() {
+	double NonlinearTMM::GetAbsorbedPower() const{
 		if (!solved) {
 			throw std::runtime_error("NonlinearTMM must be solved first.");
 		}
@@ -515,6 +546,22 @@ namespace TMM {
 			res += layers[i].GetAbsorbedPower();
 		}
 		return res;
+	}
+
+	double NonlinearTMM::GetEnhancement(int layerNr, double z) {
+		if (!solved) {
+			throw std::runtime_error("NonlinearTMM must be solved first.");
+		}
+
+		if (layerNr < 0 || layerNr > layers.size()) {
+			throw std::invalid_argument("Invalid layer index.");
+		}
+
+		double ENL = layers[layerNr].GetENorm(z, TOT);
+		double EN0 = layers[0].GetENorm(z, F) * std::sqrt(real(layers[0].n)); // Electrical field in vacuum
+		double res = ENL / EN0;
+		return res;
+
 	}
 
 	pairdd NonlinearTMM::GetPowerFlowsForWave(const Eigen::Map<Eigen::ArrayXd>& betas, const Eigen::Map<Eigen::ArrayXcd>& E0s, int layerNr, double x0, double x1, double z, double Ly, WaveDirection dir) {

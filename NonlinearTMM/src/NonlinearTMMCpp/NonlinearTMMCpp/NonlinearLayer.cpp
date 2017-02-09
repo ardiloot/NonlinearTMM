@@ -384,7 +384,7 @@ namespace TMM{
 		return res;
 	}
 
-	double NonlinearLayer::GetPowerFlow(double z) {
+	double NonlinearLayer::GetPowerFlow(double z) const{
 		if (!solved) {
 			throw std::runtime_error("NonlinearLayer must be solved first.");
 		}
@@ -393,7 +393,7 @@ namespace TMM{
 		return Sz;
 	}
 
-	double NonlinearLayer::GetAbsorbedPower() {
+	double NonlinearLayer::GetAbsorbedPower() const {
 		if (!solved) {
 			throw std::runtime_error("NonlinearLayer must be solved first.");
 		}
@@ -431,7 +431,7 @@ namespace TMM{
 		return res;
 	}
 
-	double NonlinearLayer::GetSrcPower() {
+	double NonlinearLayer::GetSrcPower() const{
 		if (!solved) {
 			throw std::runtime_error("NonlinearTMM must be solved first.");
 		}
@@ -446,4 +446,10 @@ namespace TMM{
 		return res;
 	}
 
+	double NonlinearLayer::GetENorm(double z, WaveDirection dir) const {
+		Fields f = GetFields(z, dir);
+		double res = std::sqrt(norm(f.E(0)) + norm(f.E(1)) + norm(f.E(2)));//f.E.norm();
+		return res;
+	}
+	
 };

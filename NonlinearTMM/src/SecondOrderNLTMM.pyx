@@ -178,7 +178,7 @@ cdef class _PowerFlows:
 cdef class _SweepResultNonlinearTMM:
     cdef SweepResultNonlinearTMMCpp *_thisptr 
     cdef readonly np.ndarray inc, r, t
-    cdef readonly np.ndarray I, R, T
+    cdef readonly np.ndarray I, R, T, A, enh
     cdef bool _needDealloc;
     cdef object _parent;
     
@@ -201,8 +201,10 @@ cdef class _SweepResultNonlinearTMM:
         self.I = ndarray_view(self._thisptr.I).squeeze()
         self.R = ndarray_view(self._thisptr.R).squeeze()
         self.T = ndarray_view(self._thisptr.T).squeeze()
+        self.A = ndarray_view(self._thisptr.A).squeeze()
+        self.enh = ndarray_view(self._thisptr.enh).squeeze()
 
-   
+
 #===============================================================================
 # FieldsZ
 #===============================================================================
@@ -397,9 +399,18 @@ cdef class NonlinearTMM:
         res._Init(&resCpp)
         return res 
     
-    def Sweep(self, str paramStr, np.ndarray[double, ndim = 1] values):
+    def Sweep(self, str paramStr, np.ndarray[double, ndim = 1] values, int layerNr = 0, double layerZ = 0.0, bool outPwr = True, bool outAbs = False, outEnh = False):
         cdef SweepResultNonlinearTMMCpp *resCpp;
-        resCpp = self._thisptr.Sweep(TmmParamFromStr(paramStr), Map[ArrayXd](values))
+        cdef int outmask = 0
+        
+        if outPwr:
+            outmask |= SWEEP_PWRFLOWS
+        if outAbs:
+            outmask |= SWEEP_ABS
+        if outEnh:
+            outmask |= SWEEP_ENH        
+        
+        resCpp = self._thisptr.Sweep(TmmParamFromStr(paramStr), Map[ArrayXd](values), outmask, layerNr, layerZ)
         res = _SweepResultNonlinearTMM()
         res._Init(resCpp);
         return res
@@ -627,9 +638,17 @@ cdef class SecondOrderNLTMM:
         res._Init(&resCpp)
         return res
         
-    def Sweep(self, str paramStr, np.ndarray[double, ndim = 1] valuesP1, np.ndarray[double, ndim = 1] valuesP2):
+    def Sweep(self, str paramStr, np.ndarray[double, ndim = 1] valuesP1, np.ndarray[double, ndim = 1] valuesP2, int layerNr = 0, double layerZ = 0.0, bool outPwr = True, bool outAbs = False, outEnh = False):
         cdef SweepResultSecondOrderNLTMMCpp *resCpp;
-        resCpp = self._thisptr.Sweep(TmmParamFromStr(paramStr), Map[ArrayXd](valuesP1), Map[ArrayXd](valuesP2))
+        cdef int outmask = 0
+        if outPwr:
+            outmask |= SWEEP_PWRFLOWS
+        if outAbs:
+            outmask |= SWEEP_ABS
+        if outEnh:
+            outmask |= SWEEP_ENH        
+        
+        resCpp = self._thisptr.Sweep(TmmParamFromStr(paramStr), Map[ArrayXd](valuesP1), Map[ArrayXd](valuesP2), outmask, layerNr, layerZ)
         res = _SweepResultSecondOrderNLTMM()
         res._Init(resCpp);
         return res
