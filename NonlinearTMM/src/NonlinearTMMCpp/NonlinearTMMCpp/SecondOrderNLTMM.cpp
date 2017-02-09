@@ -3,9 +3,12 @@
 namespace TMM {
 
 	SweepResultSecondOrderNLTMM::SweepResultSecondOrderNLTMM(int n, int outmask, int layerNr_, double layerZ_) : 
-		P1(n, outmask, layerNr_, layerZ_), P2(n, outmask, layerNr_, layerZ_), Gen(n, outmask, layerNr_, layerZ_) {}
+		P1(n, outmask, layerNr_, layerZ_), P2(n, outmask, layerNr_, layerZ_), Gen(n, outmask, layerNr_, layerZ_),
+		wlsGen(n), betasGen(n){}
 
 	void SweepResultSecondOrderNLTMM::SetValues(int nr, SecondOrderNLTMM & tmm) {
+		wlsGen(nr) = tmm.GetGen()->GetDouble(PARAM_WL);
+		betasGen(nr) = tmm.GetGen()->GetDouble(PARAM_BETA);
 		P1.SetValues(nr, *tmm.GetP1());
 		P2.SetValues(nr, *tmm.GetP2());
 		Gen.SetValues(nr, *tmm.GetGen());

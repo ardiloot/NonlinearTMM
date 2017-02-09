@@ -22,6 +22,7 @@ namespace TMM {
 	private:
 	public:
 		SweepResultNonlinearTMM P1, P2, Gen;
+		Eigen::ArrayXd wlsGen, betasGen;
 		SweepResultSecondOrderNLTMM(int n, int outmask, int layerNr_, double layerZ_);
 		void SetValues(int nr, SecondOrderNLTMM &tmm);
 	};
