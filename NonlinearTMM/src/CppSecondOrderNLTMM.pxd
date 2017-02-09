@@ -135,6 +135,7 @@ cdef extern from "SecondOrderNLTMM.h" namespace "TMM":
         
     cdef cppclass SweepResultSecondOrderNLTMMCpp "TMM::SweepResultSecondOrderNLTMM":
         SweepResultNonlinearTMMCpp P1, P2, Gen;
+        ArrayXd wlsGen, betasGen;
         
     cdef cppclass SecondOrderNLTMMCpp "TMM::SecondOrderNLTMM":
         SecondOrderNLTMM() except +

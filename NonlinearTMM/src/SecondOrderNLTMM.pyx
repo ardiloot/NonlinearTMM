@@ -554,6 +554,7 @@ cdef class _SecondOrderNLPowerFlows:
 cdef class _SweepResultSecondOrderNLTMM:
     cdef SweepResultSecondOrderNLTMMCpp *_thisptr
     cdef readonly object P1, P2, Gen
+    cdef readonly np.ndarray wlsGen, betasGen;
     
     def __cinit__(self):
         self._thisptr = NULL
@@ -577,6 +578,8 @@ cdef class _SweepResultSecondOrderNLTMM:
         self.P1 = P1
         self.P2 = P2
         self.Gen = Gen
+        self.wlsGen = ndarray_view(self._thisptr.wlsGen).squeeze()
+        self.betasGen = ndarray_view(self._thisptr.betasGen).squeeze()
         
 #===============================================================================
 # SecondOrderNLTMM
