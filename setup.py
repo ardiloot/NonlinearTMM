@@ -19,6 +19,7 @@ ext = Extension("NonlinearTMM._SecondOrderNLTMMCython",
     )
 
 setup(name = "NonlinearTMM",
+      varsion = "1.0.0",
       author = "Ardi Loot",
       author_email = "ardi.loot@outlook.com",
       packages = ["NonlinearTMM"],
