@@ -112,6 +112,7 @@ cdef extern from "NonlinearTMM.h" namespace "TMM":
         FieldsZXCpp* GetFields2D(Map[ArrayXd] &, Map[ArrayXd] &, WaveDirectionCpp dir) except +
         FieldsZXCpp* GetWaveFields2D(Map[ArrayXd] &, Map[ArrayXcd] &, Map[ArrayXd] &, Map[ArrayXd] &, WaveDirectionCpp) except +
         double GetAbsorbedPower() except +
+        double GetEnhancement(int layerNr, double z) except +
         pair[double, double] GetPowerFlowsForWave(Map[ArrayXd] &betas, Map[ArrayXcd] &E0s, int layerNr, double x0, double x1, double z, double Ly, WaveDirectionCpp dir) except +
 
         void SetParam(TMMParamCpp param, bool value) except +

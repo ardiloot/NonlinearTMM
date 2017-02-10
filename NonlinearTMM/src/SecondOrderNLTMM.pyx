@@ -471,6 +471,11 @@ cdef class NonlinearTMM:
     def GetAbsorbedPower(self):
         return self._thisptr.GetAbsorbedPower();
     
+    def GetEnhancement(self, int layerNr, double z = 0.0):
+        cdef double res
+        res = self._thisptr.GetEnhancement(layerNr, z)
+        return res
+    
     def _GetPowerFlowsForWave(self, object wave, double th0, int layerNr, double x0, double x1, double z, str dirStr = "total"):
         # NonlinearLayer has its own specific method
         cdef double Ly = wave.Ly
