@@ -259,6 +259,28 @@ cdef class _FieldsZX:
             self.Ez = None
         else:
             raise ValueError("Unknown polarization.")
+        
+    @property
+    def EN(self):
+        cdef PolarizationCpp pol = self._thisptr.GetPol()
+        if pol == P_POL:
+            return np.sqrt(self.Ex.real ** 2 + self.Ex.imag ** 2 + \
+                           self.Ez.real ** 2 + self.Ez.imag ** 2)
+        elif pol == S_POL:
+            return np.sqrt(self.Ey.real ** 2 + self.Ey.imag ** 2)
+        else:
+            raise ValueError("Unknown polarization.")
+
+    @property
+    def HN(self):
+        cdef PolarizationCpp pol = self._thisptr.GetPol()
+        if pol == P_POL:
+            return np.sqrt(self.Hy.real ** 2 + self.Hy.imag ** 2)
+        elif pol == S_POL:
+            return np.sqrt(self.Hx.real ** 2 + self.Hx.imag ** 2 + \
+                           self.Hz.real ** 2 + self.Hz.imag ** 2)
+        else:
+            raise ValueError("Unknown polarization.")
 
 #===============================================================================
 # HomogeneousWave
