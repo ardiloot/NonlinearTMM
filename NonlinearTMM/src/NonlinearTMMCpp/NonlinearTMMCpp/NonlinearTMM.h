@@ -38,6 +38,7 @@ namespace TMM {
 	void OuterProductSSEEigenComplex(const Eigen::ArrayXcd& X, const Eigen::ArrayXcd& Y, Eigen::MatrixXcd& R);
 	void OuterProductSSEEigenComplexAdd(const Eigen::ArrayXcd& X, const Eigen::ArrayXcd& Y, Eigen::MatrixXcd& R);
 	void OuterProductGoodEigenComplex(const Eigen::ArrayXcd& X, const Eigen::ArrayXcd& Y, Eigen::MatrixXcd& R);
+	void OuterProductGoodEigenComplexAdd(const Eigen::ArrayXcd& X, const Eigen::ArrayXcd& Y, Eigen::MatrixXcd& R);
 
 	//---------------------------------------------------------------
 	// PowerFlows

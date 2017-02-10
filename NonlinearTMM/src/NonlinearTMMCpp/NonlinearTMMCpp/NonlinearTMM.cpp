@@ -22,19 +22,23 @@ namespace TMM {
 
 	void OuterProductSSEEigenComplexAdd(const Eigen::ArrayXcd & X, const Eigen::ArrayXcd & Y, Eigen::MatrixXcd & R) {
 		// Identical to previous, but add to result (performance)
-		register dcomplex* ptrR = &R(0, 0);
+		register double* ptrR = (double*)&R(0, 0);
 		const register dcomplex* ptrX = (dcomplex*)&X(0);
 		const register dcomplex* ptrY = (dcomplex*)&Y(0);
 		const register int n = X.size();
 		const register int m = Y.size();
 
 		for (int i = 0; i < n; i++) {
-			register int k = i * m;
+			register int k = 2 * i * m;
 			register dcomplex v = ptrX[i];
 			for (int j = 0; j < m; j++) {
-				register int k2 = k + j;
+				register int k2 = k + 2 * j;
 				register dcomplex w = ptrY[j];
-				ptrR[k2] += multSSE(v, w);
+				register dcomplex r = multSSE(v, w);
+				#pragma omp atomic
+				ptrR[k2] += real(r);
+				#pragma omp atomic
+				ptrR[k2 + 1] += imag(r);
 			}
 		}
 	}
@@ -54,6 +58,31 @@ namespace TMM {
 				dcomplex w = ptrY[j];
 				int k2 = k + j;
 				ptrR[k2] = v * w;
+			}
+		}
+	}
+
+	void OuterProductGoodEigenComplexAdd(const Eigen::ArrayXcd & X, const Eigen::ArrayXcd & Y, Eigen::MatrixXcd & R) {
+		double* ptrR = (double*)&R(0, 0);
+		dcomplex* ptrX = (dcomplex*)&X(0);
+		dcomplex* ptrY = (dcomplex*)&Y(0);
+		int n = X.size();
+		int m = Y.size();
+
+		for (int i = 0; i < n; i++) {
+			//int k = i * m;
+			int k = 2 * i * m;
+			dcomplex v = ptrX[i];
+			for (int j = 0; j < m; j++) {
+				dcomplex w = ptrY[j];
+				//int k2 = k + j;
+				int k2 = k + 2 * j;
+				dcomplex r = v * w;
+				
+				#pragma omp atomic
+				ptrR[k2] += real(r);
+				#pragma omp atomic
+				ptrR[k2 + 1] += imag(r);
 			}
 		}
 	}
@@ -149,9 +178,11 @@ namespace TMM {
 		OuterProductSSEEigenFunc func;
 		if (add) {
 			func = OuterProductSSEEigenComplexAdd;
+			//func = OuterProductGoodEigenComplexAdd;
 		}
 		else {
 			func = OuterProductSSEEigenComplex;
+			//func = OuterProductGoodEigenComplex;
 		}
 
 		// Parallelisation has no/small effect

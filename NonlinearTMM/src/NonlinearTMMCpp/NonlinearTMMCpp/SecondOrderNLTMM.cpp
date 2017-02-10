@@ -77,11 +77,13 @@ namespace TMM {
 
 		// TODO:
 		if (imag(kpS->kSzF) < 0.0) {
-			throw std::runtime_error("not implemented");
+			std::cout << "kpS " << kpS->kSzF << std::endl;
+			//throw std::runtime_error("not implemented");
 		}
 
 		if (imag(kpA->kSzF) < 0.0) {
-			throw std::runtime_error("not implemented");
+			std::cout << "kpA " << kpA->kSzF << std::endl;
+			//throw std::runtime_error("not implemented");
 		}
 	}
 
