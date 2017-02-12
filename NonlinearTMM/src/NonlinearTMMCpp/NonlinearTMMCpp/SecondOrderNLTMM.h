@@ -39,8 +39,8 @@ namespace TMM {
 
 		void UpdateGenParams();
 		void CalcInhomogeneosWaveParams(int layerNr, Material *material, InhomogeneosWaveParams *kpS, InhomogeneosWaveParams *kpA);
-		__declspec(noinline) void SolveFundamentalFields();
-		__declspec(noinline) void SolveGeneratedField();
+		void SolveFundamentalFields();
+		void SolveGeneratedField();
 
 	public:
 		SecondOrderNLTMM();

@@ -98,5 +98,6 @@ namespace TMM {
 	double const IntegrateWavePower(int layerNr, Polarization pol, double wl, dcomplex epsLayer0, const Eigen::ArrayXcd &Us,
 		const Eigen::ArrayXd &kxs, const Eigen::ArrayXcd &kzs,
 		double x0, double x1, double z, double Ly);
+	WaveDirection GetWaveDirection(dcomplex kzF, dcomplex eps, Polarization pol);
 
 }

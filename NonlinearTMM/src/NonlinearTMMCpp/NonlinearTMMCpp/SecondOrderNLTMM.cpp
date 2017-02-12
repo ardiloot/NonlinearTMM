@@ -75,16 +75,27 @@ namespace TMM {
 			break;
 		}
 
-		// TODO:
-		if (imag(kpS->kSzF) < 0.0) {
-			std::cout << "kpS " << kpS->kSzF << std::endl;
-			//throw std::runtime_error("not implemented");
+		// Check inhomogenous wave directionality, correct if necessary
+		dcomplex epsL = sqr(material->GetN(tmmGen.GetDouble(PARAM_WL)));
+		Polarization pol = (Polarization)tmmGen.GetInt(PARAM_POL);
+		WaveDirection dS = F, dA = F;
+		if (kpS->kSzF != 0.0) {
+			dS = GetWaveDirection(kpS->kSzF, epsL, pol);
+		}
+		if (kpA->kSzF != 0.0) {
+			dA = GetWaveDirection(kpA->kSzF, epsL, pol);
 		}
 
-		if (imag(kpA->kSzF) < 0.0) {
-			std::cout << "kpA " << kpA->kSzF << std::endl;
-			//throw std::runtime_error("not implemented");
+		if (dS != F) {
+			kpS->kSzF *= -1.0;
+			swap(kpS->pF, kpS->pB);
 		}
+
+		if (dA != F) {
+			kpA->kSzF *= -1.0;
+			swap(kpA->pF, kpA->pB);
+		}
+
 	}
 
 	void SecondOrderNLTMM::SolveFundamentalFields() {

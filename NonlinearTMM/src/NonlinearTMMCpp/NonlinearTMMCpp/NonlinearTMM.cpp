@@ -35,10 +35,13 @@ namespace TMM {
 				register int k2 = k + 2 * j;
 				register dcomplex w = ptrY[j];
 				register dcomplex r = multSSE(v, w);
+				double realP = real(r);
+				double imagP = imag(r);
+
 				#pragma omp atomic
-				ptrR[k2] += real(r);
+				ptrR[k2] += realP;
 				#pragma omp atomic
-				ptrR[k2 + 1] += imag(r);
+				ptrR[k2 + 1] += imagP;
 			}
 		}
 	}

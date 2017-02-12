@@ -91,7 +91,14 @@ namespace TMM{
 
 		if (imag(kz(F)) < 0.0) {
 			// Shold not hapen, checking
+			std::cerr << "kzF imaginary part negative" << std::endl;
 			throw std::runtime_error("kzF imaginary part negative");
+		}
+
+		if (real(kz(F)) < 0.0) {
+			// Shold not hapen, checking
+			std::cerr << "kzF real part negative" << std::endl;
+			throw std::runtime_error("kzF real part negative");
 		}
 
 		// Propagation matrix

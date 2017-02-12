@@ -207,5 +207,59 @@ namespace TMM {
 		return res;
 	}
 
+	WaveDirection GetWaveDirection(dcomplex kzF, dcomplex eps, Polarization pol) {
+		double pwrFlow;
+		switch (pol)
+		{
+		case TMM::P_POL:
+			pwrFlow = real(kzF / eps);
+			break;
+		case TMM::S_POL:
+			pwrFlow = real(kzF);
+			break;
+		default:
+			#pragma omp critical
+			std::cerr << "Unknown polarization." << std::endl;
+			throw std::invalid_argument("Unknown polarization.");
+			break;
+		}
+
+		WaveDirection res;
+
+		if (real(kzF) > 0.0) {
+			res = F;
+		}
+		else if (real(kzF) < 0.0) {
+			res = B;
+		}
+		else {
+			if (imag(kzF) > 0.0) {
+				res = F;
+			}
+			else if (imag(kzF) < 0.0) {
+				res = B;
+			}
+			else {
+				// Only if kz = 0.0
+				#pragma omp critical
+				std::cerr << "kzF = 0: " << kzF << " " << eps << ": " << pwrFlow << std::endl;
+				throw std::runtime_error("Could not determine wave direction.");
+			}
+		}
+
+		if (res == F && (imag(kzF) < 0.0 || pwrFlow < 0.0)) {
+			#pragma omp critical
+			std::cerr << "F: " << kzF << " " << eps << ": " << pwrFlow << std::endl;
+			throw std::runtime_error("Could not determine wave direction.");
+		}
+
+		if (res == B && (imag(kzF) > 0.0 || pwrFlow > 0.0)) {
+			#pragma omp critical
+			std::cerr << "B: " << kzF << " " << eps << ": " << pwrFlow << std::endl;
+			throw std::runtime_error("Could not determine wave direction.");
+		}
+		return res;
+	}
+
 
 };
