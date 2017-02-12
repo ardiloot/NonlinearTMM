@@ -15,7 +15,7 @@ class Material(_SecondOrderNLTMMCython.Material):# @UndefinedVariable
     def FromLabPy(materialLabPy):
         if materialLabPy.materialFile == "Static":
             wls = np.array([-1.0, 1.0])
-            n = materialLabPy.n + 1.0j * materialLabPy.k
+            n = materialLabPy.n + 1.0j * (materialLabPy.k + materialLabPy.kAdditional)
             ns = np.array([n, n], dtype = complex)
         else:
             wls = np.ascontiguousarray(materialLabPy.wlExp)
@@ -23,6 +23,7 @@ class Material(_SecondOrderNLTMMCython.Material):# @UndefinedVariable
                 ns = np.ascontiguousarray(materialLabPy.nExp, dtype = complex)
             else:
                 ns = np.ascontiguousarray(materialLabPy.nExp + 1.0j * materialLabPy.kExp)
+            ns += 1.0j * materialLabPy.kAdditional
         res = Material(wls, ns)
         res._materialLabPy = materialLabPy
         return res
