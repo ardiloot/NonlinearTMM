@@ -17,6 +17,9 @@ class Material(_SecondOrderNLTMMCython.Material):# @UndefinedVariable
             wls = np.array([-1.0, 1.0])
             n = materialLabPy.n + 1.0j * (materialLabPy.k + materialLabPy.kAdditional)
             ns = np.array([n, n], dtype = complex)
+        elif materialLabPy.isFormula:
+            wls = np.ascontiguousarray(np.linspace(materialLabPy.wlRange[0], materialLabPy.wlRange[1], 500))
+            ns = np.ascontiguousarray(materialLabPy(wls))
         else:
             wls = np.ascontiguousarray(materialLabPy.wlExp)
             if materialLabPy.kExp is None:
