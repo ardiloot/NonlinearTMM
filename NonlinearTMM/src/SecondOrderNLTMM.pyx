@@ -178,28 +178,27 @@ cdef class Material:
 # Waves
 #===============================================================================
 
-cdef class Wave:
+cdef class _Wave:
     cdef WaveCpp *_thisptr
-    cdef object _materialCache;
+    cdef bool _needsDealloc;
     
-    def __cinit__(self, Material material, **kwargs):
-        self._thisptr = new WaveCpp()
-        self.SetMaterial(material)
-        self.SetParams(**kwargs)
+    def __cinit__(self):
+        self._thisptr = NULL
+        self._needsDealloc = False;
+        
+    cdef _Init(self, WaveCpp *ptr):
+        self._thisptr = ptr
+        self._needsDealloc = True
         
     def __dealloc__(self):
-        del self._thisptr
+        if self._needsDealloc:
+            del self._thisptr
         
     def SetParams(self, **kwargs):
         for name, value in kwargs.iteritems():
             if name not in waveParamsSet:
                 raise ValueError("Unknown kwarg %s" % (name))
             setattr(self, name, value)
-        
-    def SetMaterial(self, Material material):
-        cdef MaterialCpp *matptr = material._thisptr
-        self._thisptr.SetMaterial(matptr)
-        self._materialCache = material
         
     def Solve(self, double wl, double beta):
         self._thisptr.Solve(wl, beta)
@@ -494,9 +493,6 @@ cdef class _NonlinearLayer:
     
     def GetSrcPower(self):
         return self._thisptr.GetSrcPower();
-     
-    def GetPowerFlowsForWave(self, object wave, double th0, double x0, double x1, double z, str dirStr = "total"):
-        return self._parent._GetPowerFlowsForWave(wave, th0, self._layerNr, x0, x1, z, dirStr)
     
     # Getter
     #--------------------------------------------------------------------------- 
@@ -523,10 +519,12 @@ cdef class NonlinearTMM:
     cdef readonly list layers
     cdef bool _needDealloc
     cdef object _parent;
+    cdef readonly _Wave wave;
     
     def __cinit__(self, bool initStruct = True, object parent = None, **kwargs):
         if initStruct:
             self._thisptr = new NonlinearTMMCpp()
+            self._Init(self._thisptr)
             self._needDealloc = True
         else:
             self._thisptr = NULL
@@ -539,6 +537,10 @@ cdef class NonlinearTMM:
     
     cdef _Init(self, NonlinearTMMCpp* ptr):
         self._thisptr = ptr
+        cdef WaveCpp *wavePtr = self._thisptr.GetWave() 
+        wave = _Wave()
+        wave._Init(wavePtr)
+        self.wave = wave
     
     def __dealloc__(self):
         if self._needDealloc:
@@ -607,21 +609,14 @@ cdef class NonlinearTMM:
         res._Init(resCpp)
         return res
     
-    def _GetWaveFields2D(self, np.ndarray[double, ndim = 1] betas, \
-            np.ndarray[double complex, ndim = 1] E0s, np.ndarray[double, ndim = 1] zs, \
+    def WaveGetFields2D(self, np.ndarray[double, ndim = 1] zs, \
             np.ndarray[double, ndim = 1] xs, str dirStr = "total"):
         
         cdef FieldsZXCpp *resCpp;
         cdef WaveDirectionCpp direction = WaveDirectionFromStr(dirStr)
-        resCpp = self._thisptr.GetWaveFields2D(Map[ArrayXd](betas), Map[ArrayXcd](E0s), \
-            Map[ArrayXd](zs), Map[ArrayXd](xs), direction)
+        resCpp = self._thisptr.WaveGetFields2D(Map[ArrayXd](zs), Map[ArrayXd](xs), direction)
         res = _FieldsZX()
         res._Init(resCpp)
-        return res
-    
-    def GetWaveFields2D(self, object wave, double th0, np.ndarray[double, ndim = 1] zs, np.ndarray[double, ndim = 1] xs, str direction = "total"):
-        wave.Solve(th0, wl = self.wl)
-        res = self._GetWaveFields2D(wave.betas, wave.expansionCoefsKx, zs, xs, direction)
         return res
     
     def GetAbsorbedPower(self):
@@ -632,17 +627,35 @@ cdef class NonlinearTMM:
         res = self._thisptr.GetEnhancement(layerNr, z)
         return res
     
-    def _GetPowerFlowsForWave(self, object wave, double th0, int layerNr, double x0, double x1, double z, str dirStr = "total"):
+    # Waves
+    
+    def WaveGetPowerFlows(self, int layerNr, double x0, double x1, double z, str dirStr = "total"):
         # NonlinearLayer has its own specific method
-        cdef double Ly = wave.Ly
         cdef WaveDirectionCpp direction = WaveDirectionFromStr(dirStr)
-        wave.Solve(th0, wl = self.wl)
-        
         cdef pair[double, double] res;
-        res = self._thisptr.GetPowerFlowsForWave(Map[ArrayXd](wave.betas), \
-            Map[ArrayXcd](wave.expansionCoefsKx), layerNr, x0, x1, z, Ly, direction)
-        
+        res = self._thisptr.WaveGetPowerFlows(layerNr, x0, x1, z, direction)
         return (res.first, res.second)
+    
+    def WaveSweep(self, str paramStr, np.ndarray[double, ndim = 1] values, \
+            double x0, double x1, int layerNr = 0, double layerZ = 0.0, \
+            bool outPwr = True, outR = False, outT = False, outEnh = False):
+        
+        cdef SweepResultNonlinearTMMCpp *resCpp;
+        cdef int outmask = 0
+        
+        if outPwr:
+            outmask |= SWEEP_PWRFLOWS
+        if outEnh:
+            outmask |= SWEEP_ENH
+        if outR:
+            outmask |= SWEEP_R
+        if outT:
+            outmask |= SWEEP_T
+            
+        resCpp = self._thisptr.WaveSweep(TmmParamFromStr(paramStr), Map[ArrayXd](values), x0, x1, outmask, layerNr, layerZ)
+        res = _SweepResultNonlinearTMM()
+        res._Init(resCpp);
+        return res
     
     # Getters
     #--------------------------------------------------------------------------- 
@@ -705,6 +718,7 @@ cdef class NonlinearTMM:
     @mode.setter
     def mode(self, modeStr):  # @DuplicatedSignature
         self._thisptr.SetParam(PARAM_MODE, <int>NonlinearTmmModeFromStr(modeStr))
+        
 
 #===============================================================================
 # SecondOrderNLPowerFlows

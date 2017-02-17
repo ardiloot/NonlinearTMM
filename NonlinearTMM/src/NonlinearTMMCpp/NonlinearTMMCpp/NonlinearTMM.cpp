@@ -146,6 +146,37 @@ namespace TMM {
 		}
 	}
 
+	void SweepResultNonlinearTMM::SetWaveValues(int nr, NonlinearTMM & tmm, double x0, double x1) {
+		if (outmask & SWEEP_PWRFLOWS) {
+
+			// First layer
+			pairdd pf0(constNAN, constNAN);
+			if ((outmask & SWEEP_I) && (outmask & SWEEP_I)) {
+				pf0 = tmm.WaveGetPowerFlows(0, x0, x1, 0.0, TOT);
+			}
+			else if (outmask & SWEEP_I) {
+				pf0 = tmm.WaveGetPowerFlows(0, x0, x1, 0.0, F);
+			}
+			else if (outmask & SWEEP_R) {
+				pf0 = tmm.WaveGetPowerFlows(0, x0, x1, 0.0, B);
+			}
+			
+			// Last layer
+			pairdd pfL = tmm.WaveGetPowerFlows(tmm.LayersCount() - 1, x0, x1, 0.0, F);
+
+			// Save
+			I(nr) = pf0.first;
+			R(nr) = pf0.second;
+			T(nr) = pfL.first;
+		}
+
+		if (outmask & SWEEP_ENH) {
+			double enh_ = tmm.WaveGetEnhancement(layerNr, layerZ);
+			enh(nr) = enh_;
+		}
+
+	}
+
 	FieldsZ::FieldsZ(int n) : E(n, 3), H(n, 3) {
 		// Not zereod because of performance
 	}
@@ -211,6 +242,25 @@ namespace TMM {
 
 	void FieldsZX::AddFields(const FieldsZ & f, const ArrayXcd & phaseX) {
 		SetFields(f, phaseX, true);
+	}
+
+	MatrixXd FieldsZX::GetENorm() {
+		MatrixXd res;
+		switch (pol)
+		{
+		case TMM::P_POL:
+			res = (Ex.array().real().pow(2) + Ex.array().imag().pow(2) +
+				Ez.array().real().pow(2) + Ez.imag().array().pow(2)).sqrt();
+			break;
+		case TMM::S_POL:
+			res = (Ey.array().real().pow(2) + Ey.array().imag().pow(2)).sqrt();
+			break;
+		default:
+			std::cerr << "Unknown polarization." << std::endl;
+			throw std::invalid_argument("Unknown polarization.");
+			break;
+		}
+		return res;
 	}
 
 	void NonlinearTMM::CheckPrerequisites(TMMParam toIgnore) {
@@ -531,16 +581,18 @@ namespace TMM {
 		return res;
 	}
 
-	FieldsZX * NonlinearTMM::GetWaveFields2D(const Eigen::Map<ArrayXd>& betas, const Eigen::Map<ArrayXcd>& E0s, const Eigen::Map<ArrayXd>& zs, const Eigen::Map<ArrayXd>& xs, WaveDirection dir) {
-		CheckPrerequisites(PARAM_BETA);
-
-		if (E0s.size() != betas.size()) {
-			throw std::invalid_argument("Arrays (betas, E0s) must have the same length.");
-		}
+	FieldsZX * NonlinearTMM::WaveGetFields2D(const Eigen::Map<ArrayXd>& zs, const Eigen::Map<ArrayXd>& xs, WaveDirection dir) {
+		CheckPrerequisites();
 
 		if (mode == MODE_NONLINEAR) {
 			throw std::runtime_error("For nonlinear mode use the method of SecondOrderNLTMM");
 		}
+
+		// Solve wave
+		wave.Solve(wl, beta, layers[0].GetMaterial());
+		double Ly = wave.GetLy();
+		ArrayXd &betas = wave.GetBetas();
+		ArrayXcd &E0s = wave.GetExpansionCoefsKx();
 
 		// Allocate space (deletion is the responsibility of the caller!)
 		FieldsZX *res = new FieldsZX(zs.size(), xs.size(), pol);
@@ -566,6 +618,52 @@ namespace TMM {
 				ArrayXcd phaseX = (constI * kxs(i) * xs).exp() * dkx;
 				res->AddFields(*f, phaseX);
 				delete f;
+			}
+		}
+		return res;
+	}
+
+	double NonlinearTMM::WaveGetEnhancement(int layerNr, double z) {
+		if (layerNr < 0 || layerNr > layers.size()) {
+			throw std::invalid_argument("Invalid layer index.");
+		}
+
+		double xs[] = { 0.0 };
+		double zs0[] = { -1e-9 };
+		double zsL[] = { z };
+		Eigen::Map<ArrayXd> xsMap(xs, 1);
+		Eigen::Map<ArrayXd> zs0Map(zs0, 1);
+		Eigen::Map<ArrayXd> zsLMap(zsL, 1);
+
+		FieldsZX *f0 = WaveGetFields2D(zs0Map, xsMap, F);
+		FieldsZX *fL = WaveGetFields2D(zsLMap, xsMap, TOT);
+
+		double EN0 = f0->GetENorm()(0, 0);
+		double ENL = fL->GetENorm()(0, 0);
+		delete f0;
+		delete fL;
+
+		double res = ENL / (EN0 * std::sqrt(real(layers[0].n)));
+		return res;
+	}
+
+	SweepResultNonlinearTMM * NonlinearTMM::WaveSweep(TMMParam param, const Eigen::Map<ArrayXd>& values, double x0, double x1, int outmask, int layerNr, double layerZ) {
+		CheckPrerequisites(param);
+		if (layerNr < 0 || layerNr > layers.size()) {
+			throw std::invalid_argument("Invalid layer index.");
+		}
+
+		SweepResultNonlinearTMM *res = new SweepResultNonlinearTMM(values.size(), outmask, layerNr, layerZ);
+		#pragma omp parallel
+		{
+			// Make a copy of TMM
+			NonlinearTMM tmmThread = *this;
+
+			// Sweep
+			#pragma omp for
+			for (int i = 0; i < values.size(); i++) {
+				tmmThread.SetParam(param, values(i));
+				res->SetWaveValues(i, tmmThread, x0, x1);
 			}
 		}
 		return res;
@@ -598,15 +696,22 @@ namespace TMM {
 
 	}
 
-	pairdd NonlinearTMM::GetPowerFlowsForWave(const Eigen::Map<ArrayXd>& betas, const Eigen::Map<ArrayXcd>& E0s, int layerNr, double x0, double x1, double z, double Ly, WaveDirection dir) {
-		CheckPrerequisites(PARAM_BETA);
+	Wave * NonlinearTMM::GetWave() {
+		return &wave;
+	}
+
+	pairdd NonlinearTMM::WaveGetPowerFlows(int layerNr, double x0, double x1, double z, WaveDirection dir) {
+		CheckPrerequisites();
 		if (mode == MODE_NONLINEAR) {
+			std::cerr << "For nonlinear mode use the method of SecondOrderNLTMM" << std::endl;
 			throw std::runtime_error("For nonlinear mode use the method of SecondOrderNLTMM");
 		}
 
-		if (betas.size() != E0s.size()) {
-			throw std::invalid_argument("betas and E0s must have same length.");
-		}
+		// Solve wave
+		wave.Solve(wl, beta, layers[0].GetMaterial());
+		double Ly = wave.GetLy();
+		ArrayXd &betas = wave.GetBetas();
+		ArrayXcd &E0s = wave.GetExpansionCoefsKx();
 
 		if (layerNr < 0 || layerNr > layers.size()) {
 			throw std::invalid_argument("Invalid layer index.");
@@ -618,6 +723,7 @@ namespace TMM {
 
 		// Solve for every beta
 		bool oldOverrideE0 = GetBool(PARAM_OVERRIDE_E0);
+		double oldBeta = GetDouble(PARAM_BETA);
 		SetParam(PARAM_OVERRIDE_E0, true);
 		for (int i = 0; i < betas.size(); i++) {
 			SetParam(PARAM_BETA, betas(i));
@@ -627,6 +733,7 @@ namespace TMM {
 			kzs.row(i) = layers[layerNr].hw.kz;
 		}
 		SetParam(PARAM_OVERRIDE_E0, oldOverrideE0);
+		SetParam(PARAM_BETA, oldBeta);
 
 		// Integrate powers
 		ArrayXd kxs(betas.size());

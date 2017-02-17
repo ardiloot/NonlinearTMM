@@ -74,6 +74,7 @@ namespace TMM {
 		SweepResultNonlinearTMM(int n, int outmask_, int layerNr_, double layerZ_);
 		int GetOutmask();
 		void SetValues(int nr, NonlinearTMM &tmm);
+		void SetWaveValues(int nr, NonlinearTMM &tmm, double x0, double x1);
 	};
 
 	//---------------------------------------------------------------
@@ -103,6 +104,8 @@ namespace TMM {
 		Polarization GetPol();
 		void SetFields(const FieldsZ &f, const ArrayXcd &phaseX, bool add = false);
 		void AddFields(const FieldsZ &f, const ArrayXcd &phaseX);
+		MatrixXd GetENorm();
+
 	};
 
 	//---------------------------------------------------------------
@@ -125,6 +128,7 @@ namespace TMM {
 		std::vector<Array2cd> systemMatricesNL;
 		dcomplex inc, r, t;
 		bool solved;
+		Wave wave;
 
 		Array2cd CalcTransferMatrixNL(int interfaceNr, const InhomogeneousWave &w1, const InhomogeneousWave &w2);
 		void SolveInterfaceTransferMatrix(int interfaceNr);
@@ -139,29 +143,33 @@ namespace TMM {
 		int LayersCount() const;
 		void CheckPrerequisites(TMMParam toIgnore = PARAM_NOT_DEFINED);
 		
-		void Solve();
-		PowerFlows GetPowerFlows() const;
-		double GetAbsorbedPower() const;
-		double GetEnhancement(int layerNr, double z);
-		SweepResultNonlinearTMM* Sweep(TMMParam param, const Eigen::Map<ArrayXd> &values, int outmask = 1, int layerNr = 0, double layerZ = 0);
-		FieldsZ* GetFields(const Eigen::Map<ArrayXd> &zs, WaveDirection dir = TOT);
-		FieldsZX* GetFields2D(const Eigen::Map<ArrayXd> &zs, const Eigen::Map<ArrayXd> &xs, WaveDirection dir = TOT);
-
-		pairdd GetPowerFlowsForWave(const Eigen::Map<ArrayXd> &betas, const Eigen::Map<ArrayXcd> &E0s,
-			int layerNr, double x0, double x1, double z, double Ly, WaveDirection dir = TOT);
-		FieldsZX* GetWaveFields2D(const Eigen::Map<ArrayXd> &betas, const Eigen::Map<ArrayXcd> &E0s, const Eigen::Map<ArrayXd> &zs, const Eigen::Map<ArrayXd> &xs, WaveDirection dir = TOT);
-		
 		// Setters
 		void SetParam(TMMParam param, bool value);
 		void SetParam(TMMParam param, int value);
 		void SetParam(TMMParam param, double value);
 		void SetParam(TMMParam param, dcomplex value);
-		
+
 		// Getters
 		bool GetBool(TMMParam param);
 		int GetInt(TMMParam param);
 		double GetDouble(TMMParam param);
 		dcomplex GetComplex(TMMParam param);
+
+		// Plane wave functionality
+		void Solve();
+		PowerFlows GetPowerFlows() const;
+		double GetAbsorbedPower() const;
+		double GetEnhancement(int layerNr, double z);
+		SweepResultNonlinearTMM* Sweep(TMMParam param, const Eigen::Map<ArrayXd> &values, int outmask = SWEEP_PWRFLOWS, int layerNr = 0, double layerZ = 0);
+		FieldsZ* GetFields(const Eigen::Map<ArrayXd> &zs, WaveDirection dir = TOT);
+		FieldsZX* GetFields2D(const Eigen::Map<ArrayXd> &zs, const Eigen::Map<ArrayXd> &xs, WaveDirection dir = TOT);
+
+		// Waves
+		Wave* GetWave();
+		pairdd WaveGetPowerFlows(int layerNr, double x0, double x1, double z, WaveDirection dir = TOT);
+		double WaveGetEnhancement(int layerNr, double z);
+		SweepResultNonlinearTMM * WaveSweep(TMMParam param, const Eigen::Map<ArrayXd> &values, double x0, double x1, int outmask = SWEEP_PWRFLOWS, int layerNr = 0, double layerZ = 0);
+		FieldsZX* WaveGetFields2D(const Eigen::Map<ArrayXd> &zs, const Eigen::Map<ArrayXd> &xs, WaveDirection dir = TOT);
 	};
 
 }

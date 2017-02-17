@@ -1,4 +1,5 @@
 import numpy as np
+from  NonlinearTMM import _SecondOrderNLTMMCython  # @UnresolvedImport
 
 __all__ = ["PlaneWave",
            "GaussianWave",
@@ -8,6 +9,7 @@ __all__ = ["PlaneWave",
 const_c = 299792458.0
 eps0 = 8.854187817e-12
 mu0 = 1.2566370614e-6
+
 
 #===============================================================================
 # PlaneWave
@@ -103,6 +105,7 @@ class _WaveFFT(PlaneWave):
         raise NotImplementedError()
         
     def _Solve(self, maxPhiForce = None):
+       
         maxKxp = np.sin(self.maxPhi if maxPhiForce is None else maxPhiForce) * self.k
         dx = np.pi / maxKxp 
         xs = np.arange(-0.5 * dx * self.nPointsInteg, 0.5 * dx * self.nPointsInteg, dx)
@@ -175,4 +178,33 @@ class TukeyWaveFFT(_WaveFFT):
         return res
         
 if __name__ == "__main__":
-    pass
+    from NonlinearTMM import Material 
+    import pylab as plt
+    import LabPy
+    
+    materialPy = LabPy.Material("Static", n = 1.0)
+    material = Material.FromLabPy(materialPy)
+    wl = 532e-9
+    beta = 0.0
+    
+    w2 =  TukeyWaveFFT(wl = wl, pwr = 1.0, w0 = 100e-6, maxPhi = 0.1, \
+        nPointsInteg = 10, integCriteria = 1e-3, n = materialPy, Ly = 1e-3, a = 0.7)
+    w2.Solve(np.arcsin(beta) / material(wl).real)
+    
+    w = Wave(material, waveType = "tukey", nPointsInteg = 10, maxPhi = 0.1, a = 0.7)
+    w.Solve(wl, beta)
+
+    
+    xs, fp = w.fieldProfile
+    
+    plt.subplot(121)
+    plt.plot(1e6 * xs, fp, ".-")
+    plt.plot(1e6 * xs, w2._FieldProfile(xs), "x")
+    plt.subplot(122)    
+    plt.plot(w.kxs, w.expansionCoefsKx.real, "s-")
+    plt.plot(w2.kxs, w2.expansionCoefsKx.real, "x-", color = "black", lw = 1.0)
+    plt.plot(w.kxs, w.expansionCoefsKx.imag, "s--")
+    plt.plot(w2.kxs, w2.expansionCoefsKx.imag, "x--", color = "black",lw = 1.0)
+    plt.show()
+    
+    

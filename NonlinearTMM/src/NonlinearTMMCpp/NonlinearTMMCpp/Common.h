@@ -15,6 +15,7 @@ namespace TMM {
 	using Eigen::Vector3cd;
 	using Eigen::Matrix2cd;
 	using Eigen::Matrix3d;
+	using Eigen::MatrixXd;
 	using Eigen::MatrixXcd;
 	using Eigen::Tensor;
 	
@@ -79,9 +80,12 @@ namespace TMM {
 	};
 
 	enum SweepOutput {
-		SWEEP_PWRFLOWS = (1 << 0),
-		SWEEP_ABS = (1 << 1),
-		SWEEP_ENH = (1 << 2),
+		SWEEP_I = (1 << 0),
+		SWEEP_R = (1 << 1),
+		SWEEP_T = (1 << 2),
+		SWEEP_ABS = (1 << 3),
+		SWEEP_ENH = (1 << 4),
+		SWEEP_PWRFLOWS = (SWEEP_I | SWEEP_R | SWEEP_T),
 	};
 
 	//---------------------------------------------------------------
