@@ -13,25 +13,25 @@ namespace TMM {
 		return wl;
 	}
 
-	Eigen::Matrix3d RotationMatrixX(double phi) {
-		Eigen::Matrix3d res;
+	Matrix3d RotationMatrixX(double phi) {
+		Matrix3d res;
 		res << 1.0, 0.0, 0.0, 0.0, std::cos(phi), -std::sin(phi), 0.0, std::sin(phi), std::cos(phi);
 		return res;
 	}
 
-	Eigen::Matrix3d RotationMatrixY(double phi) {
-		Eigen::Matrix3d res;
+	Matrix3d RotationMatrixY(double phi) {
+		Matrix3d res;
 		res << std::cos(phi), 0.0, std::sin(phi), 0.0, 1.0, 0.0, -std::sin(phi), 0.0, std::cos(phi);
 		return res;
 	}
 
-	Eigen::Matrix3d RotationMatrixZ(double phi) {
-		Eigen::Matrix3d res;
+	Matrix3d RotationMatrixZ(double phi) {
+		Matrix3d res;
 		res << std::cos(phi), -std::sin(phi), 0.0, std::sin(phi), std::cos(phi), 0.0, 0.0, 0.0, 1.0;
 		return res;
 	}
 
-	Tensor3d ApplyRotationMatrixToTensor(Tensor3d input, Eigen::Matrix3d R) {
+	Tensor3d ApplyRotationMatrixToTensor(Tensor3d input, Matrix3d R) {
 		Tensor3d res(3, 3, 3);
 		res.setZero();
 
@@ -56,9 +56,9 @@ namespace TMM {
 		Tensor3d output(3, 3, 3);
 		output = input;
 
-		Eigen::Matrix3d Rx = RotationMatrixX(phiX);
-		Eigen::Matrix3d Ry = RotationMatrixY(phiY);
-		Eigen::Matrix3d Rz = RotationMatrixZ(phiZ);
+		Matrix3d Rx = RotationMatrixX(phiX);
+		Matrix3d Ry = RotationMatrixY(phiY);
+		Matrix3d Rz = RotationMatrixZ(phiZ);
 
 		output = ApplyRotationMatrixToTensor(output, Rx);
 		output = ApplyRotationMatrixToTensor(output, Ry);
@@ -74,7 +74,7 @@ namespace TMM {
 		return a * a;
 	}
 
-	template<typename T> T Interpolate(double x, const Eigen::ArrayXd & xs, const Eigen::Array<T, Eigen::Dynamic, 1> & ys) {
+	template<typename T> T Interpolate(double x, const ArrayXd & xs, const Eigen::Array<T, Eigen::Dynamic, 1> & ys) {
 		// xs must be sorted
 
 		// Check range
@@ -117,10 +117,10 @@ namespace TMM {
 		return res;
 	}
 
-	template dcomplex Interpolate<dcomplex>(double, const Eigen::ArrayXd &, const Eigen::ArrayXcd &);
-	template double Interpolate<double>(double, const Eigen::ArrayXd &, const Eigen::ArrayXd &);
+	template dcomplex Interpolate<dcomplex>(double, const ArrayXd &, const ArrayXcd &);
+	template double Interpolate<double>(double, const ArrayXd &, const ArrayXd &);
 
-	double GetDifferential(const Eigen::ArrayXd & intVar, int nr) {
+	double GetDifferential(const ArrayXd & intVar, int nr) {
 		double dIntVar;
 		if (intVar.size() <= 1) {
 			dIntVar = 1.0;
@@ -137,7 +137,7 @@ namespace TMM {
 		return dIntVar;
 	}
 
-	double const IntegrateWavePower(int layerNr, Polarization pol, double wl, dcomplex epsLayer0, const Eigen::ArrayXcd & Us, const Eigen::ArrayXd & kxs, const Eigen::ArrayXcd & kzs, double x0, double x1, double z, double Ly) {
+	double const IntegrateWavePower(int layerNr, Polarization pol, double wl, dcomplex epsLayer0, const ArrayXcd & Us, const ArrayXd & kxs, const ArrayXcd & kzs, double x0, double x1, double z, double Ly) {
 
 		double integValue2dRe = 0.0;
 		double integValue2dIm = 0.0;
@@ -261,10 +261,10 @@ namespace TMM {
 		return res;
 	}
 
-	Eigen::ArrayXcd FFTShift(Eigen::ArrayXcd data) {
+	ArrayXcd FFTShift(ArrayXcd data) {
 		int p2 = (data.size() + 1) / 2;
 
-		Eigen::ArrayXcd res(data.size());
+		ArrayXcd res(data.size());
 		for (int i = p2; i < data.size(); i++) {
 			res(i - p2) = data(i);
 		}
@@ -274,9 +274,9 @@ namespace TMM {
 		return res;
 	}
 
-	Eigen::ArrayXd IFFTShift(Eigen::ArrayXd data) {
+	ArrayXd IFFTShift(ArrayXd data) {
 		int p2 = data.size() - (data.size() + 1) / 2;
-		Eigen::ArrayXd res(data.size());
+		ArrayXd res(data.size());
 
 		for (int i = p2; i < data.size(); i++) {
 			res(i - p2) = data(i);
@@ -287,8 +287,8 @@ namespace TMM {
 		return res;
 	}
 
-	Eigen::ArrayXd FFTFreq(int n, double dx) {
-		Eigen::ArrayXd res(n);
+	ArrayXd FFTFreq(int n, double dx) {
+		ArrayXd res(n);
 		int startI = -(n - (n % 2)) / 2;
 		for (int i = 0; i < n; i++) {
 			res(i) = double(startI + i) / (dx * n);

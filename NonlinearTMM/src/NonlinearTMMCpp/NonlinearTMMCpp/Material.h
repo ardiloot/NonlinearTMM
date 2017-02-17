@@ -37,13 +37,13 @@ namespace TMM {
 	private:
 		bool isStatic;
 		dcomplex staticN;
-		Eigen::ArrayXd wlsExp;
-		Eigen::ArrayXcd nsExp;
+		ArrayXd wlsExp;
+		ArrayXcd nsExp;
 	public:
 		Chi2Tensor chi2;
 
 		Material(dcomplex n_);
-		Material(Eigen::ArrayXd wlsExp_, Eigen::ArrayXcd nsExp_);
+		Material(ArrayXd wlsExp_, ArrayXcd nsExp_);
 		dcomplex GetN(double wl) const;
 		bool IsNonlinear() const;
 	};

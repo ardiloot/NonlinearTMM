@@ -9,11 +9,15 @@
 //#include <omp.h>
 
 namespace TMM {
-	using Eigen::Matrix2cd;
 	using Eigen::Array2cd;
+	using Eigen::ArrayXd;
+	using Eigen::ArrayXcd;
 	using Eigen::Vector3cd;
+	using Eigen::Matrix2cd;
+	using Eigen::Matrix3d;
+	using Eigen::MatrixXcd;
 	using Eigen::Tensor;
-
+	
 	//---------------------------------------------------------------
 	// Typedefs
 	//---------------------------------------------------------------
@@ -86,21 +90,21 @@ namespace TMM {
 
 	double WlToOmega(double wl);
 	double OmegaToWl(double omega);
-	Eigen::Matrix3d RotationMatrixX(double phi);
-	Eigen::Matrix3d RotationMatrixY(double phi);
-	Eigen::Matrix3d RotationMatrixZ(double phi);
-	Tensor3d ApplyRotationMatrixToTensor(Tensor3d input, Eigen::Matrix3d R);
+	Matrix3d RotationMatrixX(double phi);
+	Matrix3d RotationMatrixY(double phi);
+	Matrix3d RotationMatrixZ(double phi);
+	Tensor3d ApplyRotationMatrixToTensor(Tensor3d input, Matrix3d R);
 	Tensor3d RotateTensor(Tensor3d &input, double phiX = 0, double phiY = 0, double phiZ = 0);
 	double sqr(double a);
 	dcomplex sqr(dcomplex a);
-	template <typename T> T Interpolate(double x, const Eigen::ArrayXd & xs, const Eigen::Array<T, Eigen::Dynamic, 1> & ys);
-	double GetDifferential(const Eigen::ArrayXd &intVar, int nr);
-	double const IntegrateWavePower(int layerNr, Polarization pol, double wl, dcomplex epsLayer0, const Eigen::ArrayXcd &Us,
-		const Eigen::ArrayXd &kxs, const Eigen::ArrayXcd &kzs,
+	template <typename T> T Interpolate(double x, const ArrayXd & xs, const Eigen::Array<T, Eigen::Dynamic, 1> & ys);
+	double GetDifferential(const ArrayXd &intVar, int nr);
+	double const IntegrateWavePower(int layerNr, Polarization pol, double wl, dcomplex epsLayer0, const ArrayXcd &Us,
+		const ArrayXd &kxs, const ArrayXcd &kzs,
 		double x0, double x1, double z, double Ly);
 	WaveDirection GetWaveDirection(dcomplex kzF, dcomplex eps, Polarization pol);
-	Eigen::ArrayXcd FFTShift(Eigen::ArrayXcd data);
-	Eigen::ArrayXd IFFTShift(Eigen::ArrayXd data);
-	Eigen::ArrayXd FFTFreq(int n, double dx);
+	ArrayXcd FFTShift(ArrayXcd data);
+	ArrayXd IFFTShift(ArrayXd data);
+	ArrayXd FFTFreq(int n, double dx);
 
 }

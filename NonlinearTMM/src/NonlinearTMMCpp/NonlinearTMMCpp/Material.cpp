@@ -97,7 +97,7 @@ namespace TMM {
 		staticN = n_;
 	}
 
-	Material::Material(Eigen::ArrayXd wlsExp_, Eigen::ArrayXcd nsExp_) : wlsExp(wlsExp_), nsExp(nsExp_) {
+	Material::Material(ArrayXd wlsExp_, ArrayXcd nsExp_) : wlsExp(wlsExp_), nsExp(nsExp_) {
 		// Copy of wlsExp and nsExp is made intentionally
 		isStatic = false;
 		staticN = 1.0;

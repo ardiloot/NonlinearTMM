@@ -2,7 +2,7 @@
 
 namespace TMM {
 
-	void OuterProductSSEEigenComplex(const Eigen::ArrayXcd & X, const Eigen::ArrayXcd & Y, Eigen::MatrixXcd & R) {
+	void OuterProductSSEEigenComplex(const ArrayXcd & X, const ArrayXcd & Y, MatrixXcd & R) {
 		register dcomplex* ptrR = &R(0, 0);
 		const register dcomplex* ptrX = (dcomplex*)&X(0);
 		const register dcomplex* ptrY = (dcomplex*)&Y(0);
@@ -20,7 +20,7 @@ namespace TMM {
 		}
 	}
 
-	void OuterProductSSEEigenComplexAdd(const Eigen::ArrayXcd & X, const Eigen::ArrayXcd & Y, Eigen::MatrixXcd & R) {
+	void OuterProductSSEEigenComplexAdd(const ArrayXcd & X, const ArrayXcd & Y, MatrixXcd & R) {
 		// Identical to previous, but add to result (performance)
 		register double* ptrR = (double*)&R(0, 0);
 		const register dcomplex* ptrX = (dcomplex*)&X(0);
@@ -47,7 +47,7 @@ namespace TMM {
 	}
 
 
-	void OuterProductGoodEigenComplex(const Eigen::ArrayXcd & X, const Eigen::ArrayXcd & Y, Eigen::MatrixXcd & R) {
+	void OuterProductGoodEigenComplex(const ArrayXcd & X, const ArrayXcd & Y, MatrixXcd & R) {
 		dcomplex* ptrR = &R(0, 0);
 		dcomplex* ptrX = (dcomplex*)&X(0);
 		dcomplex* ptrY = (dcomplex*)&Y(0);
@@ -65,7 +65,7 @@ namespace TMM {
 		}
 	}
 
-	void OuterProductGoodEigenComplexAdd(const Eigen::ArrayXcd & X, const Eigen::ArrayXcd & Y, Eigen::MatrixXcd & R) {
+	void OuterProductGoodEigenComplexAdd(const ArrayXcd & X, const ArrayXcd & Y, MatrixXcd & R) {
 		double* ptrR = (double*)&R(0, 0);
 		dcomplex* ptrX = (dcomplex*)&X(0);
 		dcomplex* ptrY = (dcomplex*)&Y(0);
@@ -173,7 +173,7 @@ namespace TMM {
 		return pol;
 	}
 
-	void FieldsZX::SetFields(const FieldsZ & f, const Eigen::ArrayXcd & phaseX, bool add) {
+	void FieldsZX::SetFields(const FieldsZ & f, const ArrayXcd & phaseX, bool add) {
 		int n = f.E.rows();
 		int m = phaseX.size();
 
@@ -209,7 +209,7 @@ namespace TMM {
 		}
 	}
 
-	void FieldsZX::AddFields(const FieldsZ & f, const Eigen::ArrayXcd & phaseX) {
+	void FieldsZX::AddFields(const FieldsZ & f, const ArrayXcd & phaseX) {
 		SetFields(f, phaseX, true);
 	}
 
@@ -450,7 +450,7 @@ namespace TMM {
 		return res;
 	}
 
-	SweepResultNonlinearTMM * NonlinearTMM::Sweep(TMMParam param, const Eigen::Map<Eigen::ArrayXd>& values, int outmask, int layerNr, double layerZ) {
+	SweepResultNonlinearTMM * NonlinearTMM::Sweep(TMMParam param, const Eigen::Map<ArrayXd>& values, int outmask, int layerNr, double layerZ) {
 		CheckPrerequisites(param);
 		if (layerNr < 0 || layerNr > layers.size()) {
 			throw std::invalid_argument("Invalid layer index.");
@@ -474,14 +474,14 @@ namespace TMM {
 		return res;
 	}
 
-	FieldsZ * NonlinearTMM::GetFields(const Eigen::Map<Eigen::ArrayXd>& zs, WaveDirection dir) {
+	FieldsZ * NonlinearTMM::GetFields(const Eigen::Map<ArrayXd>& zs, WaveDirection dir) {
 		if (!solved) {
 			throw std::runtime_error("NonlinearTMM must be solved first.");
 		}
 
 		// Find layerNr for every z
 		Eigen::ArrayXi layerNrs(zs.size());
-		Eigen::ArrayXd zInternal(zs.size());
+		ArrayXd zInternal(zs.size());
 		int curLayer = 0;
 		double curLayerStartZ = 0.0;
 		double curLayerEndZ = 0.0;
@@ -515,7 +515,7 @@ namespace TMM {
 		return res;
 	}
 
-	FieldsZX * NonlinearTMM::GetFields2D(const Eigen::Map<Eigen::ArrayXd>& zs, const Eigen::Map<Eigen::ArrayXd>& xs, WaveDirection dir) {
+	FieldsZX * NonlinearTMM::GetFields2D(const Eigen::Map<ArrayXd>& zs, const Eigen::Map<ArrayXd>& xs, WaveDirection dir) {
 		if (!solved) {
 			throw std::runtime_error("NonlinearTMM must be solved first.");
 		}
@@ -525,13 +525,13 @@ namespace TMM {
 		double kx = layers[0].kx;
 
 		FieldsZ *f = GetFields(zs, dir);
-		Eigen::ArrayXcd phaseX = (constI * kx * xs).exp();
+		ArrayXcd phaseX = (constI * kx * xs).exp();
 		res->SetFields(*f, phaseX);
 		delete f;
 		return res;
 	}
 
-	FieldsZX * NonlinearTMM::GetWaveFields2D(const Eigen::Map<Eigen::ArrayXd>& betas, const Eigen::Map<Eigen::ArrayXcd>& E0s, const Eigen::Map<Eigen::ArrayXd>& zs, const Eigen::Map<Eigen::ArrayXd>& xs, WaveDirection dir) {
+	FieldsZX * NonlinearTMM::GetWaveFields2D(const Eigen::Map<ArrayXd>& betas, const Eigen::Map<ArrayXcd>& E0s, const Eigen::Map<ArrayXd>& zs, const Eigen::Map<ArrayXd>& xs, WaveDirection dir) {
 		CheckPrerequisites(PARAM_BETA);
 
 		if (E0s.size() != betas.size()) {
@@ -546,7 +546,7 @@ namespace TMM {
 		FieldsZX *res = new FieldsZX(zs.size(), xs.size(), pol);
 		res->SetZero(); // We are summing up
 
-		Eigen::ArrayXd kxs = betas * 2.0 * PI / wl;
+		ArrayXd kxs = betas * 2.0 * PI / wl;
 
 		#pragma omp parallel
 		{
@@ -563,7 +563,7 @@ namespace TMM {
 				// Integrate fields
 				double dkx = GetDifferential(kxs, i);
 				FieldsZ *f = tmmThread.GetFields(zs, dir);
-				Eigen::ArrayXcd phaseX = (constI * kxs(i) * xs).exp() * dkx;
+				ArrayXcd phaseX = (constI * kxs(i) * xs).exp() * dkx;
 				res->AddFields(*f, phaseX);
 				delete f;
 			}
@@ -598,7 +598,7 @@ namespace TMM {
 
 	}
 
-	pairdd NonlinearTMM::GetPowerFlowsForWave(const Eigen::Map<Eigen::ArrayXd>& betas, const Eigen::Map<Eigen::ArrayXcd>& E0s, int layerNr, double x0, double x1, double z, double Ly, WaveDirection dir) {
+	pairdd NonlinearTMM::GetPowerFlowsForWave(const Eigen::Map<ArrayXd>& betas, const Eigen::Map<ArrayXcd>& E0s, int layerNr, double x0, double x1, double z, double Ly, WaveDirection dir) {
 		CheckPrerequisites(PARAM_BETA);
 		if (mode == MODE_NONLINEAR) {
 			throw std::runtime_error("For nonlinear mode use the method of SecondOrderNLTMM");
@@ -629,7 +629,7 @@ namespace TMM {
 		SetParam(PARAM_OVERRIDE_E0, oldOverrideE0);
 
 		// Integrate powers
-		Eigen::ArrayXd kxs(betas.size());
+		ArrayXd kxs(betas.size());
 		kxs = betas * layers[0].k0;
 		dcomplex epsLayer0 = layers[0].eps;
 		double PF = constNAN, PB = constNAN;

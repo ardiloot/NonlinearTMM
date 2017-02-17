@@ -35,11 +35,11 @@ namespace TMM {
 		return res;
 	}
 
-	typedef std::function<void(const Eigen::ArrayXcd&, const Eigen::ArrayXcd&, Eigen::MatrixXcd&)> OuterProductSSEEigenFunc;
-	void OuterProductSSEEigenComplex(const Eigen::ArrayXcd& X, const Eigen::ArrayXcd& Y, Eigen::MatrixXcd& R);
-	void OuterProductSSEEigenComplexAdd(const Eigen::ArrayXcd& X, const Eigen::ArrayXcd& Y, Eigen::MatrixXcd& R);
-	void OuterProductGoodEigenComplex(const Eigen::ArrayXcd& X, const Eigen::ArrayXcd& Y, Eigen::MatrixXcd& R);
-	void OuterProductGoodEigenComplexAdd(const Eigen::ArrayXcd& X, const Eigen::ArrayXcd& Y, Eigen::MatrixXcd& R);
+	typedef std::function<void(const ArrayXcd&, const ArrayXcd&, MatrixXcd&)> OuterProductSSEEigenFunc;
+	void OuterProductSSEEigenComplex(const ArrayXcd& X, const ArrayXcd& Y, MatrixXcd& R);
+	void OuterProductSSEEigenComplexAdd(const ArrayXcd& X, const ArrayXcd& Y, MatrixXcd& R);
+	void OuterProductGoodEigenComplex(const ArrayXcd& X, const ArrayXcd& Y, MatrixXcd& R);
+	void OuterProductGoodEigenComplexAdd(const ArrayXcd& X, const ArrayXcd& Y, MatrixXcd& R);
 
 	//---------------------------------------------------------------
 	// PowerFlows
@@ -67,9 +67,9 @@ namespace TMM {
 		int layerNr;
 		double layerZ;
 	public:
-		Eigen::ArrayXcd inc, r, t;
-		Eigen::ArrayXd I, R, T, A;
-		Eigen::ArrayXd enh;
+		ArrayXcd inc, r, t;
+		ArrayXd I, R, T, A;
+		ArrayXd enh;
 
 		SweepResultNonlinearTMM(int n, int outmask_, int layerNr_, double layerZ_);
 		int GetOutmask();
@@ -83,7 +83,7 @@ namespace TMM {
 	class FieldsZ {
 	private:
 	public:
-		Eigen::MatrixXcd E, H;
+		MatrixXcd E, H;
 		FieldsZ(int n);
 		void SetFieldsAtZ(int nr, const Fields &f);
 
@@ -97,12 +97,12 @@ namespace TMM {
 	private:
 		Polarization pol;
 	public:
-		Eigen::MatrixXcd Ex, Ey, Ez, Hx, Hy, Hz;
+		MatrixXcd Ex, Ey, Ez, Hx, Hy, Hz;
 		FieldsZX(int n, int m, Polarization pol_);
 		void SetZero();
 		Polarization GetPol();
-		void SetFields(const FieldsZ &f, const Eigen::ArrayXcd &phaseX, bool add = false);
-		void AddFields(const FieldsZ &f, const Eigen::ArrayXcd &phaseX);
+		void SetFields(const FieldsZ &f, const ArrayXcd &phaseX, bool add = false);
+		void AddFields(const FieldsZ &f, const ArrayXcd &phaseX);
 	};
 
 	//---------------------------------------------------------------
@@ -143,13 +143,13 @@ namespace TMM {
 		PowerFlows GetPowerFlows() const;
 		double GetAbsorbedPower() const;
 		double GetEnhancement(int layerNr, double z);
-		SweepResultNonlinearTMM* Sweep(TMMParam param, const Eigen::Map<Eigen::ArrayXd> &values, int outmask = 1, int layerNr = 0, double layerZ = 0);
-		FieldsZ* GetFields(const Eigen::Map<Eigen::ArrayXd> &zs, WaveDirection dir = TOT);
-		FieldsZX* GetFields2D(const Eigen::Map<Eigen::ArrayXd> &zs, const Eigen::Map<Eigen::ArrayXd> &xs, WaveDirection dir = TOT);
+		SweepResultNonlinearTMM* Sweep(TMMParam param, const Eigen::Map<ArrayXd> &values, int outmask = 1, int layerNr = 0, double layerZ = 0);
+		FieldsZ* GetFields(const Eigen::Map<ArrayXd> &zs, WaveDirection dir = TOT);
+		FieldsZX* GetFields2D(const Eigen::Map<ArrayXd> &zs, const Eigen::Map<ArrayXd> &xs, WaveDirection dir = TOT);
 
-		pairdd GetPowerFlowsForWave(const Eigen::Map<Eigen::ArrayXd> &betas, const Eigen::Map<Eigen::ArrayXcd> &E0s,
+		pairdd GetPowerFlowsForWave(const Eigen::Map<ArrayXd> &betas, const Eigen::Map<ArrayXcd> &E0s,
 			int layerNr, double x0, double x1, double z, double Ly, WaveDirection dir = TOT);
-		FieldsZX* GetWaveFields2D(const Eigen::Map<Eigen::ArrayXd> &betas, const Eigen::Map<Eigen::ArrayXcd> &E0s, const Eigen::Map<Eigen::ArrayXd> &zs, const Eigen::Map<Eigen::ArrayXd> &xs, WaveDirection dir = TOT);
+		FieldsZX* GetWaveFields2D(const Eigen::Map<ArrayXd> &betas, const Eigen::Map<ArrayXcd> &E0s, const Eigen::Map<ArrayXd> &zs, const Eigen::Map<ArrayXd> &xs, WaveDirection dir = TOT);
 		
 		// Setters
 		void SetParam(TMMParam param, bool value);

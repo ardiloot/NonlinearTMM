@@ -46,8 +46,8 @@ void TestNonlinearTmm() {
 	tmm.Solve();
 	
 	
-	Eigen::ArrayXd zs = Eigen::ArrayXd::LinSpaced(1000, -100e-9, 100e-9);
-	Eigen::Map<Eigen::ArrayXd> zsMap(&zs(0), zs.size());
+	ArrayXd zs = ArrayXd::LinSpaced(1000, -100e-9, 100e-9);
+	Eigen::Map<ArrayXd> zsMap(&zs(0), zs.size());
 	
 	for (int i = 0; i < 50000; i++) {
 		tmm.Solve();
@@ -56,11 +56,11 @@ void TestNonlinearTmm() {
 	/*
 
 	/*
-	Eigen::ArrayXd xs = Eigen::ArrayXd::LinSpaced(500, -100e-9, 100e-9);
-	Eigen::Map<Eigen::ArrayXd> xsMap(&xs(0), xs.size());
+	ArrayXd xs = ArrayXd::LinSpaced(500, -100e-9, 100e-9);
+	Eigen::Map<ArrayXd> xsMap(&xs(0), xs.size());
 
-	Eigen::ArrayXd zs = Eigen::ArrayXd::LinSpaced(510, -200e-9, 200e-9);
-	Eigen::Map<Eigen::ArrayXd> zsMap(&zs(0), zs.size());
+	ArrayXd zs = ArrayXd::LinSpaced(510, -200e-9, 200e-9);
+	Eigen::Map<ArrayXd> zsMap(&zs(0), zs.size());
 
 	for (int i = 0; i < 10000; i++) {
 		tmm.Solve();
@@ -133,8 +133,8 @@ void TestSecondOrderNLTMM() {
 	//tmm.Solve();
 
 	/*
-	Eigen::ArrayXd betas = Eigen::ArrayXd::LinSpaced(1000, 0.0, 0.99);
-	Eigen::Map<Eigen::ArrayXd> betasMap(&betas(0), betas.size());
+	ArrayXd betas = ArrayXd::LinSpaced(1000, 0.0, 0.99);
+	Eigen::Map<ArrayXd> betasMap(&betas(0), betas.size());
 	for (int i = 0; i < 1000; i++) {
 		tmm.Sweep(TMM::PARAM_BETA, betasMap, betasMap);
 	}

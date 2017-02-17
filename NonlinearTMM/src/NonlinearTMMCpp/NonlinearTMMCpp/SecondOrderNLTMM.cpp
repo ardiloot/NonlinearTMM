@@ -76,6 +76,7 @@ namespace TMM {
 		}
 
 		// Check inhomogenous wave directionality, correct if necessary
+		/*
 		dcomplex epsL = sqr(material->GetN(tmmGen.GetDouble(PARAM_WL)));
 		Polarization pol = (Polarization)tmmGen.GetInt(PARAM_POL);
 		WaveDirection dS = F, dA = F;
@@ -86,6 +87,7 @@ namespace TMM {
 			dA = GetWaveDirection(kpA->kSzF, epsL, pol);
 		}
 
+		
 		if (dS != F) {
 			kpS->kSzF *= -1.0;
 			swap(kpS->pF, kpS->pB);
@@ -95,6 +97,8 @@ namespace TMM {
 			kpA->kSzF *= -1.0;
 			swap(kpA->pF, kpA->pB);
 		}
+		*/
+		
 
 	}
 
@@ -169,7 +173,7 @@ namespace TMM {
 		return &tmmGen;
 	}
 
-	SweepResultSecondOrderNLTMM * SecondOrderNLTMM::Sweep(TMMParam param, const Eigen::Map<Eigen::ArrayXd>& valuesP1, const Eigen::Map<Eigen::ArrayXd>& valuesP2, int outmask, int layerNr, double layerZ) {
+	SweepResultSecondOrderNLTMM * SecondOrderNLTMM::Sweep(TMMParam param, const Eigen::Map<ArrayXd>& valuesP1, const Eigen::Map<ArrayXd>& valuesP2, int outmask, int layerNr, double layerZ) {
 		if (valuesP1.size() != valuesP2.size()) {
 			throw std::invalid_argument("Value arrays must have the same size.");
 		}
@@ -204,7 +208,7 @@ namespace TMM {
 		return res;
 	}
 
-	FieldsZX * SecondOrderNLTMM::GetGenWaveFields2D(const Eigen::Map<Eigen::ArrayXd>& betasP1, const Eigen::Map<Eigen::ArrayXd>& betasP2, const Eigen::Map<Eigen::ArrayXcd>& E0sP1, const Eigen::Map<Eigen::ArrayXcd>& E0sP2, const Eigen::Map<Eigen::ArrayXd>& zs, const Eigen::Map<Eigen::ArrayXd>& xs, WaveDirection dir) {
+	FieldsZX * SecondOrderNLTMM::GetGenWaveFields2D(const Eigen::Map<ArrayXd>& betasP1, const Eigen::Map<ArrayXd>& betasP2, const Eigen::Map<ArrayXcd>& E0sP1, const Eigen::Map<ArrayXcd>& E0sP2, const Eigen::Map<ArrayXd>& zs, const Eigen::Map<ArrayXd>& xs, WaveDirection dir) {
 		// Do checking
 		tmmP1.CheckPrerequisites(PARAM_BETA);
 		tmmP2.CheckPrerequisites(PARAM_BETA);
@@ -219,8 +223,8 @@ namespace TMM {
 		}
 
 		// kxs
-		Eigen::ArrayXd kxsP1 = betasP1 * 2.0 * PI / tmmP1.GetDouble(PARAM_WL);
-		Eigen::ArrayXd kxsP2 = betasP2 * 2.0 * PI / tmmP2.GetDouble(PARAM_WL);
+		ArrayXd kxsP1 = betasP1 * 2.0 * PI / tmmP1.GetDouble(PARAM_WL);
+		ArrayXd kxsP2 = betasP2 * 2.0 * PI / tmmP2.GetDouble(PARAM_WL);
 
 		// Allocate space (deletion is the responsibility of the caller!)
 		FieldsZX *res = new FieldsZX(zs.size(), xs.size(), (Polarization)tmmGen.GetInt(PARAM_POL));
@@ -247,7 +251,7 @@ namespace TMM {
 					// Integrate fields
 					double kxGen = tmmThread.tmmGen.GetLayer(0)->GetKx();
 					FieldsZ *fGen = tmmThread.tmmGen.GetFields(zs, dir);
-					Eigen::ArrayXcd phaseXGen = (constI * kxGen * xs).exp() * dkxP1 * dkxP2;
+					ArrayXcd phaseXGen = (constI * kxGen * xs).exp() * dkxP1 * dkxP2;
 					res->AddFields(*fGen, phaseXGen);
 					delete fGen;
 				}
@@ -256,7 +260,7 @@ namespace TMM {
 		return res;
 	}
 
-	pairdd SecondOrderNLTMM::GetPowerFlowsGenForWave(const Eigen::Map<Eigen::ArrayXd>& betasP1, const Eigen::Map<Eigen::ArrayXd>& betasP2, const Eigen::Map<Eigen::ArrayXcd>& E0sP1, const Eigen::Map<Eigen::ArrayXcd>& E0sP2, int layerNr, double x0, double x1, double z, double Ly, WaveDirection dir) {
+	pairdd SecondOrderNLTMM::GetPowerFlowsGenForWave(const Eigen::Map<ArrayXd>& betasP1, const Eigen::Map<ArrayXd>& betasP2, const Eigen::Map<ArrayXcd>& E0sP1, const Eigen::Map<ArrayXcd>& E0sP2, int layerNr, double x0, double x1, double z, double Ly, WaveDirection dir) {
 		// Do checking
 
 		if (E0sP1.size() != betasP1.size()) {
@@ -275,7 +279,7 @@ namespace TMM {
 		int nTot = betasP1.size() * betasP2.size();
 		Eigen::MatrixX2cd UsUnsorted(nTot, 2);
 		Eigen::MatrixX2cd kzsUnsorted(nTot, 2);
-		Eigen::ArrayXd kxsUnsorted(nTot);
+		ArrayXd kxsUnsorted(nTot);
 
 		// Solve for every beta
 		bool oldOverrideE0P1 = tmmP1.GetBool(PARAM_OVERRIDE_E0);
@@ -312,7 +316,7 @@ namespace TMM {
 
 		Eigen::MatrixX2cd Us(nTot, 2);
 		Eigen::MatrixX2cd kzs(nTot, 2);
-		Eigen::ArrayXd kxs(nTot);
+		ArrayXd kxs(nTot);
 
 		for (int i = 0; i < nTot; i++) {
 			Us.row(i) = UsUnsorted.row(indices(i));
