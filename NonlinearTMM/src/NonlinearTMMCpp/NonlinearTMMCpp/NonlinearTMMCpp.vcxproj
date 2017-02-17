@@ -171,6 +171,7 @@
     <ClCompile Include="NonlinearLayer.cpp" />
     <ClCompile Include="NonlinearTMM.cpp" />
     <ClCompile Include="SecondOrderNLTMM.cpp" />
+    <ClCompile Include="Waves.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common.h" />
@@ -178,6 +179,7 @@
     <ClInclude Include="NonlinearLayer.h" />
     <ClInclude Include="NonlinearTMM.h" />
     <ClInclude Include="SecondOrderNLTMM.h" />
+    <ClInclude Include="Waves.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

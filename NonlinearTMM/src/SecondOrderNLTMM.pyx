@@ -39,6 +39,16 @@ cdef NonlinearProcessCpp NonlinearProcessFromStr(str processStr):
     else:
         raise ValueError()
 
+cdef WaveTypeCpp WaveTypeFromStr(str waveTypeStr):
+    if waveTypeStr == "planewave":
+        return PLANEWAVE
+    if waveTypeStr == "gaussian":
+        return GAUSSIANWAVE
+    if waveTypeStr == "tukey":
+        return TUKEYWAVE
+    else:
+        raise NotImplementedError()
+
 cdef paramDict = {"wl": PARAM_WL, \
                   "beta": PARAM_BETA, \
                   "pol": PARAM_POL, \
@@ -46,6 +56,18 @@ cdef paramDict = {"wl": PARAM_WL, \
                   "overrideE0": PARAM_OVERRIDE_E0, \
                   "E0": PARAM_E0, \
                   "mode": PARAM_MODE}
+    
+cdef waveParamsSet = set(["waveType",
+                "pwr",
+                "overrideE0",
+                "E0",
+                "w0",
+                "Ly",
+                "a",
+                "nPointsInteg",
+                "maxPhi",
+                "integCriteria"])
+
     
 cdef TMMParamCpp TmmParamFromStr(str paramStr):
     return paramDict[paramStr]
@@ -151,6 +173,140 @@ cdef class Material:
         
     def IsNonlinear(self):
         return self._thisptr.IsNonlinear()
+
+#===============================================================================
+# Waves
+#===============================================================================
+
+cdef class Wave:
+    cdef WaveCpp *_thisptr
+    cdef object _materialCache;
+    
+    def __cinit__(self, Material material, **kwargs):
+        self._thisptr = new WaveCpp()
+        self.SetMaterial(material)
+        self.SetParams(**kwargs)
+        
+    def __dealloc__(self):
+        del self._thisptr
+        
+    def SetParams(self, **kwargs):
+        for name, value in kwargs.iteritems():
+            if name not in waveParamsSet:
+                raise ValueError("Unknown kwarg %s" % (name))
+            setattr(self, name, value)
+        
+    def SetMaterial(self, Material material):
+        cdef MaterialCpp *matptr = material._thisptr
+        self._thisptr.SetMaterial(matptr)
+        self._materialCache = material
+        
+    def Solve(self, double wl, double beta):
+        self._thisptr.Solve(wl, beta)
+        
+    # Getters
+    #--------------------------------------------------------------------------- 
+        
+    @property
+    def waveType(self):
+        raise NotImplementedError()
+        
+    @property
+    def pwr(self):
+        return self._thisptr.GetPwr();
+    
+    @property
+    def overrideE0(self):
+        return self._thisptr.GetOverrideE0();
+    
+    @property
+    def E0(self):
+        return self._thisptr.GetE0();
+
+    @property
+    def w0(self):
+        return self._thisptr.GetW0();
+    
+    @property
+    def Ly(self):
+        return self._thisptr.GetLy();
+    
+    @property
+    def a(self):
+        return self._thisptr.GetA();
+    
+    @property
+    def nPointsInteg(self):
+        return self._thisptr.GetNPointsInteg();
+    
+    @property
+    def maxPhi(self):
+        return self._thisptr.GetMaxPhi();
+    
+    @property
+    def integCriteria(self):
+        return self._thisptr.GetIntegCriteria();
+        
+    @property
+    def kxs(self):
+        return ndarray_copy(self._thisptr.GetKxs()).squeeze()
+
+    @property
+    def kzs(self):
+        return ndarray_copy(self._thisptr.GetKzs()).squeeze()
+    
+    @property
+    def fieldProfile(self):
+        xs = ndarray_copy(self._thisptr.GetFieldProfileXs()).squeeze()
+        fieldProfile = ndarray_copy(self._thisptr.GetFieldProfile()).squeeze()
+        return xs, fieldProfile
+    
+    @property
+    def expansionCoefsKx(self):
+        return ndarray_copy(self._thisptr.GetExpansionCoefsKx()).squeeze()
+
+    # Setters
+    #---------------------------------------------------------------------------
+
+    @waveType.setter
+    def waveType(self, str waveTypeStr):  # @DuplicatedSignature
+        self._thisptr.SetWaveType(WaveTypeFromStr(waveTypeStr))
+    
+    @pwr.setter    
+    def pwr(self, double value):  # @DuplicatedSignature
+        self._thisptr.SetPwr(value)
+
+    @overrideE0.setter
+    def overrideE0(self, bool value): # @DuplicatedSignature
+        self._thisptr.SetOverrideE0(value)
+
+    @E0.setter
+    def E0(self, double value): # @DuplicatedSignature
+        self._thisptr.SetE0(value)
+        
+    @w0.setter
+    def w0(self, double value): # @DuplicatedSignature
+        self._thisptr.SetW0(value)
+        
+    @Ly.setter
+    def Ly(self, double value): # @DuplicatedSignature
+        self._thisptr.SetLy(value)
+    
+    @a.setter
+    def a(self, double value): # @DuplicatedSignature
+        self._thisptr.SetA(value)
+        
+    @nPointsInteg.setter
+    def nPointsInteg(self, int value): # @DuplicatedSignature
+        self._thisptr.SetNPointsInteg(value)
+        
+    @maxPhi.setter
+    def maxPhi(self, double value): # @DuplicatedSignature
+        self._thisptr.SetMaxPhi(value)
+    
+    @integCriteria.setter
+    def integCriteria(self, double value): # @DuplicatedSignature
+        self._thisptr.SetIntegCriteria(value)  
 
 #===============================================================================
 # PowerFlows

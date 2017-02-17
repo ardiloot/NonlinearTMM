@@ -1,6 +1,7 @@
 #pragma once
 #include "Common.h"
 #include "Material.h"
+#include "Waves.h"
 #include "NonlinearLayer.h"
 
 namespace TMM {	
@@ -137,6 +138,7 @@ namespace TMM {
 		NonlinearLayer* GetLayer(int layerNr);
 		int LayersCount() const;
 		void CheckPrerequisites(TMMParam toIgnore = PARAM_NOT_DEFINED);
+		
 		void Solve();
 		PowerFlows GetPowerFlows() const;
 		double GetAbsorbedPower() const;
@@ -144,10 +146,11 @@ namespace TMM {
 		SweepResultNonlinearTMM* Sweep(TMMParam param, const Eigen::Map<Eigen::ArrayXd> &values, int outmask = 1, int layerNr = 0, double layerZ = 0);
 		FieldsZ* GetFields(const Eigen::Map<Eigen::ArrayXd> &zs, WaveDirection dir = TOT);
 		FieldsZX* GetFields2D(const Eigen::Map<Eigen::ArrayXd> &zs, const Eigen::Map<Eigen::ArrayXd> &xs, WaveDirection dir = TOT);
-		FieldsZX* GetWaveFields2D(const Eigen::Map<Eigen::ArrayXd> &betas, const Eigen::Map<Eigen::ArrayXcd> &E0s, const Eigen::Map<Eigen::ArrayXd> &zs, const Eigen::Map<Eigen::ArrayXd> &xs, WaveDirection dir = TOT);
-		pairdd GetPowerFlowsForWave(const Eigen::Map<Eigen::ArrayXd> &betas, const Eigen::Map<Eigen::ArrayXcd> &E0s, 
-			int layerNr, double x0, double x1, double z, double Ly, WaveDirection dir = TOT);
 
+		pairdd GetPowerFlowsForWave(const Eigen::Map<Eigen::ArrayXd> &betas, const Eigen::Map<Eigen::ArrayXcd> &E0s,
+			int layerNr, double x0, double x1, double z, double Ly, WaveDirection dir = TOT);
+		FieldsZX* GetWaveFields2D(const Eigen::Map<Eigen::ArrayXd> &betas, const Eigen::Map<Eigen::ArrayXcd> &E0s, const Eigen::Map<Eigen::ArrayXd> &zs, const Eigen::Map<Eigen::ArrayXd> &xs, WaveDirection dir = TOT);
+		
 		// Setters
 		void SetParam(TMMParam param, bool value);
 		void SetParam(TMMParam param, int value);

@@ -247,16 +247,51 @@ namespace TMM {
 			}
 		}
 
-		if (res == F && (imag(kzF) < 0.0 || pwrFlow < 0.0)) {
+		if (res == F && (/*imag(kzF) < 0.0 || */ pwrFlow < 0.0)) {
 			#pragma omp critical
 			std::cerr << "F: " << kzF << " " << eps << ": " << pwrFlow << std::endl;
-			throw std::runtime_error("Could not determine wave direction.");
+			//throw std::runtime_error("Could not determine wave direction.");
 		}
 
-		if (res == B && (imag(kzF) > 0.0 || pwrFlow > 0.0)) {
+		if (res == B && (/*imag(kzF) > 0.0 || */pwrFlow > 0.0)) {
 			#pragma omp critical
 			std::cerr << "B: " << kzF << " " << eps << ": " << pwrFlow << std::endl;
-			throw std::runtime_error("Could not determine wave direction.");
+			//throw std::runtime_error("Could not determine wave direction.");
+		}
+		return res;
+	}
+
+	Eigen::ArrayXcd FFTShift(Eigen::ArrayXcd data) {
+		int p2 = (data.size() + 1) / 2;
+
+		Eigen::ArrayXcd res(data.size());
+		for (int i = p2; i < data.size(); i++) {
+			res(i - p2) = data(i);
+		}
+		for (int i = 0; i < p2; i++) {
+			res(data.size() - p2 + i) = data(i);
+		}
+		return res;
+	}
+
+	Eigen::ArrayXd IFFTShift(Eigen::ArrayXd data) {
+		int p2 = data.size() - (data.size() + 1) / 2;
+		Eigen::ArrayXd res(data.size());
+
+		for (int i = p2; i < data.size(); i++) {
+			res(i - p2) = data(i);
+		}
+		for (int i = 0; i < p2; i++) {
+			res(data.size() - p2 + i) = data(i);
+		}
+		return res;
+	}
+
+	Eigen::ArrayXd FFTFreq(int n, double dx) {
+		Eigen::ArrayXd res(n);
+		int startI = -(n - (n % 2)) / 2;
+		for (int i = 0; i < n; i++) {
+			res(i) = double(startI + i) / (dx * n);
 		}
 		return res;
 	}

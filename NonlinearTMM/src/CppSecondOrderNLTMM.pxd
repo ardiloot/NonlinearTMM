@@ -59,6 +59,46 @@ cdef extern from "Material.h" namespace "TMM":
         bool IsNonlinear() except +
 
 #===============================================================================
+# Waves.h
+#===============================================================================
+
+cdef extern from "Waves.h" namespace "TMM":
+    cdef enum WaveTypeCpp "TMM::WaveType":
+        PLANEWAVE,
+        GAUSSIANWAVE,
+        TUKEYWAVE
+
+    cdef cppclass WaveCpp "TMM::Wave":
+        void SetWaveType(WaveTypeCpp waveType_) except +
+        void SetPwr(double pwr_) except +
+        void SetOverrideE0(bool overrideE0_) except +
+        void SetE0(double E0_) except +
+        void SetW0(double w0_) except +
+        void SetMaterial(MaterialCpp *material_) except +
+        void SetLy(double Ly_) except +
+        void SetA(double a_) except +
+        void SetNPointsInteg(int nPointsInteg_) except +
+        void SetMaxPhi(double maxPhi_) except +
+        void SetIntegCriteria(double criteria_) except +
+        
+        void Solve(double wl, double beta) except +
+        
+        double GetPwr() except +
+        bool GetOverrideE0() except +
+        double GetE0() except +
+        double GetW0() except +
+        double GetLy() except +
+        double GetA() except +
+        int GetNPointsInteg() except +
+        double GetMaxPhi() except +
+        double GetIntegCriteria() except +
+        ArrayXd GetKxs() except +
+        ArrayXd GetKzs() except +
+        ArrayXd GetFieldProfileXs() except +
+        ArrayXd GetFieldProfile() except +
+        ArrayXcd GetExpansionCoefsKx() except +
+        
+#===============================================================================
 # NonlinearLayer.h
 #===============================================================================
 

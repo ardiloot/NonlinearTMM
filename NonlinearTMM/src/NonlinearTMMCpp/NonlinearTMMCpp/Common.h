@@ -99,5 +99,8 @@ namespace TMM {
 		const Eigen::ArrayXd &kxs, const Eigen::ArrayXcd &kzs,
 		double x0, double x1, double z, double Ly);
 	WaveDirection GetWaveDirection(dcomplex kzF, dcomplex eps, Polarization pol);
+	Eigen::ArrayXcd FFTShift(Eigen::ArrayXcd data);
+	Eigen::ArrayXd IFFTShift(Eigen::ArrayXd data);
+	Eigen::ArrayXd FFTFreq(int n, double dx);
 
 }
