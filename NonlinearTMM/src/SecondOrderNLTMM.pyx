@@ -188,7 +188,7 @@ cdef class _Wave:
         
     cdef _Init(self, WaveCpp *ptr):
         self._thisptr = ptr
-        self._needsDealloc = True
+        self._needsDealloc = False
         
     def __dealloc__(self):
         if self._needsDealloc:
