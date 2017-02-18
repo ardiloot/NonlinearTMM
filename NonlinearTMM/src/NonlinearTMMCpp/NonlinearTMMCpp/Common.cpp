@@ -137,7 +137,30 @@ namespace TMM {
 		return dIntVar;
 	}
 
+	inline  dcomplex FastExp(dcomplex z) {
+		double c = std::exp(real(z));
+		double y = imag(z);
+		/*
+		__m128d c2 = _mm_set1_pd(c);
+		__m128d xy = _mm_set_pd(std::cos(y), std::sin(y));
+		xy = _mm_mul_pd(xy, c2);
+		dcomplex res;
+		_mm_storeu_pd((double*)&(res), xy);
+		*/
+		dcomplex res(c * std::cos(y), c * std::sin(y));
+		return res;
+	}
+
+	inline dcomplex CalcFx(dcomplex dk, double x0, double x1) {
+		dcomplex exp1 = FastExp(constI * dk * x1);
+		dcomplex exp2 = FastExp(constI * dk * x0);
+		dcomplex res  = -constI * (exp1 - exp2) / dk;
+		return res;
+	}
+
 	double const IntegrateWavePower(int layerNr, Polarization pol, double wl, dcomplex epsLayer0, const ArrayXcd & Us, const ArrayXd & kxs, const ArrayXcd & kzs, double x0, double x1, double z, double Ly) {
+		int m = kxs.size();
+		bool needFz = bool(z != 0.0);
 
 		double integValue2dRe = 0.0;
 		double integValue2dIm = 0.0;
@@ -159,11 +182,14 @@ namespace TMM {
 					Fx = x1 - x0;
 				}
 				else {
-					Fx = -constI * (std::exp(constI * dk * x1) - std::exp(constI * dk * x0)) / dk; // almost all time spent here
+					Fx = CalcFx(dk, x0, x1);
 				}
 
 				// Fz
-				dcomplex Fz = std::exp(constI * (kz - kzP) * z);
+				dcomplex Fz = 1.0;
+				if (needFz) {
+					dcomplex Fz = FastExp(constI * (kz - kzP) * z);
+				}
 
 				// Integrate
 				double dkxP = GetDifferential(kxs, j);
@@ -290,8 +316,9 @@ namespace TMM {
 	ArrayXd FFTFreq(int n, double dx) {
 		ArrayXd res(n);
 		int startI = -(n - (n % 2)) / 2;
+		double step = 1.0 / (dx * n);
 		for (int i = 0; i < n; i++) {
-			res(i) = double(startI + i) / (dx * n);
+			res(i) = (startI + i) * step;
 		}
 		return res;
 	}

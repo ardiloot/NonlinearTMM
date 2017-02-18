@@ -250,7 +250,7 @@ namespace TMM {
 		{
 		case TMM::P_POL:
 			res = (Ex.array().real().pow(2) + Ex.array().imag().pow(2) +
-				Ez.array().real().pow(2) + Ez.imag().array().pow(2)).sqrt();
+				Ez.array().real().pow(2) + Ez.array().imag().pow(2)).sqrt();
 			break;
 		case TMM::S_POL:
 			res = (Ey.array().real().pow(2) + Ey.array().imag().pow(2)).sqrt();
