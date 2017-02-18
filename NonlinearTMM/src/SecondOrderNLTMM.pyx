@@ -66,7 +66,8 @@ cdef waveParamsSet = set(["waveType",
                 "a",
                 "nPointsInteg",
                 "maxPhi",
-                "integCriteria"])
+                "integCriteria",
+                "maxX"])
 
     
 cdef TMMParamCpp TmmParamFromStr(str paramStr):
@@ -245,6 +246,10 @@ cdef class _Wave:
     @property
     def integCriteria(self):
         return self._thisptr.GetIntegCriteria();
+
+    @property
+    def maxX(self):
+        return self._thisptr.GetMaxX();
         
     @property
     def kxs(self):
@@ -306,6 +311,10 @@ cdef class _Wave:
     @integCriteria.setter
     def integCriteria(self, double value): # @DuplicatedSignature
         self._thisptr.SetIntegCriteria(value)  
+
+    @maxX.setter
+    def maxX(self, double value): # @DuplicatedSignature
+        self._thisptr.SetMaxX(value)  
 
 #===============================================================================
 # PowerFlows

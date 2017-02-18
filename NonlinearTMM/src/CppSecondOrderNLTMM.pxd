@@ -83,6 +83,7 @@ cdef extern from "Waves.h" namespace "TMM":
         void SetNPointsInteg(int nPointsInteg_) except +
         void SetMaxPhi(double maxPhi_) except +
         void SetIntegCriteria(double criteria_) except +
+        void SetMaxX(double maxX_) except +
         
         void Solve(double wl, double beta) except +
         
@@ -95,6 +96,7 @@ cdef extern from "Waves.h" namespace "TMM":
         int GetNPointsInteg() except +
         double GetMaxPhi() except +
         double GetIntegCriteria() except +
+        double GetMaxX() except +
         ArrayXd GetKxs() except +
         ArrayXd GetKzs() except +
         ArrayXd GetFieldProfileXs() except +
