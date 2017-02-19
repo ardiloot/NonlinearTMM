@@ -164,7 +164,7 @@ namespace TMM {
 			R(nr) = pf0.second;
 			
 			// Last layer
-			if (outmask & SWEEP_R) {
+			if (outmask & SWEEP_T) {
 				pairdd pfL = tmm.WaveGetPowerFlows(tmm.LayersCount() - 1, F);
 				T(nr) = pfL.first;
 			}
@@ -717,7 +717,6 @@ namespace TMM {
 			throw std::invalid_argument("Invalid layer index.");
 		}
 
-
 		// Solve wave
 		wave.Solve(wl, beta, layers[0].GetMaterial());
 		double Ly = wave.GetLy();
@@ -755,7 +754,7 @@ namespace TMM {
 		// Integrate powers
 		ArrayXd kxs(betas.size());
 		kxs = betas * layers[0].k0;
-		dcomplex epsLayer0 = layers[0].eps;
+		dcomplex epsLayer0 = layers[layerNr].eps;
 		double PF = constNAN, PB = constNAN;
 		switch (dir)
 		{
