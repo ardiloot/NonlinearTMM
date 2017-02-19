@@ -137,76 +137,93 @@ namespace TMM {
 		return dIntVar;
 	}
 
-	inline  dcomplex FastExp(dcomplex z) {
-		double c = std::exp(real(z));
-		double y = imag(z);
-		/*
-		__m128d c2 = _mm_set1_pd(c);
-		__m128d xy = _mm_set_pd(std::cos(y), std::sin(y));
-		xy = _mm_mul_pd(xy, c2);
-		dcomplex res;
-		_mm_storeu_pd((double*)&(res), xy);
-		*/
-		dcomplex res(c * std::cos(y), c * std::sin(y));
-		return res;
-	}
-
+	/*
 	inline dcomplex CalcFx(dcomplex dk, double x0, double x1) {
 		dcomplex exp1 = FastExp(constI * dk * x1);
 		dcomplex exp2 = FastExp(constI * dk * x0);
 		dcomplex res  = -constI * (exp1 - exp2) / dk;
 		return res;
 	}
+	*/
 
+	inline double CalcFxSym(double dk, double x0) {
+		double res = -2.0 * std::sin(x0 * dk) / dk;
+		return res;
+	}
+	
 	double const IntegrateWavePower(int layerNr, Polarization pol, double wl, dcomplex epsLayer0, const ArrayXcd & Us, const ArrayXd & kxs, const ArrayXcd & kzs, double x0, double x1, double z, double Ly) {
+		
+		if (x0 != -x1) {
+			std::cerr << "Currently only x0 = -x1 supported." << std::endl;
+			throw std::invalid_argument("Currently only x0 = -x1 supported.");
+		}
+		
 		int m = kxs.size();
 		bool needFz = bool(z != 0.0);
 
+		//Precalc Fx
+		MatrixXd Fxprecalc(m, m);
+		double *FxPrecalcPtr = Fxprecalc.data();
+
+		for (int i = 0; i < m; i++) {
+			Fxprecalc(i, i) = x1 - x0;
+		}
+
+		for (int i = 0; i < m; i++) {
+			double kx = kxs(i);
+			for (int j = i + 1; j < m; j++) {
+				double kxP = kxs(j);
+				double dk = kx - kxP;
+				double Fx = CalcFxSym(dk, x0);
+				FxPrecalcPtr[i * m + j] = Fx;
+				FxPrecalcPtr[j * m + i] = Fx;
+				//Fxprecalc(j, i) = Fx;
+				//Fxprecalc(i, j) = Fx;
+			}
+		}
+
+		// Precalc differentials
+		ArrayXd dkxs(m);
+		for (int i = 0; i < m; i++) {
+			dkxs(i) = GetDifferential(kxs, i);
+		}
+
 		double integValue2dRe = 0.0;
 		double integValue2dIm = 0.0;
-		#pragma omp parallel for default(shared) reduction(+:integValue2dRe,integValue2dIm)
-		for (int i = 0; i < kxs.size(); i++) {
+		//#pragma omp parallel for default(shared) reduction(+:integValue2dRe,integValue2dIm)
+		for (int i = 0; i < m; i++) {
 			double kx = kxs(i);
 			dcomplex kz = kzs(i);
 			dcomplex U = Us(i);
 			dcomplex integValue1d = 0.0;
-			for (int j = 0; j < kxs.size(); j++) {
+			for (int j = 0; j < m; j++) {
 				double kxP = kxs(j);
 				dcomplex kzP = kzs(j);
-				dcomplex UP = Us(j);
-				dcomplex dk = kx - kxP;
-
-				// Fx
-				dcomplex Fx;
-				if (i == j) {
-					Fx = x1 - x0;
-				}
-				else {
-					Fx = CalcFx(dk, x0, x1);
-				}
-
-				// Fz
-				dcomplex Fz = 1.0;
+				dcomplex UPc = std::conj(Us(j));
+				double dkxP = dkxs(j);
+				
+				double Fx = FxPrecalcPtr[i * m + j];// Fxprecalc(j, i);
+				dcomplex coef = dkxP * UPc * Fx;
 				if (needFz) {
-					dcomplex Fz = FastExp(constI * (kz - kzP) * z);
+					coef *= FastExp(constI * (kz - kzP) * z);
 				}
 
 				// Integrate
-				double dkxP = GetDifferential(kxs, j);
+				
 				switch (pol)
 				{
 				case TMM::P_POL:
-					integValue1d += std::conj(UP) * Fx * kz * Fz * dkxP;
+					integValue1d += coef * kz;
 					break;
 				case TMM::S_POL:
-					integValue1d += std::conj(UP) * Fx * kzP * Fz * dkxP;
+					integValue1d += coef * kzP;
 					break;
 				default:
 					throw std::invalid_argument("Invalid polarization");
 					break;
 				}
 			}
-			double dkx = GetDifferential(kxs, i);
+			double dkx = dkxs(i);
 			dcomplex tmpRes = U * integValue1d * dkx;
 			integValue2dRe += real(tmpRes);
 			integValue2dIm += imag(tmpRes);
@@ -322,6 +339,5 @@ namespace TMM {
 		}
 		return res;
 	}
-
 
 };

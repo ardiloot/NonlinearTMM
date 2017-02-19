@@ -11,30 +11,6 @@ namespace TMM {
 	// Functions
 	//---------------------------------------------------------------
 
-	// Complex multiplication with SSE
-	__forceinline dcomplex multSSE(dcomplex aa, dcomplex bb) {
-		const __m128d mask = _mm_set_pd(-0.0, 0.0);
-
-		// Load to registers
-		__m128d a = _mm_load_pd((double*)&aa);
-		__m128d b = _mm_load_pd((double*)&bb);
-
-		// Real part
-		__m128d ab = _mm_mul_pd(a, b);
-		ab = _mm_xor_pd(ab, mask);
-
-		// Imaginary part
-		b = _mm_shuffle_pd(b, b, 1);
-		b = _mm_mul_pd(b, a);
-
-		// Combine
-		ab = _mm_hadd_pd(ab, b);
-
-		dcomplex res = 0.0;
-		_mm_storeu_pd((double*)&(res), ab);
-		return res;
-	}
-
 	typedef std::function<void(const ArrayXcd&, const ArrayXcd&, MatrixXcd&)> OuterProductSSEEigenFunc;
 	void OuterProductSSEEigenComplex(const ArrayXcd& X, const ArrayXcd& Y, MatrixXcd& R);
 	void OuterProductSSEEigenComplexAdd(const ArrayXcd& X, const ArrayXcd& Y, MatrixXcd& R);

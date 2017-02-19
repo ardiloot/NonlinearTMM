@@ -111,4 +111,48 @@ namespace TMM {
 	ArrayXd IFFTShift(ArrayXd data);
 	ArrayXd FFTFreq(int n, double dx);
 
+	//---------------------------------------------------------------
+	// Inline SSE
+	//---------------------------------------------------------------
+
+	__forceinline dcomplex FastExp(dcomplex z) {
+		/*
+		double y = imag(z);
+		__m128d c2 = _mm_set1_pd(std::exp(real(z)));
+		__m128d xy = _mm_set_pd(std::cos(y), std::sin(y));
+		xy = _mm_mul_pd(xy, c2);
+		dcomplex res;
+		_mm_storeu_pd((double*)&(res), xy);
+		*/
+		
+		double c = std::exp(real(z));
+		double y = imag(z);
+		dcomplex res(c * std::cos(y), c * std::sin(y));
+		return res;
+	}
+
+	__forceinline dcomplex multSSE(dcomplex aa, dcomplex bb) {
+		const __m128d mask = _mm_set_pd(-0.0, 0.0);
+
+		// Load to registers
+		__m128d a = _mm_load_pd((double*)&aa);
+		__m128d b = _mm_load_pd((double*)&bb);
+
+		// Real part
+		__m128d ab = _mm_mul_pd(a, b);
+		ab = _mm_xor_pd(ab, mask);
+
+		// Imaginary part
+		b = _mm_shuffle_pd(b, b, 1);
+		b = _mm_mul_pd(b, a);
+
+		// Combine
+		ab = _mm_hadd_pd(ab, b);
+
+		dcomplex res = 0.0;
+		_mm_storeu_pd((double*)&(res), ab);
+		return res;
+	}
+
+
 }
