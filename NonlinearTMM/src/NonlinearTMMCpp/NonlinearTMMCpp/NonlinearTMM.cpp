@@ -146,28 +146,28 @@ namespace TMM {
 		}
 	}
 
-	void SweepResultNonlinearTMM::SetWaveValues(int nr, NonlinearTMM & tmm, double x0, double x1) {
+	void SweepResultNonlinearTMM::SetWaveValues(int nr, NonlinearTMM & tmm) {
 		if (outmask & SWEEP_PWRFLOWS) {
 
 			// First layer
 			pairdd pf0(constNAN, constNAN);
 			if ((outmask & SWEEP_I) && (outmask & SWEEP_I)) {
-				pf0 = tmm.WaveGetPowerFlows(0, x0, x1, 0.0, TOT);
+				pf0 = tmm.WaveGetPowerFlows(0, TOT);
 			}
 			else if (outmask & SWEEP_I) {
-				pf0 = tmm.WaveGetPowerFlows(0, x0, x1, 0.0, F);
+				pf0 = tmm.WaveGetPowerFlows(0, F);
 			}
 			else if (outmask & SWEEP_R) {
-				pf0 = tmm.WaveGetPowerFlows(0, x0, x1, 0.0, B);
+				pf0 = tmm.WaveGetPowerFlows(0, B);
 			}
-			
-			// Last layer
-			pairdd pfL = tmm.WaveGetPowerFlows(tmm.LayersCount() - 1, x0, x1, 0.0, F);
-
-			// Save
 			I(nr) = pf0.first;
 			R(nr) = pf0.second;
-			T(nr) = pfL.first;
+			
+			// Last layer
+			if (outmask & SWEEP_R) {
+				pairdd pfL = tmm.WaveGetPowerFlows(tmm.LayersCount() - 1, F);
+				T(nr) = pfL.first;
+			}
 		}
 
 		if (outmask & SWEEP_ENH) {
@@ -628,9 +628,15 @@ namespace TMM {
 			throw std::invalid_argument("Invalid layer index.");
 		}
 
+		double layerZ = 0.0;
+		for (int i = 1; i < layerNr; i++) {
+			layerZ += layers[i].d;
+		}
+		layerZ += z;
+
 		double xs[] = { 0.0 };
 		double zs0[] = { -1e-9 };
-		double zsL[] = { z };
+		double zsL[] = { layerZ };
 		Eigen::Map<ArrayXd> xsMap(xs, 1);
 		Eigen::Map<ArrayXd> zs0Map(zs0, 1);
 		Eigen::Map<ArrayXd> zsLMap(zsL, 1);
@@ -647,7 +653,7 @@ namespace TMM {
 		return res;
 	}
 
-	SweepResultNonlinearTMM * NonlinearTMM::WaveSweep(TMMParam param, const Eigen::Map<ArrayXd>& values, double x0, double x1, int outmask, int layerNr, double layerZ) {
+	SweepResultNonlinearTMM * NonlinearTMM::WaveSweep(TMMParam param, const Eigen::Map<ArrayXd>& values, int outmask, int layerNr, double layerZ) {
 		CheckPrerequisites(param);
 		if (layerNr < 0 || layerNr > layers.size()) {
 			throw std::invalid_argument("Invalid layer index.");
@@ -663,7 +669,7 @@ namespace TMM {
 			#pragma omp for
 			for (int i = 0; i < values.size(); i++) {
 				tmmThread.SetParam(param, values(i));
-				res->SetWaveValues(i, tmmThread, x0, x1);
+				res->SetWaveValues(i, tmmThread);
 			}
 		}
 		return res;
@@ -700,12 +706,17 @@ namespace TMM {
 		return &wave;
 	}
 
-	pairdd NonlinearTMM::WaveGetPowerFlows(int layerNr, double x0, double x1, double z, WaveDirection dir) {
+	pairdd NonlinearTMM::WaveGetPowerFlows(int layerNr, WaveDirection dir, double x0, double x1, double z) {
 		CheckPrerequisites();
 		if (mode == MODE_NONLINEAR) {
 			std::cerr << "For nonlinear mode use the method of SecondOrderNLTMM" << std::endl;
 			throw std::runtime_error("For nonlinear mode use the method of SecondOrderNLTMM");
 		}
+
+		if (layerNr < 0 || layerNr > layers.size()) {
+			throw std::invalid_argument("Invalid layer index.");
+		}
+
 
 		// Solve wave
 		wave.Solve(wl, beta, layers[0].GetMaterial());
@@ -713,8 +724,14 @@ namespace TMM {
 		ArrayXd &betas = wave.GetBetas();
 		ArrayXcd &E0s = wave.GetExpansionCoefsKx();
 
-		if (layerNr < 0 || layerNr > layers.size()) {
-			throw std::invalid_argument("Invalid layer index.");
+		// Adjust range
+		pairdd xrange = wave.GetXRange();
+		if (isnan(x0)) {
+			x0 = xrange.first;
+		}
+
+		if (isnan(x1)) {
+			x1 = xrange.second;
 		}
 
 		// Init memory

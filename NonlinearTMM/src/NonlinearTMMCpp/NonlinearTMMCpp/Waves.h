@@ -82,6 +82,7 @@ namespace TMM {
 		double GetMaxPhi();
 		double GetIntegCriteria();
 		double GetMaxX();
+		pairdd GetXRange();
 		ArrayXd GetBetas();
 		ArrayXd GetKxs();
 		ArrayXd GetKzs();

@@ -251,6 +251,10 @@ namespace TMM {
 		return maxX;
 	}
 
+	pairdd Wave::GetXRange() {
+		return pairdd(-maxX, maxX);
+	}
+
 	ArrayXd Wave::GetBetas() {
 		return kxs / k0;
 	}

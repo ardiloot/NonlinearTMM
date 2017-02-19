@@ -618,16 +618,6 @@ cdef class NonlinearTMM:
         res._Init(resCpp)
         return res
     
-    def WaveGetFields2D(self, np.ndarray[double, ndim = 1] zs, \
-            np.ndarray[double, ndim = 1] xs, str dirStr = "total"):
-        
-        cdef FieldsZXCpp *resCpp;
-        cdef WaveDirectionCpp direction = WaveDirectionFromStr(dirStr)
-        resCpp = self._thisptr.WaveGetFields2D(Map[ArrayXd](zs), Map[ArrayXd](xs), direction)
-        res = _FieldsZX()
-        res._Init(resCpp)
-        return res
-    
     def GetAbsorbedPower(self):
         return self._thisptr.GetAbsorbedPower();
     
@@ -638,16 +628,16 @@ cdef class NonlinearTMM:
     
     # Waves
     
-    def WaveGetPowerFlows(self, int layerNr, double x0, double x1, double z, str dirStr = "total"):
+    def WaveGetPowerFlows(self, int layerNr, double x0 = float("nan"), double x1 = float("nan"), double z = 0.0, str dirStr = "total"):
         # NonlinearLayer has its own specific method
         cdef WaveDirectionCpp direction = WaveDirectionFromStr(dirStr)
         cdef pair[double, double] res;
-        res = self._thisptr.WaveGetPowerFlows(layerNr, x0, x1, z, direction)
+        res = self._thisptr.WaveGetPowerFlows(layerNr, direction, x0, x1, z)
         return (res.first, res.second)
     
     def WaveSweep(self, str paramStr, np.ndarray[double, ndim = 1] values, \
-            double x0, double x1, int layerNr = 0, double layerZ = 0.0, \
-            bool outPwr = True, outR = False, outT = False, outEnh = False):
+            int layerNr = 0, double layerZ = 0.0, bool outPwr = True, \
+            outR = False, outT = False, outEnh = False):
         
         cdef SweepResultNonlinearTMMCpp *resCpp;
         cdef int outmask = 0
@@ -661,9 +651,19 @@ cdef class NonlinearTMM:
         if outT:
             outmask |= SWEEP_T
             
-        resCpp = self._thisptr.WaveSweep(TmmParamFromStr(paramStr), Map[ArrayXd](values), x0, x1, outmask, layerNr, layerZ)
+        resCpp = self._thisptr.WaveSweep(TmmParamFromStr(paramStr), Map[ArrayXd](values), outmask, layerNr, layerZ)
         res = _SweepResultNonlinearTMM()
         res._Init(resCpp);
+        return res
+           
+    def WaveGetFields2D(self, np.ndarray[double, ndim = 1] zs, \
+            np.ndarray[double, ndim = 1] xs, str dirStr = "total"):
+        
+        cdef FieldsZXCpp *resCpp;
+        cdef WaveDirectionCpp direction = WaveDirectionFromStr(dirStr)
+        resCpp = self._thisptr.WaveGetFields2D(Map[ArrayXd](zs), Map[ArrayXd](xs), direction)
+        res = _FieldsZX()
+        res._Init(resCpp)
         return res
     
     # Getters

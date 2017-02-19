@@ -74,7 +74,7 @@ namespace TMM {
 		SweepResultNonlinearTMM(int n, int outmask_, int layerNr_, double layerZ_);
 		int GetOutmask();
 		void SetValues(int nr, NonlinearTMM &tmm);
-		void SetWaveValues(int nr, NonlinearTMM &tmm, double x0, double x1);
+		void SetWaveValues(int nr, NonlinearTMM &tmm);
 	};
 
 	//---------------------------------------------------------------
@@ -166,9 +166,9 @@ namespace TMM {
 
 		// Waves
 		Wave* GetWave();
-		pairdd WaveGetPowerFlows(int layerNr, double x0, double x1, double z, WaveDirection dir = TOT);
+		pairdd WaveGetPowerFlows(int layerNr, WaveDirection dir = TOT, double x0 = constNAN, double x1 = constNAN, double z = 0.0);
 		double WaveGetEnhancement(int layerNr, double z);
-		SweepResultNonlinearTMM * WaveSweep(TMMParam param, const Eigen::Map<ArrayXd> &values, double x0, double x1, int outmask = SWEEP_PWRFLOWS, int layerNr = 0, double layerZ = 0);
+		SweepResultNonlinearTMM * WaveSweep(TMMParam param, const Eigen::Map<ArrayXd> &values, int outmask = SWEEP_PWRFLOWS, int layerNr = 0, double layerZ = 0);
 		FieldsZX* WaveGetFields2D(const Eigen::Map<ArrayXd> &zs, const Eigen::Map<ArrayXd> &xs, WaveDirection dir = TOT);
 	};
 
