@@ -40,6 +40,7 @@ namespace TMM {
 		bool dynamicMaxX;
 		double dynamicMaxXCoef;
 		double maxXThis;
+		double maxPhi;
 		bool solved;
 
 		double wl;
@@ -69,6 +70,8 @@ namespace TMM {
 		void SetMaxX(double maxX_);
 		void EnableDynamicMaxX(bool dynamicMaxX_);
 		void SetDynamicMaxXCoef(double dynamicMaxXCoef_);
+		void SetMaxPhi(double maxPhi_);
+		void SetParam(TMMParam param, double value);
 
 		// Solve
 		void Solve(double wl, double beta, Material *material_ = NULL);
@@ -84,6 +87,8 @@ namespace TMM {
 		double GetMaxX();
 		bool IsDynamicMaxXEnabled();
 		double GetDynamicMaxXCoef();
+		double GetMaxPhi();
+		double GetDouble(TMMParam param);
 		pairdd GetXRange();
 		ArrayXd GetBetas();
 		ArrayXd GetKxs();

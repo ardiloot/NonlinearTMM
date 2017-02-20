@@ -28,6 +28,8 @@ cdef extern from "Common.h" namespace "TMM":
         PARAM_OVERRIDE_E0,
         PARAM_E0,
         PARAM_MODE,
+        PARAM_WAVE_W0,
+        PARAM_LAYER_D,
         
     cdef enum NonlinearProcessCpp "TMM::NonlinearProcess":
         SFG,
@@ -84,6 +86,7 @@ cdef extern from "Waves.h" namespace "TMM":
         void SetMaxX(double maxX_) except +
         void EnableDynamicMaxX(bool dynamicMaxX_) except +
         void SetDynamicMaxXCoef(double dynamicMaxXCoef_) except +
+        void SetMaxPhi(double maxPhi_) except +
         
         void Solve(double wl, double beta) except +
         
@@ -97,6 +100,7 @@ cdef extern from "Waves.h" namespace "TMM":
         double GetMaxX() except +
         bool IsDynamicMaxXEnabled() except +
         double GetDynamicMaxXCoef() except +
+        double GetMaxPhi() except +
         ArrayXd GetKxs() except +
         ArrayXd GetKzs() except +
         ArrayXd GetFieldProfileXs() except +
@@ -164,7 +168,7 @@ cdef extern from "NonlinearTMM.h" namespace "TMM":
         # Plane waves
         void Solve() except +
         PowerFlowsCpp GetPowerFlows() except +
-        SweepResultNonlinearTMMCpp* Sweep(TMMParamCpp param, Map[ArrayXd] &, int outmask, int layerNr, double layerZ) except +
+        SweepResultNonlinearTMMCpp* Sweep(TMMParamCpp param, Map[ArrayXd] &, int outmask, int paramLayer, int layerNr, double layerZ) except +
         FieldsZCpp* GetFields(Map[ArrayXd] &, WaveDirectionCpp dir) except +
         FieldsZXCpp* GetFields2D(Map[ArrayXd] &, Map[ArrayXd] &, WaveDirectionCpp dir) except +
         double GetAbsorbedPower() except +

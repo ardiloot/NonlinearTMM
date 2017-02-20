@@ -120,10 +120,10 @@ namespace TMM {
 		void CheckPrerequisites(TMMParam toIgnore = PARAM_NOT_DEFINED);
 		
 		// Setters
-		void SetParam(TMMParam param, bool value);
-		void SetParam(TMMParam param, int value);
-		void SetParam(TMMParam param, double value);
-		void SetParam(TMMParam param, dcomplex value);
+		void SetParam(TMMParam param, bool value, int paramLayer = -1);
+		void SetParam(TMMParam param, int value, int paramLayer = -1);
+		void SetParam(TMMParam param, double value, int paramLayer = -1);
+		void SetParam(TMMParam param, dcomplex value, int paramLayer = -1);
 
 		// Getters
 		bool GetBool(TMMParam param);
@@ -136,7 +136,7 @@ namespace TMM {
 		PowerFlows GetPowerFlows() const;
 		double GetAbsorbedPower() const;
 		double GetEnhancement(int layerNr, double z);
-		SweepResultNonlinearTMM* Sweep(TMMParam param, const Eigen::Map<ArrayXd> &values, int outmask = SWEEP_PWRFLOWS, int layerNr = 0, double layerZ = 0);
+		SweepResultNonlinearTMM* Sweep(TMMParam param, const Eigen::Map<ArrayXd> &values, int outmask = SWEEP_PWRFLOWS, int paramLayer = -1, int layerNr = 0, double layerZ = 0);
 		FieldsZ* GetFields(const Eigen::Map<ArrayXd> &zs, WaveDirection dir = TOT);
 		FieldsZX* GetFields2D(const Eigen::Map<ArrayXd> &zs, const Eigen::Map<ArrayXd> &xs, WaveDirection dir = TOT);
 

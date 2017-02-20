@@ -55,7 +55,8 @@ cdef paramDict = {"wl": PARAM_WL, \
                   "I0": PARAM_I0, \
                   "overrideE0": PARAM_OVERRIDE_E0, \
                   "E0": PARAM_E0, \
-                  "mode": PARAM_MODE}
+                  "mode": PARAM_MODE,
+                  "w0": PARAM_WAVE_W0}
     
 cdef waveParamsSet = set(["waveType",
                 "pwr",
@@ -67,7 +68,8 @@ cdef waveParamsSet = set(["waveType",
                 "nPointsInteg",
                 "maxX",
                 "dynamicMaxX",
-                "dynamicMaxXCoef"])
+                "dynamicMaxXCoef",
+                "maxPhi"])
 
     
 cdef TMMParamCpp TmmParamFromStr(str paramStr):
@@ -252,6 +254,10 @@ cdef class _Wave:
         return self._thisptr.GetDynamicMaxXCoef()
 
     @property
+    def maxPhi(self):
+        return self._thisptr.GetMaxPhi()
+    
+    @property
     def kxs(self):
         return ndarray_copy(self._thisptr.GetKxs()).squeeze()
 
@@ -313,8 +319,13 @@ cdef class _Wave:
         self._thisptr.EnableDynamicMaxX(value)  
             
     @dynamicMaxXCoef.setter
-    def dynamicMaxXCoef(self, bool value): # @DuplicatedSignature
-        self._thisptr.SetDynamicMaxXCoef(value)          
+    def dynamicMaxXCoef(self, double value): # @DuplicatedSignature
+        self._thisptr.SetDynamicMaxXCoef(value)    
+    
+    @maxPhi.setter
+    def maxPhi(self, double value): # @DuplicatedSignature
+        self._thisptr.SetMaxPhi(value)    
+     
 
 #===============================================================================
 # PowerFlows
@@ -597,9 +608,17 @@ cdef class NonlinearTMM:
         if outAbs:
             outmask |= SWEEP_ABS
         if outEnh:
-            outmask |= SWEEP_ENH        
+            outmask |= SWEEP_ENH
+            
+        cdef TMMParamCpp param;
+        cdef int paramLayer = -1;
+        if (paramStr.startswith("d_")):
+            param = PARAM_LAYER_D
+            paramLayer = int(paramStr[2:])
+        else:
+            param = TmmParamFromStr(paramStr)
         
-        resCpp = self._thisptr.Sweep(TmmParamFromStr(paramStr), Map[ArrayXd](values), outmask, layerNr, layerZ)
+        resCpp = self._thisptr.Sweep(TmmParamFromStr(paramStr), Map[ArrayXd](values), outmask, paramLayer, layerNr, layerZ)
         res = _SweepResultNonlinearTMM()
         res._Init(resCpp);
         return res

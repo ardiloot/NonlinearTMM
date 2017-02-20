@@ -1,7 +1,30 @@
 #include "Common.h"
 
 namespace TMM {
-	
+	TMMParamType GetParamType(TMMParam param) {
+		switch (param)
+		{
+		case TMM::PARAM_WL:
+		case TMM::PARAM_BETA:
+		case TMM::PARAM_POL:
+		case TMM::PARAM_I0:
+		case TMM::PARAM_OVERRIDE_E0:
+		case TMM::PARAM_E0:
+		case TMM::PARAM_MODE:
+			return PTYPE_NONLINEAR_TMM;
+			break;
+		case TMM::PARAM_WAVE_W0:
+			return PTYPE_WAVE;
+			break;
+		case TMM::PARAM_LAYER_D:
+			return PTYPE_NONLINEAR_LAYER;
+			break;
+		default:
+			std::cerr << "Param has no type" << std::endl;
+			throw std::invalid_argument("Param has no type");
+			break;
+		}
+	}
 	double WlToOmega(double wl) {
 		double omega = 2.0 * PI * constC / wl;
 		return omega;

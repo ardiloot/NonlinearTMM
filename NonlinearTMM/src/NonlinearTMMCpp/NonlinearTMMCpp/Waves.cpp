@@ -43,6 +43,7 @@ namespace TMM {
 			throw std::runtime_error("nPointsInteg too small");
 		}
 		
+		double maxXByPhi = (nPointsInteg / 2) * PI / (std::sin(maxPhi) * k);
 		// Calc maxX
 		if (dynamicMaxX) {
 			maxXThis = dynamicMaxXCoef * (0.5 * w0 / std::cos(th0));
@@ -50,7 +51,8 @@ namespace TMM {
 		else {
 			maxXThis = maxX;
 		}
-
+		maxXThis = max(maxXThis, maxXByPhi);
+		
 		// Init xs
 		ArrayXd xs(nPointsInteg);
 		xs = ArrayXd::LinSpaced(nPointsInteg, -maxXThis, maxXThis);
@@ -108,6 +110,7 @@ namespace TMM {
 		dynamicMaxXCoef = 2.0;
 		maxXThis = 0.0;
 		solved = false;
+		maxPhi = 0.17;
 	}
 
 	void Wave::SetWaveType(WaveType waveType_) {
@@ -158,9 +161,26 @@ namespace TMM {
 		dynamicMaxXCoef = dynamicMaxXCoef_;
 	}
 
+	void Wave::SetMaxPhi(double maxPhi_) {
+		maxPhi = maxPhi_;
+	}
+
+	void Wave::SetParam(TMMParam param, double value) {
+		switch (param)
+		{
+		case PARAM_WAVE_W0:
+			SetW0(value);
+			break;
+		default:
+			throw std::invalid_argument("Param not in list.");
+			break;
+		}
+	}
+
 	void Wave::Solve(double wl_, double beta_, Material *material_) {
 		wl = wl_;
 		beta = beta_;
+		maxXThis = maxX;
 
 		if (material_ != NULL) {
 			SetMaterial(material_);
@@ -233,6 +253,22 @@ namespace TMM {
 
 	double Wave::GetDynamicMaxXCoef() {
 		return dynamicMaxXCoef;
+	}
+
+	double Wave::GetMaxPhi() {
+		return maxPhi;
+	}
+
+	double Wave::GetDouble(TMMParam param) {
+		switch (param)
+		{
+		case PARAM_WAVE_W0:
+			return GetW0();
+			break;
+		default:
+			throw std::invalid_argument("Param not in list.");
+			break;
+		}
 	}
 
 	pairdd Wave::GetXRange() {

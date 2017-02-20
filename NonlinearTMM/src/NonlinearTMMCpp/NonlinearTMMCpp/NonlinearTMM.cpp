@@ -164,7 +164,6 @@ namespace TMM {
 			double enh_ = tmm.WaveGetEnhancement(layerNr, layerZ);
 			enh(nr) = enh_;
 		}
-
 	}
 
 	FieldsZ::FieldsZ(int n) : E(n, 3), H(n, 3) {
@@ -490,7 +489,7 @@ namespace TMM {
 		return res;
 	}
 
-	SweepResultNonlinearTMM * NonlinearTMM::Sweep(TMMParam param, const Eigen::Map<ArrayXd>& values, int outmask, int layerNr, double layerZ) {
+	SweepResultNonlinearTMM * NonlinearTMM::Sweep(TMMParam param, const Eigen::Map<ArrayXd>& values, int outmask, int paramLayer, int layerNr, double layerZ) {
 		CheckPrerequisites(param);
 		if (layerNr < 0 || layerNr > layers.size()) {
 			throw std::invalid_argument("Invalid layer index.");
@@ -506,7 +505,7 @@ namespace TMM {
 			// Sweep
 			#pragma omp for
 			for (int i = 0; i < values.size(); i++) {
-				tmmThread.SetParam(param, values(i));
+				tmmThread.SetParam(param, values(i), paramLayer);
 				tmmThread.Solve();
 				res->SetValues(i, tmmThread);
 			}
@@ -581,14 +580,13 @@ namespace TMM {
 		// Solve wave
 		wave.Solve(wl, beta, layers[0].GetMaterial());
 		double Ly = wave.GetLy();
-		ArrayXd &betas = wave.GetBetas();
-		ArrayXcd &E0s = wave.GetExpansionCoefsKx();
+		ArrayXd betas = wave.GetBetas();
+		ArrayXcd E0s = wave.GetExpansionCoefsKx();
+		ArrayXd kxs = betas * 2.0 * PI / wl;
 
 		// Allocate space (deletion is the responsibility of the caller!)
 		FieldsZX *res = new FieldsZX(zs.size(), xs.size(), pol);
 		res->SetZero(); // We are summing up
-
-		ArrayXd kxs = betas * 2.0 * PI / wl;
 
 		#pragma omp parallel
 		{
@@ -710,8 +708,8 @@ namespace TMM {
 		// Solve wave
 		wave.Solve(wl, beta, layers[0].GetMaterial());
 		double Ly = wave.GetLy();
-		ArrayXd &betas = wave.GetBetas();
-		ArrayXcd &E0s = wave.GetExpansionCoefsKx();
+		ArrayXd betas = wave.GetBetas();
+		ArrayXcd E0s = wave.GetExpansionCoefsKx();
 
 		// Adjust range
 		pairdd xrange = wave.GetXRange();
@@ -749,40 +747,58 @@ namespace TMM {
 		return res;
 	}
 	
-	void NonlinearTMM::SetParam(TMMParam param, bool value) {
+	void NonlinearTMM::SetParam(TMMParam param, bool value, int paramLayer) {
 		switch (param)
 		{
 		case PARAM_OVERRIDE_E0:
 			overrideE0 = value;
 			break;
 		default:
+			std::cerr << "Param not in list." << std::endl;
 			throw std::invalid_argument("Param not in list.");
 			break;
 		}
 	}
 
-	void NonlinearTMM::SetParam(TMMParam param, double value) {
-		switch (param)
-		{
-		case PARAM_WL:
-			wl = value;
-			break;
-		case PARAM_BETA:
-			beta = value;
-			break;
-		case PARAM_I0:
-			I0 = value;
-			break;
-		case PARAM_E0:
-			E0 = (dcomplex)value;
-			break;
-		default:
-			throw std::invalid_argument("Param not in list.");
-			break;
+	void NonlinearTMM::SetParam(TMMParam param, double value, int paramLayer) {
+		if (GetParamType(param) == PTYPE_NONLINEAR_TMM) {
+			switch (param)
+			{
+			case PARAM_WL:
+				wl = value;
+				break;
+			case PARAM_BETA:
+				beta = value;
+				break;
+			case PARAM_I0:
+				I0 = value;
+				break;
+			case PARAM_E0:
+				E0 = (dcomplex)value;
+				break;
+			default:
+				std::cerr << "Param not in list." << std::endl;
+				throw std::invalid_argument("Param not in list.");
+				break;
+			}
+		}
+		else if (GetParamType(param) == PTYPE_NONLINEAR_LAYER) {
+			if (paramLayer < 0 || paramLayer >= layers.size()) {
+				std::cerr << "Invalid layer number." << std::endl;
+				throw std::invalid_argument("Invalid layer number.");
+			}
+			layers[paramLayer].SetParam(param, value);
+		}
+		else if (GetParamType(param) == PTYPE_WAVE) {
+			wave.SetParam(param, value);
+		}
+		else {
+			std::cerr << "Invalid param type" << std::endl;
+			throw std::invalid_argument("Invalid param type");
 		}
 	}
 
-	void NonlinearTMM::SetParam(TMMParam param, int value) {
+	void NonlinearTMM::SetParam(TMMParam param, int value, int paramLayer) {
 		switch (param)
 		{
 		case PARAM_POL:
@@ -792,18 +808,20 @@ namespace TMM {
 			mode = (NonlinearTmmMode)value;
 			break;
 		default:
+			std::cerr << "Param not in list." << std::endl;
 			throw std::invalid_argument("Param not in list.");
 			break;
 		}
 	}
 
-	void NonlinearTMM::SetParam(TMMParam param, dcomplex value) {
+	void NonlinearTMM::SetParam(TMMParam param, dcomplex value, int paramLayer) {
 		switch (param)
 		{
 		case PARAM_E0:
 			E0 = value;
 			break;
 		default:
+			std::cerr << "Param not in list." << std::endl;
 			throw std::invalid_argument("Param not in list.");
 			break;
 		}
@@ -816,6 +834,7 @@ namespace TMM {
 			return overrideE0;
 			break;
 		default:
+			std::cerr << "Param not in list." << std::endl;
 			throw std::invalid_argument("Param not in list.");
 			break;
 		}
@@ -831,6 +850,7 @@ namespace TMM {
 			return (int)mode;
 			break;
 		default:
+			std::cerr << "Param not in list." << std::endl;
 			throw std::invalid_argument("Param not in list.");
 			break;
 		}
@@ -849,6 +869,7 @@ namespace TMM {
 			return I0;
 			break;
 		default:
+			std::cerr << "Param not in list." << std::endl;
 			throw std::invalid_argument("Param not in list.");
 			break;
 		}
@@ -861,6 +882,7 @@ namespace TMM {
 			return E0;
 			break;
 		default:
+			std::cerr << "Param not in list." << std::endl;
 			throw std::invalid_argument("Param not in list.");
 			break;
 		}

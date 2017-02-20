@@ -68,6 +68,7 @@ namespace TMM {
 		MODE_NOT_DEFINED,
 	};
 
+	// Params that are used in sweep must be here
 	enum TMMParam {
 		PARAM_WL,
 		PARAM_BETA,
@@ -76,7 +77,15 @@ namespace TMM {
 		PARAM_OVERRIDE_E0,
 		PARAM_E0,
 		PARAM_MODE,
+		PARAM_WAVE_W0,
+		PARAM_LAYER_D,
 		PARAM_NOT_DEFINED,
+	};
+
+	enum TMMParamType {
+		PTYPE_NONLINEAR_TMM,
+		PTYPE_NONLINEAR_LAYER,
+		PTYPE_WAVE
 	};
 
 	enum SweepOutput {
@@ -92,6 +101,7 @@ namespace TMM {
 	// Functions
 	//---------------------------------------------------------------
 
+	TMMParamType GetParamType(TMMParam param);
 	double WlToOmega(double wl);
 	double OmegaToWl(double omega);
 	Matrix3d RotationMatrixX(double phi);

@@ -301,6 +301,18 @@ namespace TMM{
 		d = d_;
 	}
 
+	void NonlinearLayer::SetParam(TMMParam param, double value) {
+		switch (param)
+		{
+		case PARAM_LAYER_D:
+			SetThickness(value);
+			break;
+		default:
+			throw std::invalid_argument("Param not in list.");
+			break;
+		}
+	}
+
 	double NonlinearLayer::GetThickness() {
 		return d;
 	}
@@ -327,6 +339,18 @@ namespace TMM{
 			throw std::runtime_error("NonlinearLayer must be solved first.");
 		}
 		return k0;
+	}
+
+	double NonlinearLayer::GetDouble(TMMParam param) {
+		switch (param)
+		{
+		case PARAM_LAYER_D:
+			return GetThickness();
+			break;
+		default:
+			throw std::invalid_argument("Param not in list.");
+			break;
+		}
 	}
 
 	Array2cd NonlinearLayer::GetMainFields(double z) const
