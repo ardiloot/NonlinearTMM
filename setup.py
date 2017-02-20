@@ -4,11 +4,14 @@ import numpy
 import glob
 import eigency
 
+def RemoveMain(listoffiles):
+    return [fn for fn in listoffiles if "Main.cpp" not in fn]
+
 cmdclass = {'build_ext': build_ext}
 
 ext = Extension("NonlinearTMM._SecondOrderNLTMMCython",
                 sources = ["NonlinearTMM/src/SecondOrderNLTMM.pyx"] + 
-                            glob.glob("NonlinearTMM/src/NonlinearTMMCpp/NonlinearTMMCpp/*.cpp"),
+                            RemoveMain(glob.glob("NonlinearTMM/src/NonlinearTMMCpp/NonlinearTMMCpp/*.cpp")),
                 include_dirs = [r"NonlinearTMM/src/NonlinearTMMCpp/NonlinearTMMCpp",
                                 r"NonlinearTMM/src/eigen_3.3.2",
                                 numpy.get_include()] + 
