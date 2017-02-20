@@ -661,6 +661,11 @@ cdef class NonlinearTMM:
         res = self._thisptr.WaveGetPowerFlows(layerNr, x0, x1, z)
         return (res.first, res.second)
     
+    def WaveGetEnhancement(self, int layerNr, double z = 0.0):
+        cdef double res
+        res = self._thisptr.WaveGetEnhancement(layerNr, z)
+        return res
+    
     def WaveSweep(self, str paramStr, np.ndarray[double, ndim = 1] values, \
             int layerNr = 0, double layerZ = 0.0, bool outPwr = True, \
             outR = False, outT = False, outEnh = False):

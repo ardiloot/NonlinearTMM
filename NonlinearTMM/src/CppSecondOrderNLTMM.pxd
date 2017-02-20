@@ -189,6 +189,7 @@ cdef extern from "NonlinearTMM.h" namespace "TMM":
         # Waves
         WaveCpp* GetWave() except +
         pair[double, double] WaveGetPowerFlows(int layerNr, double x0, double x1, double z) except +
+        double WaveGetEnhancement(int layerNr, double z) except +
         SweepResultNonlinearTMMCpp* WaveSweep(TMMParamCpp param, Map[ArrayXd] &, int outmask, int paramLayer, int layerNr, double layerZ) except +
         FieldsZXCpp* WaveGetFields2D(Map[ArrayXd] &, Map[ArrayXd] &, WaveDirectionCpp) except +
       

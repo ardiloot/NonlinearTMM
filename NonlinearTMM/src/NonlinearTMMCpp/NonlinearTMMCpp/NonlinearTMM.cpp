@@ -666,8 +666,8 @@ namespace TMM {
 		double ENL = fL->GetENorm()(0, 0);
 		delete f0;
 		delete fL;
-
-		double res = ENL / (EN0 * std::sqrt(real(layers[0].n)));
+		double n0 = real(layers[0].GetMaterial()->GetN(wl));
+		double res = ENL / (EN0 * std::sqrt(n0));
 		return res;
 	}
 
