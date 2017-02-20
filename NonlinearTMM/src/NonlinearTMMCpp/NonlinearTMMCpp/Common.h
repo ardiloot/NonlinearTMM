@@ -103,8 +103,8 @@ namespace TMM {
 	dcomplex sqr(dcomplex a);
 	template <typename T> T Interpolate(double x, const ArrayXd & xs, const Eigen::Array<T, Eigen::Dynamic, 1> & ys);
 	double GetDifferential(const ArrayXd &intVar, int nr);
-	double const IntegrateWavePower(int layerNr, Polarization pol, double wl, dcomplex epsLayer0, const ArrayXcd &Us,
-		const ArrayXd &kxs, const ArrayXcd &kzs,
+	pairdd const IntegrateWavePower(int layerNr, Polarization pol, double wl, dcomplex epsLayer, const Eigen::MatrixX2cd &Us,
+		const ArrayXd &kxs, const Eigen::MatrixX2cd &kzs,
 		double x0, double x1, double z, double Ly);
 	WaveDirection GetWaveDirection(dcomplex kzF, dcomplex eps, Polarization pol);
 	ArrayXcd FFTShift(ArrayXcd data);

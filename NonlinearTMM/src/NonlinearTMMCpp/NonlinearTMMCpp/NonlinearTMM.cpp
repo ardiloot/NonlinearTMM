@@ -147,29 +147,19 @@ namespace TMM {
 	}
 
 	void SweepResultNonlinearTMM::SetWaveValues(int nr, NonlinearTMM & tmm) {
-		if (outmask & SWEEP_PWRFLOWS) {
-
-			// First layer
-			pairdd pf0(constNAN, constNAN);
-			if ((outmask & SWEEP_I) && (outmask & SWEEP_I)) {
-				pf0 = tmm.WaveGetPowerFlows(0, TOT);
-			}
-			else if (outmask & SWEEP_I) {
-				pf0 = tmm.WaveGetPowerFlows(0, F);
-			}
-			else if (outmask & SWEEP_R) {
-				pf0 = tmm.WaveGetPowerFlows(0, B);
-			}
+		// First layer
+		if ((outmask & SWEEP_I) || (outmask & SWEEP_R)) {
+			pairdd pf0 = tmm.WaveGetPowerFlows(0);
 			I(nr) = pf0.first;
 			R(nr) = pf0.second;
-			
-			// Last layer
-			if (outmask & SWEEP_T) {
-				pairdd pfL = tmm.WaveGetPowerFlows(tmm.LayersCount() - 1, F);
-				T(nr) = pfL.first;
-			}
 		}
-
+			
+		// Last layer
+		if (outmask & SWEEP_T) {
+			pairdd pfL = tmm.WaveGetPowerFlows(tmm.LayersCount() - 1);
+			T(nr) = pfL.first;
+		}
+		
 		if (outmask & SWEEP_ENH) {
 			double enh_ = tmm.WaveGetEnhancement(layerNr, layerZ);
 			enh(nr) = enh_;
@@ -706,7 +696,7 @@ namespace TMM {
 		return &wave;
 	}
 
-	pairdd NonlinearTMM::WaveGetPowerFlows(int layerNr, WaveDirection dir, double x0, double x1, double z) {
+	pairdd NonlinearTMM::WaveGetPowerFlows(int layerNr, double x0, double x1, double z) {
 		CheckPrerequisites();
 		if (mode == MODE_NONLINEAR) {
 			std::cerr << "For nonlinear mode use the method of SecondOrderNLTMM" << std::endl;
@@ -755,25 +745,8 @@ namespace TMM {
 		ArrayXd kxs(betas.size());
 		kxs = betas * layers[0].k0;
 		dcomplex epsLayer0 = layers[layerNr].eps;
-		double PF = constNAN, PB = constNAN;
-		switch (dir)
-		{
-		case TMM::F:
-			PF = IntegrateWavePower(layerNr, pol, wl, epsLayer0, Us.col(F), kxs, kzs.col(F), x0, x1, z, Ly);
-			break;
-		case TMM::B:
-			PB = -IntegrateWavePower(layerNr, pol, wl, epsLayer0, Us.col(B), kxs, kzs.col(B), x0, x1, z, Ly);
-			break;
-		case TMM::TOT:
-			PF = IntegrateWavePower(layerNr, pol, wl, epsLayer0, Us.col(F), kxs, kzs.col(F), x0, x1, z, Ly);
-			PB = -IntegrateWavePower(layerNr, pol, wl, epsLayer0, Us.col(B), kxs, kzs.col(B), x0, x1, z, Ly);
-			break;
-		default:
-			throw std::invalid_argument("Invalid direction.");
-			break;
-		}
-		
-		return pairdd(PF, PB);
+		pairdd res = IntegrateWavePower(layerNr, pol, wl, epsLayer0, Us, kxs, kzs, x0, x1, z, Ly);
+		return res;
 	}
 	
 	void NonlinearTMM::SetParam(TMMParam param, bool value) {

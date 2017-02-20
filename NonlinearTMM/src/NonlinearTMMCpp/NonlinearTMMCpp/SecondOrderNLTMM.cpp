@@ -329,7 +329,7 @@ namespace TMM {
 		double wlGen = tmmGen.GetDouble(PARAM_WL);
 		Polarization polGen = (Polarization)tmmGen.GetInt(PARAM_POL);
 		dcomplex epsLayer0 = tmmGen.GetLayer(0)->eps;
-
+		/*
 		switch (dir)
 		{
 		case TMM::F:
@@ -346,6 +346,7 @@ namespace TMM {
 			throw std::invalid_argument("Invalid direction.");
 			break;
 		}
+		*/
 		return pairdd(PF, PB);
 	}
 

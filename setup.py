@@ -14,7 +14,7 @@ ext = Extension("NonlinearTMM._SecondOrderNLTMMCython",
                                 numpy.get_include()] + 
                                 eigency.get_includes(include_eigen = False),
                 language = "c++",
-                extra_compile_args=["/openmp", "/arch:SSE2", "/O2", "/Ot"],
+                extra_compile_args=["/openmp", "/arch:SSE2", "/O2", "/Ot", "/MP"],
                 extra_link_args=[],
     )
 

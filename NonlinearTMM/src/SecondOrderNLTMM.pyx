@@ -628,11 +628,10 @@ cdef class NonlinearTMM:
     
     # Waves
     
-    def WaveGetPowerFlows(self, int layerNr, double x0 = float("nan"), double x1 = float("nan"), double z = 0.0, str dirStr = "total"):
+    def WaveGetPowerFlows(self, int layerNr, double x0 = float("nan"), double x1 = float("nan"), double z = 0.0):
         # NonlinearLayer has its own specific method
-        cdef WaveDirectionCpp direction = WaveDirectionFromStr(dirStr)
         cdef pair[double, double] res;
-        res = self._thisptr.WaveGetPowerFlows(layerNr, direction, x0, x1, z)
+        res = self._thisptr.WaveGetPowerFlows(layerNr, x0, x1, z)
         return (res.first, res.second)
     
     def WaveSweep(self, str paramStr, np.ndarray[double, ndim = 1] values, \

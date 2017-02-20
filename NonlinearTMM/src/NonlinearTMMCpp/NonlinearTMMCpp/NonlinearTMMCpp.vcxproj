@@ -149,6 +149,7 @@
       <OpenMPSupport>true</OpenMPSupport>
       <PrecompiledHeaderFile>Common.h</PrecompiledHeaderFile>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
