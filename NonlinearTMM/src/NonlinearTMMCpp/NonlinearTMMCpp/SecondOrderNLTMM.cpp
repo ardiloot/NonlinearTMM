@@ -301,8 +301,8 @@ namespace TMM {
 
 		// Ly
 		if (LyP1 != LyP2) {
-			std::cerr << "Both pump wase must have the same Ly." << std::endl;
-			throw std::invalid_argument("Both pump wase must have the same Ly.");
+			std::cerr << "Both pump waves must have the same Ly." << std::endl;
+			throw std::invalid_argument("Both pump waves must have the same Ly.");
 		}
 		double Ly = LyP1;
 

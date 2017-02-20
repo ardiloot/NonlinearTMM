@@ -256,6 +256,14 @@ cdef class _Wave:
     @property
     def maxPhi(self):
         return self._thisptr.GetMaxPhi()
+
+    @property
+    def betas(self):
+        return ndarray_copy(self._thisptr.GetBetas()).squeeze()
+
+    @property
+    def phis(self):
+        return ndarray_copy(self._thisptr.GetPhis()).squeeze()
     
     @property
     def kxs(self):

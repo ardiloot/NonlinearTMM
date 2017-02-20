@@ -46,7 +46,7 @@ namespace TMM {
 		double wl;
 		double beta;
 		double k0;
-		ArrayXd kxs, kzs, fieldProfileXs, fieldProfile;
+		ArrayXd phis, kxs, kzs, fieldProfileXs, fieldProfile;
 		ArrayXcd expansionCoefsKx;
 		Eigen::FFT<double> fft;
 
@@ -91,6 +91,7 @@ namespace TMM {
 		double GetDouble(TMMParam param);
 		pairdd GetXRange();
 		ArrayXd GetBetas();
+		ArrayXd GetPhis();
 		ArrayXd GetKxs();
 		ArrayXd GetKzs();
 		ArrayXd GetFieldProfileXs();

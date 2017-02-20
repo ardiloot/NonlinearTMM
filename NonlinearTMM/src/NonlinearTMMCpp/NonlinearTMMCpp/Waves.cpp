@@ -27,11 +27,13 @@ namespace TMM {
 
 	void Wave::SolvePlaneWave(double E0, double th0, double k) {
 		// Plane waves
+		phis = ArrayXd(1);
 		kxs = ArrayXd(1);
 		kzs = ArrayXd(1);
 		expansionCoefsKx = ArrayXcd(1);
 		fieldProfileXs = ArrayXd(0);
 		fieldProfile = ArrayXd(0);
+		phis(0) = 0.0;
 		kxs(0) = k * std::sin(th0);
 		kzs(0) = k * std::cos(th0);
 		expansionCoefsKx(0) = E0;
@@ -80,7 +82,7 @@ namespace TMM {
 		fieldProfileSpectrum = FFTShift(fieldProfileSpectrum);
 		fieldProfileSpectrum *= dx / (2.0 * PI);
 		ArrayXd kxPs = 2.0 * PI * FFTFreq(fieldProfile.size(), dx);
-		ArrayXd phis = (kxPs / k).asin();
+		phis = (kxPs / k).asin();
 
 		// Check for backward-propagating waves
 		if (phis.maxCoeff() + th0 >= PI / 2.0) {
@@ -95,7 +97,7 @@ namespace TMM {
 		expansionCoefsKx = fieldProfileSpectrum / std::cos(th0);
 	}
 
-	Wave::Wave() : kxs(0), kzs(0), expansionCoefsKx(0), fieldProfileXs(0), fieldProfile(0) {
+	Wave::Wave() : phis(0), kxs(0), kzs(0), expansionCoefsKx(0), fieldProfileXs(0), fieldProfile(0) {
 		waveType = PLANEWAVE;
 		pwr = 1.0;
 		overrideE0 = false;
@@ -286,6 +288,8 @@ namespace TMM {
 		}
 		return kxs / k0;
 	}
+
+	ArrayXd Wave::GetPhis() { return phis; }
 
 	ArrayXd Wave::GetKxs() {
 		if (!solved) {
