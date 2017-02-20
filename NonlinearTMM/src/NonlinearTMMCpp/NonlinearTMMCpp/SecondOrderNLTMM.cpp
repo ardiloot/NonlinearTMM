@@ -7,8 +7,8 @@ namespace TMM {
 		wlsGen(n), betasGen(n){}
 
 	void SweepResultSecondOrderNLTMM::SetValues(int nr, SecondOrderNLTMM & tmm) {
-		wlsGen(nr) = tmm.GetGen()->GetDouble(PARAM_WL);
-		betasGen(nr) = tmm.GetGen()->GetDouble(PARAM_BETA);
+		wlsGen(nr) = tmm.GetGen()->GetWl();
+		betasGen(nr) = tmm.GetGen()->GetBeta();
 		P1.SetValues(nr, *tmm.GetP1());
 		P2.SetValues(nr, *tmm.GetP2());
 		Gen.SetValues(nr, *tmm.GetGen());
@@ -16,10 +16,10 @@ namespace TMM {
 
 	void SecondOrderNLTMM::UpdateGenParams()
 	{
-		double wlP1 = tmmP1.GetDouble(PARAM_WL);
-		double wlP2 = tmmP2.GetDouble(PARAM_WL);
-		double betaP1 = tmmP1.GetDouble(PARAM_BETA);
-		double betaP2 = tmmP2.GetDouble(PARAM_BETA);
+		double wlP1 = tmmP1.GetWl();
+		double wlP2 = tmmP2.GetWl();
+		double betaP1 = tmmP1.GetBeta();
+		double betaP2 = tmmP2.GetBeta();
 
 		switch (process)
 		{
@@ -107,8 +107,8 @@ namespace TMM {
 		tmmP2.Solve();
 	}
 	void SecondOrderNLTMM::SolveGeneratedField() {
-		tmmGen.SetParam(PARAM_WL, wlGen);
-		tmmGen.SetParam(PARAM_BETA, betaGen);
+		tmmGen.SetWl(wlGen);
+		tmmGen.SetBeta(betaGen);
 		
 		// Insert nonlinearities
 		for (int i = 0; i < tmmGen.LayersCount(); i++) {
@@ -129,9 +129,9 @@ namespace TMM {
 	SecondOrderNLTMM::SecondOrderNLTMM()
 	{
 		SetProcess(SFG);
-		tmmP1.SetParam(PARAM_MODE, MODE_INCIDENT);
-		tmmP2.SetParam(PARAM_MODE, MODE_INCIDENT);
-		tmmGen.SetParam(PARAM_MODE, MODE_NONLINEAR);
+		tmmP1.SetMode(MODE_INCIDENT);
+		tmmP2.SetMode(MODE_INCIDENT);
+		tmmGen.SetMode(MODE_NONLINEAR);
 	}
 
 	void SecondOrderNLTMM::SetProcess(NonlinearProcess process_)
@@ -223,26 +223,26 @@ namespace TMM {
 		}
 
 		// kxs
-		ArrayXd kxsP1 = betasP1 * 2.0 * PI / tmmP1.GetDouble(PARAM_WL);
-		ArrayXd kxsP2 = betasP2 * 2.0 * PI / tmmP2.GetDouble(PARAM_WL);
+		ArrayXd kxsP1 = betasP1 * 2.0 * PI / tmmP1.GetWl();
+		ArrayXd kxsP2 = betasP2 * 2.0 * PI / tmmP2.GetWl();
 
 		// Allocate space (deletion is the responsibility of the caller!)
-		FieldsZX *res = new FieldsZX(zs.size(), xs.size(), (Polarization)tmmGen.GetInt(PARAM_POL));
+		FieldsZX *res = new FieldsZX(zs.size(), xs.size(), tmmGen.GetPolarization());
 		res->SetZero();
 
 		#pragma omp parallel
 		{
 			SecondOrderNLTMM tmmThread = *this;
-			tmmThread.tmmP1.SetParam(PARAM_OVERRIDE_E0, true);
-			tmmThread.tmmP2.SetParam(PARAM_OVERRIDE_E0, true);
+			tmmThread.tmmP1.SetOverrideE0(true);
+			tmmThread.tmmP2.SetOverrideE0(true);
 			#pragma omp for
 			for (int i = 0; i < betasP1.size(); i++) {
-				tmmThread.tmmP1.SetParam(PARAM_BETA, betasP1(i));
-				tmmThread.tmmP1.SetParam(PARAM_E0, E0sP1(i));
+				tmmThread.tmmP1.SetBeta(betasP1(i));
+				tmmThread.tmmP1.SetE0(E0sP1(i));
 				double dkxP1 = GetDifferential(kxsP1, i);
 				for (int j = 0; j < betasP2.size(); j++) {
-					tmmThread.tmmP2.SetParam(PARAM_BETA, betasP2(j));
-					tmmThread.tmmP2.SetParam(PARAM_E0, E0sP2(j));
+					tmmThread.tmmP2.SetBeta(betasP2(j));
+					tmmThread.tmmP2.SetE0(E0sP2(j));
 					double dkxP2 = GetDifferential(kxsP2, j);
 
 					// Solve
@@ -282,16 +282,16 @@ namespace TMM {
 		ArrayXd kxsUnsorted(nTot);
 
 		// Solve for every beta
-		bool oldOverrideE0P1 = tmmP1.GetBool(PARAM_OVERRIDE_E0);
-		bool oldOverrideE0P2 = tmmP2.GetBool(PARAM_OVERRIDE_E0);
-		tmmP1.SetParam(PARAM_OVERRIDE_E0, true);
-		tmmP2.SetParam(PARAM_OVERRIDE_E0, true);
+		bool oldOverrideE0P1 = tmmP1.GetOverrideE0();
+		bool oldOverrideE0P2 = tmmP2.GetOverrideE0();
+		tmmP1.SetOverrideE0(true);
+		tmmP2.SetOverrideE0(true);
 		for (int i = 0; i < betasP1.size(); i++) {
-			tmmP1.SetParam(PARAM_BETA, betasP1(i));
-			tmmP1.SetParam(PARAM_E0, E0sP1(i));
+			tmmP1.SetBeta(betasP1(i));
+			tmmP1.SetE0(E0sP1(i));
 			for (int j = 0; j < betasP2.size(); j++) {
-				tmmP2.SetParam(PARAM_BETA, betasP2(j));
-				tmmP2.SetParam(PARAM_E0, E0sP2(j));
+				tmmP2.SetBeta(betasP2(j));
+				tmmP2.SetE0(E0sP2(j));
 				Solve();
 
 				int index = i * betasP2.size() + j;
@@ -300,8 +300,8 @@ namespace TMM {
 				kxsUnsorted(index) = tmmGen.GetLayer(layerNr)->GetKx();
 			}
 		}
-		tmmP1.SetParam(PARAM_OVERRIDE_E0, oldOverrideE0P1);
-		tmmP2.SetParam(PARAM_OVERRIDE_E0, oldOverrideE0P2);
+		tmmP1.SetOverrideE0(oldOverrideE0P1);
+		tmmP2.SetOverrideE0(oldOverrideE0P2);
 
 		// Sort values by kxs
 		Eigen::ArrayXi indices(nTot);
@@ -326,8 +326,8 @@ namespace TMM {
 
 		// Integrate powers
 		double PF = constNAN, PB = constNAN;
-		double wlGen = tmmGen.GetDouble(PARAM_WL);
-		Polarization polGen = (Polarization)tmmGen.GetInt(PARAM_POL);
+		double wlGen = tmmGen.GetWl();
+		Polarization polGen = tmmGen.GetPolarization();
 		dcomplex epsLayer0 = tmmGen.GetLayer(0)->eps;
 		/*
 		switch (dir)

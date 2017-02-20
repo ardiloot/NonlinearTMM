@@ -155,13 +155,23 @@ cdef extern from "NonlinearTMM.h" namespace "TMM":
         NonlinearLayerCpp* GetLayer(int layerNr)  except +
         int LayersCount() except +
        
-        void SetParam(TMMParamCpp param, bool value) except +
-        void SetParam(TMMParamCpp param, int value) except +
+        void SetWl(double wl_) except +
+        void SetBeta(double beta_) except +
+        void SetPolarization(PolarizationCpp pol_) except +
+        void SetI0(double I0_) except +
+        void SetOverrideE0(bool overrideE0_) except +
+        void SetE0(double complex E0_) except +
+        void SetMode(NonlinearTmmModeCpp mode_) except +
         void SetParam(TMMParamCpp param, double value) except +
         void SetParam(TMMParamCpp param, double complex value) except +
         
-        bool GetBool(TMMParamCpp param) except +
-        int GetInt(TMMParamCpp param) except +
+        double GetWl() except +
+        double GetBeta() except +
+        PolarizationCpp GetPolarization() except +
+        double GetI0() except +
+        bool GetOverrideE0() except +
+        double complex GetE0() except +
+        NonlinearTmmModeCpp GetMode() except +
         double GetDouble(TMMParamCpp param) except +
         complex GetComplex(TMMParamCpp param) except +
        

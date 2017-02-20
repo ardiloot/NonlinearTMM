@@ -273,6 +273,36 @@ namespace TMM {
 		}
 	}
 
+	// Setters
+
+	void NonlinearTMM::SetWl(double wl_) {
+		wl = wl_;
+	}
+
+	void NonlinearTMM::SetBeta(double beta_) {
+		beta = beta_;
+	}
+
+	void NonlinearTMM::SetPolarization(Polarization pol_) {
+		pol = pol_;
+	}
+
+	void NonlinearTMM::SetI0(double I0_) {
+		I0 = I0_;
+	}
+
+	void NonlinearTMM::SetOverrideE0(bool overrideE0_) {
+		overrideE0 = overrideE0_;
+	}
+
+	void NonlinearTMM::SetE0(dcomplex E0_) {
+		E0 = E0_;
+	}
+
+	void NonlinearTMM::SetMode(NonlinearTmmMode mode_) {
+		mode = mode_;
+	}
+
 	Array2cd NonlinearTMM::CalcTransferMatrixNL(int interfaceNr, const InhomogeneousWave & w1, const InhomogeneousWave & w2) {
 		NonlinearLayer &l1 = layers[interfaceNr];
 		NonlinearLayer &l2 = layers[interfaceNr + 1];
@@ -591,13 +621,13 @@ namespace TMM {
 		#pragma omp parallel
 		{
 			NonlinearTMM tmmThread = *this;
-			tmmThread.SetParam(PARAM_OVERRIDE_E0, true);
+			tmmThread.SetOverrideE0(true);
 			#pragma omp for
 			for (int i = 0; i < betas.size(); i++) {
 				
 				// Solve TMM
-				tmmThread.SetParam(PARAM_BETA, betas(i));
-				tmmThread.SetParam(PARAM_E0, E0s(i));
+				tmmThread.SetBeta(betas(i));
+				tmmThread.SetE0(E0s(i));
 				tmmThread.Solve();
 
 				// Integrate fields
@@ -726,18 +756,18 @@ namespace TMM {
 		Eigen::MatrixX2cd kzs(betas.size(), 2);
 
 		// Solve for every beta
-		bool oldOverrideE0 = GetBool(PARAM_OVERRIDE_E0);
-		double oldBeta = GetDouble(PARAM_BETA);
-		SetParam(PARAM_OVERRIDE_E0, true);
+		bool oldOverrideE0 = GetOverrideE0();
+		double oldBeta = GetBeta();
+		SetOverrideE0(true);
 		for (int i = 0; i < betas.size(); i++) {
-			SetParam(PARAM_BETA, betas(i));
-			SetParam(PARAM_E0, E0s(i));
+			SetBeta(betas(i));
+			SetE0(E0s(i));
 			Solve();
 			Us.row(i) = layers[layerNr].GetMainFields(0.0);
 			kzs.row(i) = layers[layerNr].hw.kz;
 		}
-		SetParam(PARAM_OVERRIDE_E0, oldOverrideE0);
-		SetParam(PARAM_BETA, oldBeta);
+		SetOverrideE0(oldOverrideE0);
+		SetBeta(oldBeta);
 
 		// Integrate powers
 		ArrayXd kxs(betas.size());
@@ -747,34 +777,21 @@ namespace TMM {
 		return res;
 	}
 	
-	void NonlinearTMM::SetParam(TMMParam param, bool value, int paramLayer) {
-		switch (param)
-		{
-		case PARAM_OVERRIDE_E0:
-			overrideE0 = value;
-			break;
-		default:
-			std::cerr << "Param not in list." << std::endl;
-			throw std::invalid_argument("Param not in list.");
-			break;
-		}
-	}
-
 	void NonlinearTMM::SetParam(TMMParam param, double value, int paramLayer) {
 		if (GetParamType(param) == PTYPE_NONLINEAR_TMM) {
 			switch (param)
 			{
 			case PARAM_WL:
-				wl = value;
+				SetWl(value);
 				break;
 			case PARAM_BETA:
-				beta = value;
+				SetBeta(value);
 				break;
 			case PARAM_I0:
-				I0 = value;
+				SetI0(value);
 				break;
 			case PARAM_E0:
-				E0 = (dcomplex)value;
+				SetE0(value);
 				break;
 			default:
 				std::cerr << "Param not in list." << std::endl;
@@ -798,27 +815,11 @@ namespace TMM {
 		}
 	}
 
-	void NonlinearTMM::SetParam(TMMParam param, int value, int paramLayer) {
-		switch (param)
-		{
-		case PARAM_POL:
-			pol = (Polarization)value;
-			break;
-		case PARAM_MODE:
-			mode = (NonlinearTmmMode)value;
-			break;
-		default:
-			std::cerr << "Param not in list." << std::endl;
-			throw std::invalid_argument("Param not in list.");
-			break;
-		}
-	}
-
 	void NonlinearTMM::SetParam(TMMParam param, dcomplex value, int paramLayer) {
 		switch (param)
 		{
 		case PARAM_E0:
-			E0 = value;
+			SetE0(value);
 			break;
 		default:
 			std::cerr << "Param not in list." << std::endl;
@@ -827,33 +828,34 @@ namespace TMM {
 		}
 	}
 
-	bool NonlinearTMM::GetBool(TMMParam param) {
-		switch (param)
-		{
-		case PARAM_OVERRIDE_E0:
-			return overrideE0;
-			break;
-		default:
-			std::cerr << "Param not in list." << std::endl;
-			throw std::invalid_argument("Param not in list.");
-			break;
-		}
+	// Getters
+
+	double NonlinearTMM::GetWl() {
+		return wl;
 	}
 
-	int NonlinearTMM::GetInt(TMMParam param) {
-		switch (param)
-		{
-		case PARAM_POL:
-			return (int)pol;
-			break;
-		case PARAM_MODE:
-			return (int)mode;
-			break;
-		default:
-			std::cerr << "Param not in list." << std::endl;
-			throw std::invalid_argument("Param not in list.");
-			break;
-		}
+	double NonlinearTMM::GetBeta() {
+		return beta;
+	}
+
+	Polarization NonlinearTMM::GetPolarization() {
+		return pol;
+	}
+
+	double NonlinearTMM::GetI0() {
+		return I0;
+	}
+
+	bool NonlinearTMM::GetOverrideE0() {
+		return overrideE0;
+	}
+
+	dcomplex NonlinearTMM::GetE0() {
+		return E0;
+	}
+
+	NonlinearTmmMode NonlinearTMM::GetMode() {
+		return mode;
 	}
 
 	double NonlinearTMM::GetDouble(TMMParam param) {

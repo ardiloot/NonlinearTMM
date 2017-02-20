@@ -697,62 +697,62 @@ cdef class NonlinearTMM:
     
     @property
     def wl(self):
-        return self._thisptr.GetDouble(PARAM_WL)    
+        return self._thisptr.GetWl()  
     
     @property
     def beta(self):
-        return self._thisptr.GetDouble(PARAM_BETA)    
+        return self._thisptr.GetBeta()   
 
     @property
     def pol(self):
-        return "ps"[self._thisptr.GetInt(PARAM_POL)]    
+        return "ps"[<int>self._thisptr.GetPolarization()]    
 
     @property
     def I0(self):
-        return self._thisptr.GetDouble(PARAM_I0)    
+        return self._thisptr.GetI0()
 
     @property
     def overrideE0(self):
-        return self._thisptr.GetBool(PARAM_OVERRIDE_E0)    
+        return self._thisptr.GetOverrideE0()   
 
     @property
     def E0(self):
-        return self._thisptr.GetComplex(PARAM_E0)    
+        return self._thisptr.GetE0()    
 
     @property
     def mode(self):
-        return ["incident", "nonlinear"][self._thisptr.GetComplex(PARAM_MODE)]    
+        return ["incident", "nonlinear"][<int>self._thisptr.GetMode()]    
             
     # Setter
     #--------------------------------------------------------------------------- 
         
     @wl.setter
     def wl(self, value):  # @DuplicatedSignature
-        self._thisptr.SetParam(PARAM_WL, <double>value)
+        self._thisptr.SetWl(<double>value)
         
     @beta.setter
     def beta(self, value):  # @DuplicatedSignature
-        self._thisptr.SetParam(PARAM_BETA, <double>value)
+        self._thisptr.SetBeta(<double>value)
     
     @pol.setter
     def pol(self, polStr):  # @DuplicatedSignature
-        self._thisptr.SetParam(PARAM_POL, <int>PolarizationFromStr(polStr))
+        self._thisptr.SetPolarization(PolarizationFromStr(polStr))
         
     @I0.setter
     def I0(self, value):  # @DuplicatedSignature
-        self._thisptr.SetParam(PARAM_I0, <double>value)
+        self._thisptr.SetI0(<double>value)
             
     @overrideE0.setter
     def overrideE0(self, value):  # @DuplicatedSignature
-        self._thisptr.SetParam(PARAM_OVERRIDE_E0, <bool>value)
+        self._thisptr.SetOverrideE0(<bool>value)
         
     @E0.setter
     def E0(self, value):  # @DuplicatedSignature
-        self._thisptr.SetParam(PARAM_E0, <double complex>value)
+        self._thisptr.SetE0(<double complex>value)
         
     @mode.setter
     def mode(self, modeStr):  # @DuplicatedSignature
-        self._thisptr.SetParam(PARAM_MODE, <int>NonlinearTmmModeFromStr(modeStr))
+        self._thisptr.SetMode(NonlinearTmmModeFromStr(modeStr))
         
 
 #===============================================================================

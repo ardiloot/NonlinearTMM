@@ -118,16 +118,26 @@ namespace TMM {
 		NonlinearLayer* GetLayer(int layerNr);
 		int LayersCount() const;
 		void CheckPrerequisites(TMMParam toIgnore = PARAM_NOT_DEFINED);
-		
+
 		// Setters
-		void SetParam(TMMParam param, bool value, int paramLayer = -1);
-		void SetParam(TMMParam param, int value, int paramLayer = -1);
+		void SetWl(double wl_);
+		void SetBeta(double beta_);
+		void SetPolarization(Polarization pol_);
+		void SetI0(double I0_);
+		void SetOverrideE0(bool overrideE0_);
+		void SetE0(dcomplex E0_);
+		void SetMode(NonlinearTmmMode mode_);
 		void SetParam(TMMParam param, double value, int paramLayer = -1);
 		void SetParam(TMMParam param, dcomplex value, int paramLayer = -1);
 
 		// Getters
-		bool GetBool(TMMParam param);
-		int GetInt(TMMParam param);
+		double GetWl();
+		double GetBeta();
+		Polarization GetPolarization();
+		double GetI0();
+		bool GetOverrideE0();
+		dcomplex GetE0();
+		NonlinearTmmMode GetMode();
 		double GetDouble(TMMParam param);
 		dcomplex GetComplex(TMMParam param);
 
