@@ -641,7 +641,7 @@ namespace TMM {
 		return res;
 	}
 
-	SweepResultNonlinearTMM * NonlinearTMM::WaveSweep(TMMParam param, const Eigen::Map<ArrayXd>& values, int outmask, int layerNr, double layerZ) {
+	SweepResultNonlinearTMM * NonlinearTMM::WaveSweep(TMMParam param, const Eigen::Map<ArrayXd>& values, int outmask, int paramLayer, int layerNr, double layerZ) {
 		CheckPrerequisites(param);
 		if (layerNr < 0 || layerNr > layers.size()) {
 			throw std::invalid_argument("Invalid layer index.");
@@ -656,7 +656,7 @@ namespace TMM {
 			// Sweep
 			#pragma omp for
 			for (int i = 0; i < values.size(); i++) {
-				tmmThread.SetParam(param, values(i));
+				tmmThread.SetParam(param, values(i), paramLayer);
 				res->SetWaveValues(i, tmmThread);
 			}
 		}

@@ -669,7 +669,15 @@ cdef class NonlinearTMM:
         if outT:
             outmask |= SWEEP_T
             
-        resCpp = self._thisptr.WaveSweep(TmmParamFromStr(paramStr), Map[ArrayXd](values), outmask, layerNr, layerZ)
+        cdef TMMParamCpp param;
+        cdef int paramLayer = -1;
+        if (paramStr.startswith("d_")):
+            param = PARAM_LAYER_D
+            paramLayer = int(paramStr[2:])
+        else:
+            param = TmmParamFromStr(paramStr)
+            
+        resCpp = self._thisptr.WaveSweep(TmmParamFromStr(paramStr), Map[ArrayXd](values), outmask, paramLayer, layerNr, layerZ)
         res = _SweepResultNonlinearTMM()
         res._Init(resCpp);
         return res
