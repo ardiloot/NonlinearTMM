@@ -37,19 +37,24 @@ namespace TMM {
 		expansionCoefsKx(0) = E0;
 	}
 
-	void Wave::SolveFFTWave(double E0, double th0, double k, int iteration, double maxPhiThis) {
-		// FFT waves
-		double maxKxpByMaxX = (nPointsInteg - 1) / 2 * (PI / maxX);
-		double maxKxp = min(maxKxpByMaxX, std::sin(maxPhiThis) * k);
-		double dx = PI / maxKxp;
-
-		//std::cout << "x: " << dx * (nPointsInteg - 1) << std::endl;
+	void Wave::SolveFFTWave(double E0, double th0, double k) {
+		if (nPointsInteg < 2) {
+			std::cerr << "nPointsInteg too small" << std::endl;
+			throw std::runtime_error("nPointsInteg too small");
+		}
+		
+		// Calc maxX
+		if (dynamicMaxX) {
+			maxXThis = dynamicMaxXCoef * (0.5 * w0 / std::cos(th0));
+		}
+		else {
+			maxXThis = maxX;
+		}
 
 		// Init xs
 		ArrayXd xs(nPointsInteg);
-		for (int i = 0; i < nPointsInteg; i++) {
-			xs(i) = -0.5 * dx * nPointsInteg + i * dx;
-		}
+		xs = ArrayXd::LinSpaced(nPointsInteg, -maxXThis, maxXThis);
+		double dx = xs(1) - xs(0);
 
 		// Field profile
 		fieldProfileXs = xs;
@@ -75,30 +80,6 @@ namespace TMM {
 		ArrayXd kxPs = 2.0 * PI * FFTFreq(fieldProfile.size(), dx);
 		ArrayXd phis = (kxPs / k).asin();
 
-
-		// Check if needed to reduce maxPhi
-		ArrayXd cumSum(fieldProfileSpectrum.size());
-		cumSum(0) = std::abs(fieldProfileSpectrum(0));
-		for (int i = 1; i < cumSum.size(); i++) {
-			cumSum(i) = cumSum(i - 1) + std::abs(fieldProfileSpectrum(i));
-		}
-
-		double newMaxPhiIndex = -1;
-		double totalSum = cumSum(cumSum.size() - 1);
-		for (int i = 1; i < cumSum.size(); i++) {
-			if (cumSum(i) / totalSum >= integCriteria) {
-				newMaxPhiIndex = i;
-				break;
-			}
-		}
-
-		// Recursion if can reduce maxPhi
-		if (newMaxPhiIndex > 0 && iteration < 1) {
-			double newMaxPhi = abs(phis(max(0, newMaxPhiIndex - 5)));
-			SolveFFTWave(E0, th0, k, iteration + 1, newMaxPhi);
-			return;
-		}
-
 		// Check for backward-propagating waves
 		if (phis.maxCoeff() + th0 >= PI / 2.0) {
 			std::cerr << "Phi larger than 90 deg." << std::endl;
@@ -122,9 +103,11 @@ namespace TMM {
 		Ly = 1e-3;
 		a = 0.7;
 		nPointsInteg = 100;
-		maxPhi = 0.17;
-		integCriteria = 1e-3;
 		maxX = 1e-3;
+		dynamicMaxX = true;
+		dynamicMaxXCoef = 2.0;
+		maxXThis = 0.0;
+		solved = false;
 	}
 
 	void Wave::SetWaveType(WaveType waveType_) {
@@ -163,16 +146,16 @@ namespace TMM {
 		nPointsInteg = nPointsInteg_;
 	}
 
-	void Wave::SetMaxPhi(double maxPhi_) {
-		maxPhi = maxPhi_;
-	}
-
-	void Wave::SetIntegCriteria(double criteria_) {
-		integCriteria = criteria_;
-	}
-
 	void Wave::SetMaxX(double maxX_) {
 		maxX = maxX_;
+	}
+
+	void Wave::EnableDynamicMaxX(bool dynamicMaxX_) {
+		dynamicMaxX = dynamicMaxX_;
+	}
+
+	void Wave::SetDynamicMaxXCoef(double dynamicMaxXCoef_) {
+		dynamicMaxXCoef = dynamicMaxXCoef_;
 	}
 
 	void Wave::Solve(double wl_, double beta_, Material *material_) {
@@ -207,8 +190,9 @@ namespace TMM {
 			SolvePlaneWave(E0, th0, k);
 		}
 		else {
-			SolveFFTWave(E0, th0, k, 0, maxPhi);
+			SolveFFTWave(E0, th0, k);
 		}
+		solved = true;
 	}
 
 	double Wave::GetPwr() {
@@ -239,43 +223,71 @@ namespace TMM {
 		return nPointsInteg;
 	}
 
-	double Wave::GetMaxPhi() {
-		return maxPhi;
-	}
-
-	double Wave::GetIntegCriteria() {
-		return integCriteria;
-	}
-
 	double Wave::GetMaxX() {
 		return maxX;
 	}
 
+	bool Wave::IsDynamicMaxXEnabled() {
+		return dynamicMaxX;
+	}
+
+	double Wave::GetDynamicMaxXCoef() {
+		return dynamicMaxXCoef;
+	}
+
 	pairdd Wave::GetXRange() {
-		return pairdd(-maxX, maxX);
+		if (!solved) {
+			std::cerr << "Wave must be solved first." << std::endl;
+			throw std::runtime_error("Wave must be solved first.");
+		}
+		return pairdd(-maxXThis, maxXThis);
 	}
 
 	ArrayXd Wave::GetBetas() {
+		if (!solved) {
+			std::cerr << "Wave must be solved first." << std::endl;
+			throw std::runtime_error("Wave must be solved first.");
+		}
 		return kxs / k0;
 	}
 
 	ArrayXd Wave::GetKxs() {
+		if (!solved) {
+			std::cerr << "Wave must be solved first." << std::endl;
+			throw std::runtime_error("Wave must be solved first.");
+		}
 		return kxs;
 	}
 
 	ArrayXd Wave::GetKzs() {
+		if (!solved) {
+			std::cerr << "Wave must be solved first." << std::endl;
+			throw std::runtime_error("Wave must be solved first.");
+		}
 		return kzs;
 	}
 
 	ArrayXd Wave::GetFieldProfileXs() {
+		if (!solved) {
+			std::cerr << "Wave must be solved first." << std::endl;
+			throw std::runtime_error("Wave must be solved first.");
+		}
 		return fieldProfileXs;
 	}
 
 	ArrayXd Wave::GetFieldProfile() {
+		if (!solved) {
+			std::cerr << "Wave must be solved first." << std::endl;
+			throw std::runtime_error("Wave must be solved first.");
+		}
 		return fieldProfile;
 	}
 
 	ArrayXcd Wave::GetExpansionCoefsKx() {
+		if (!solved) {
+			std::cerr << "Wave must be solved first." << std::endl;
+			throw std::runtime_error("Wave must be solved first.");
+		}
 		return expansionCoefsKx;
 	}
 

@@ -65,9 +65,9 @@ cdef waveParamsSet = set(["waveType",
                 "Ly",
                 "a",
                 "nPointsInteg",
-                "maxPhi",
-                "integCriteria",
-                "maxX"])
+                "maxX",
+                "dynamicMaxX",
+                "dynamicMaxXCoef"])
 
     
 cdef TMMParamCpp TmmParamFromStr(str paramStr):
@@ -213,44 +213,44 @@ cdef class _Wave:
         
     @property
     def pwr(self):
-        return self._thisptr.GetPwr();
+        return self._thisptr.GetPwr()
     
     @property
     def overrideE0(self):
-        return self._thisptr.GetOverrideE0();
+        return self._thisptr.GetOverrideE0()
     
     @property
     def E0(self):
-        return self._thisptr.GetE0();
+        return self._thisptr.GetE0()
 
     @property
     def w0(self):
-        return self._thisptr.GetW0();
+        return self._thisptr.GetW0()
     
     @property
     def Ly(self):
-        return self._thisptr.GetLy();
+        return self._thisptr.GetLy()
     
     @property
     def a(self):
-        return self._thisptr.GetA();
+        return self._thisptr.GetA()
     
     @property
     def nPointsInteg(self):
-        return self._thisptr.GetNPointsInteg();
-    
-    @property
-    def maxPhi(self):
-        return self._thisptr.GetMaxPhi();
-    
-    @property
-    def integCriteria(self):
-        return self._thisptr.GetIntegCriteria();
+        return self._thisptr.GetNPointsInteg()
 
     @property
     def maxX(self):
-        return self._thisptr.GetMaxX();
+        return self._thisptr.GetMaxX()
         
+    @property
+    def dynamicMaxX(self):
+        return self._thisptr.IsDynamicMaxXEnabled()
+    
+    @property
+    def dynamicMaxXCoef(self):
+        return self._thisptr.GetDynamicMaxXCoef()
+
     @property
     def kxs(self):
         return ndarray_copy(self._thisptr.GetKxs()).squeeze()
@@ -303,18 +303,18 @@ cdef class _Wave:
     @nPointsInteg.setter
     def nPointsInteg(self, int value): # @DuplicatedSignature
         self._thisptr.SetNPointsInteg(value)
-        
-    @maxPhi.setter
-    def maxPhi(self, double value): # @DuplicatedSignature
-        self._thisptr.SetMaxPhi(value)
-    
-    @integCriteria.setter
-    def integCriteria(self, double value): # @DuplicatedSignature
-        self._thisptr.SetIntegCriteria(value)  
 
     @maxX.setter
     def maxX(self, double value): # @DuplicatedSignature
         self._thisptr.SetMaxX(value)  
+    
+    @dynamicMaxX.setter
+    def dynamicMaxX(self, bool value): # @DuplicatedSignature
+        self._thisptr.EnableDynamicMaxX(value)  
+            
+    @dynamicMaxXCoef.setter
+    def dynamicMaxXCoef(self, bool value): # @DuplicatedSignature
+        self._thisptr.SetDynamicMaxXCoef(value)          
 
 #===============================================================================
 # PowerFlows

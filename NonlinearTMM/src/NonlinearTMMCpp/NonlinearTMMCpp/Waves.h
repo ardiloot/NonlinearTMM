@@ -36,9 +36,11 @@ namespace TMM {
 		double Ly;
 		double a; // Tukey param
 		int nPointsInteg;
-		double maxPhi;
-		double integCriteria;
 		double maxX;
+		bool dynamicMaxX;
+		double dynamicMaxXCoef;
+		double maxXThis;
+		bool solved;
 
 		double wl;
 		double beta;
@@ -48,10 +50,10 @@ namespace TMM {
 		Eigen::FFT<double> fft;
 
 		void SolvePlaneWave(double E0, double th0, double k);
-		void SolveFFTWave(double E0, double th0, double k, int iteration, double maxPhiThis);
+		void SolveFFTWave(double E0, double th0, double k);
 
 	public:
-	
+
 		Wave();
 
 		// Setters
@@ -64,9 +66,9 @@ namespace TMM {
 		void SetLy(double Ly_);
 		void SetA(double a_);
 		void SetNPointsInteg(int nPointsInteg_);
-		void SetMaxPhi(double maxPhi_);
-		void SetIntegCriteria(double criteria_);
 		void SetMaxX(double maxX_);
+		void EnableDynamicMaxX(bool dynamicMaxX_);
+		void SetDynamicMaxXCoef(double dynamicMaxXCoef_);
 
 		// Solve
 		void Solve(double wl, double beta, Material *material_ = NULL);
@@ -79,9 +81,9 @@ namespace TMM {
 		double GetLy();
 		double GetA();
 		int GetNPointsInteg();
-		double GetMaxPhi();
-		double GetIntegCriteria();
 		double GetMaxX();
+		bool IsDynamicMaxXEnabled();
+		double GetDynamicMaxXCoef();
 		pairdd GetXRange();
 		ArrayXd GetBetas();
 		ArrayXd GetKxs();
