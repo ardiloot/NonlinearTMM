@@ -153,7 +153,7 @@ namespace TMM {
 		SolveGeneratedField();
 	}
 
-	SecondOrderNLPowerFlows SecondOrderNLTMM::GetPowerFlows() {
+	SecondOrderNLPowerFlows SecondOrderNLTMM::GetPowerFlows() const{
 		SecondOrderNLPowerFlows res;
 		res.P1 = tmmP1.GetPowerFlows();
 		res.P2 = tmmP2.GetPowerFlows();
@@ -173,7 +173,7 @@ namespace TMM {
 		return &tmmGen;
 	}
 
-	SweepResultSecondOrderNLTMM * SecondOrderNLTMM::Sweep(TMMParam param, const Eigen::Map<ArrayXd>& valuesP1, const Eigen::Map<ArrayXd>& valuesP2, int outmask, int layerNr, double layerZ) {
+	SweepResultSecondOrderNLTMM * SecondOrderNLTMM::Sweep(TMMParam param, const Eigen::Map<ArrayXd>& valuesP1, const Eigen::Map<ArrayXd>& valuesP2, int outmask, int paramLayer, int layerNr, double layerZ) {
 		if (valuesP1.size() != valuesP2.size()) {
 			throw std::invalid_argument("Value arrays must have the same size.");
 		}
@@ -197,8 +197,12 @@ namespace TMM {
 			#pragma omp for
 			for (int i = 0; i < valuesP1.size(); i++) {
 				//Set sweep param
-				nlTMMCopy.GetP1()->SetParam(param, valuesP1(i));
-				nlTMMCopy.GetP2()->SetParam(param, valuesP2(i));
+				nlTMMCopy.GetP1()->SetParam(param, valuesP1(i), paramLayer);
+				nlTMMCopy.GetP2()->SetParam(param, valuesP2(i), paramLayer);
+				if (GetParamType(param) == PTYPE_NONLINEAR_LAYER) {
+					// TODO
+					nlTMMCopy.GetGen()->SetParam(param, valuesP2(i), paramLayer);
+				}
 
 				// Solver
 				nlTMMCopy.Solve();
@@ -208,19 +212,25 @@ namespace TMM {
 		return res;
 	}
 
-	FieldsZX * SecondOrderNLTMM::GetGenWaveFields2D(const Eigen::Map<ArrayXd>& betasP1, const Eigen::Map<ArrayXd>& betasP2, const Eigen::Map<ArrayXcd>& E0sP1, const Eigen::Map<ArrayXcd>& E0sP2, const Eigen::Map<ArrayXd>& zs, const Eigen::Map<ArrayXd>& xs, WaveDirection dir) {
+	FieldsZX * SecondOrderNLTMM::WaveGetFields2D(const Eigen::Map<ArrayXd> &zs, const Eigen::Map<ArrayXd> &xs, WaveDirection dir) {
 		// Do checking
 		tmmP1.CheckPrerequisites(PARAM_BETA);
 		tmmP2.CheckPrerequisites(PARAM_BETA);
 		tmmGen.CheckPrerequisites(PARAM_BETA);
 
-		if (E0sP1.size() != betasP1.size()) {
-			throw std::invalid_argument("Arrays (betasP1, E0sP1) must have the same length.");
-		}
+		// Solve wave P1
+		Wave *waveP1 = tmmP1.GetWave();
+		waveP1->Solve(tmmP1.GetWl(), tmmP1.GetBeta(), tmmP1.GetLayer(0)->GetMaterial());
+		double LyP1 = waveP1->GetLy();
+		ArrayXd betasP1 = waveP1->GetBetas();
+		ArrayXcd E0sP1 = waveP1->GetExpansionCoefsKx();
 
-		if (E0sP2.size() != betasP2.size()) {
-			throw std::invalid_argument("Arrays (betasP2, E0sP2) must have the same length.");
-		}
+		// Solve wave P2
+		Wave *waveP2 = tmmP2.GetWave();
+		waveP2->Solve(tmmP2.GetWl(), tmmP2.GetBeta(), tmmP2.GetLayer(0)->GetMaterial());
+		double LyP2 = waveP2->GetLy();
+		ArrayXd betasP2 = waveP2->GetBetas();
+		ArrayXcd E0sP2 = waveP2->GetExpansionCoefsKx();
 
 		// kxs
 		ArrayXd kxsP1 = betasP1 * 2.0 * PI / tmmP1.GetWl();
@@ -260,20 +270,41 @@ namespace TMM {
 		return res;
 	}
 
-	pairdd SecondOrderNLTMM::GetPowerFlowsGenForWave(const Eigen::Map<ArrayXd>& betasP1, const Eigen::Map<ArrayXd>& betasP2, const Eigen::Map<ArrayXcd>& E0sP1, const Eigen::Map<ArrayXcd>& E0sP2, int layerNr, double x0, double x1, double z, double Ly, WaveDirection dir) {
+	pairdd SecondOrderNLTMM::WaveGetPowerFlows(int layerNr, double x0, double x1, double z) {
 		// Do checking
-
-		if (E0sP1.size() != betasP1.size()) {
-			throw std::invalid_argument("Arrays (betasP1, E0sP1) must have the same length.");
-		}
-
-		if (E0sP2.size() != betasP2.size()) {
-			throw std::invalid_argument("Arrays (betasP2, E0sP2) must have the same length.");
-		}
-
 		if (layerNr < 0 || layerNr > tmmP1.LayersCount()) {
 			throw std::invalid_argument("Invalid layer index.");
 		}
+
+		// Solve wave P1
+		Wave *waveP1 = tmmP1.GetWave();
+		waveP1->Solve(tmmP1.GetWl(), tmmP1.GetBeta(), tmmP1.GetLayer(0)->GetMaterial());
+		double LyP1 = waveP1->GetLy();
+		ArrayXd betasP1 = waveP1->GetBetas();
+		ArrayXcd E0sP1 = waveP1->GetExpansionCoefsKx();
+
+		// Solve wave P2
+		Wave *waveP2 = tmmP2.GetWave();
+		waveP2->Solve(tmmP2.GetWl(), tmmP2.GetBeta(), tmmP2.GetLayer(0)->GetMaterial());
+		double LyP2 = waveP2->GetLy();
+		ArrayXd betasP2 = waveP2->GetBetas();
+		ArrayXcd E0sP2 = waveP2->GetExpansionCoefsKx();
+
+		// X-range (TODO)
+		pairdd xrangeP1 = waveP1->GetXRange();
+		if (isnan(x0)) {
+			x0 = xrangeP1.first;
+		}
+		if (isnan(x1)) {
+			x1 = xrangeP1.second;
+		}
+
+		// Ly
+		if (LyP1 != LyP2) {
+			std::cerr << "Both pump wase must have the same Ly." << std::endl;
+			throw std::invalid_argument("Both pump wase must have the same Ly.");
+		}
+		double Ly = LyP1;
 
 		// Init memory
 		int nTot = betasP1.size() * betasP2.size();
@@ -328,26 +359,10 @@ namespace TMM {
 		double PF = constNAN, PB = constNAN;
 		double wlGen = tmmGen.GetWl();
 		Polarization polGen = tmmGen.GetPolarization();
-		dcomplex epsLayer0 = tmmGen.GetLayer(0)->eps;
-		/*
-		switch (dir)
-		{
-		case TMM::F:
-			PF = IntegrateWavePower(layerNr, polGen, wlGen, epsLayer0, Us.col(F), kxs, kzs.col(F), x0, x1, z, Ly);
-			break;
-		case TMM::B:
-			PB = -IntegrateWavePower(layerNr, polGen, wlGen, epsLayer0, Us.col(B), kxs, kzs.col(B), x0, x1, z, Ly);
-			break;
-		case TMM::TOT:
-			PF = IntegrateWavePower(layerNr, polGen, wlGen, epsLayer0, Us.col(F), kxs, kzs.col(F), x0, x1, z, Ly);
-			PB = -IntegrateWavePower(layerNr, polGen, wlGen, epsLayer0, Us.col(B), kxs, kzs.col(B), x0, x1, z, Ly);
-			break;
-		default:
-			throw std::invalid_argument("Invalid direction.");
-			break;
-		}
-		*/
-		return pairdd(PF, PB);
+		dcomplex epsLayer = tmmGen.GetLayer(layerNr)->eps;
+
+		pairdd res = IntegrateWavePower(layerNr, polGen, wlGen, epsLayer, Us, kxs, kzs, x0, x1, z, Ly);
+		return res;
 	}
 
 }

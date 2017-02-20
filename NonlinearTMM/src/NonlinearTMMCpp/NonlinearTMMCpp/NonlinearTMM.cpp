@@ -772,8 +772,8 @@ namespace TMM {
 		// Integrate powers
 		ArrayXd kxs(betas.size());
 		kxs = betas * layers[0].k0;
-		dcomplex epsLayer0 = layers[layerNr].eps;
-		pairdd res = IntegrateWavePower(layerNr, pol, wl, epsLayer0, Us, kxs, kzs, x0, x1, z, Ly);
+		dcomplex epsLayer = layers[layerNr].eps;
+		pairdd res = IntegrateWavePower(layerNr, pol, wl, epsLayer, Us, kxs, kzs, x0, x1, z, Ly);
 		return res;
 	}
 	

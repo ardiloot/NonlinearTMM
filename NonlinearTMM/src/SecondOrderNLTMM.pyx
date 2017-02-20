@@ -883,38 +883,29 @@ cdef class SecondOrderNLTMM:
         if outEnh:
             outmask |= SWEEP_ENH        
         
-        resCpp = self._thisptr.Sweep(TmmParamFromStr(paramStr), Map[ArrayXd](valuesP1), Map[ArrayXd](valuesP2), outmask, layerNr, layerZ)
+        cdef TMMParamCpp param;
+        cdef int paramLayer = -1;
+        if (paramStr.startswith("d_")):
+            param = PARAM_LAYER_D
+            paramLayer = int(paramStr[2:])
+        else:
+            param = TmmParamFromStr(paramStr)
+        
+        resCpp = self._thisptr.Sweep(TmmParamFromStr(paramStr), Map[ArrayXd](valuesP1), Map[ArrayXd](valuesP2), outmask, paramLayer, layerNr, layerZ)
         res = _SweepResultSecondOrderNLTMM()
         res._Init(resCpp);
         return res
     
-    def GetGenWaveFields2D(self, np.ndarray[double, ndim = 1] betasP1, np.ndarray[double, ndim = 1] betasP2,
-                        np.ndarray[double complex, ndim = 1] E0sP1, np.ndarray[double complex, ndim = 1] E0sP2,
-                        np.ndarray[double, ndim = 1] zs, np.ndarray[double, ndim = 1] xs, str dirStr = "total"):
-        
+    def WaveGetPowerFlows(self, int layerNr, double x0 = float("nan"), double x1 = float("nan"), double z = 0.0):
+        cdef pair[double, double] res;
+        res = self._thisptr.WaveGetPowerFlows(layerNr, x0, x1, z)
+        return (res.first, res.second)
+    
+    def WaveGetFields2D(self, np.ndarray[double, ndim = 1] zs, np.ndarray[double, ndim = 1] xs, str dirStr = "total"):
         cdef FieldsZXCpp *resCpp;
         cdef WaveDirectionCpp direction = WaveDirectionFromStr(dirStr)
-        resCpp = self._thisptr.GetGenWaveFields2D(Map[ArrayXd](betasP1), Map[ArrayXd](betasP2),
-            Map[ArrayXcd](E0sP1), Map[ArrayXcd](E0sP2), Map[ArrayXd](zs), Map[ArrayXd](xs), direction)
+        resCpp = self._thisptr.WaveGetFields2D(Map[ArrayXd](zs), Map[ArrayXd](xs), direction)
         res = _FieldsZX()
         res._Init(resCpp)
         return res
         
-    def GetPowerFlowsGenForWave(self, object waveP1, object waveP2, double th0P1, double th0P2, int layerNr, double x0, double x1, double z, str dirStr = "total"):
-        # NonlinearLayer has its own specific method
-        
-        if (waveP1.Ly != waveP2.Ly):
-            raise ValueError("Waves musth have the same Ly")
-
-        cdef double Ly = waveP1.Ly
-        cdef WaveDirectionCpp direction = WaveDirectionFromStr(dirStr)
-        waveP1.Solve(th0P1, wl = self.P1.wl)
-        waveP2.Solve(th0P2, wl = self.P2.wl)
-        
-        cdef pair[double, double] res;
-        res = self._thisptr.GetPowerFlowsGenForWave(Map[ArrayXd](waveP1.betas), \
-            Map[ArrayXd](waveP2.betas), Map[ArrayXcd](waveP1.expansionCoefsKx), \
-            Map[ArrayXcd](waveP2.expansionCoefsKx), layerNr, x0, x1, z, Ly, direction)
-        
-        return (res.first, res.second)
-    

@@ -208,12 +208,13 @@ cdef extern from "SecondOrderNLTMM.h" namespace "TMM":
         SecondOrderNLTMM() except +
         void SetProcess(NonlinearProcessCpp process_) except +
         void AddLayer(double d_, MaterialCpp *material_) except +
-        void Solve() except +
-        SecondOrderNLPowerFlowsCpp GetPowerFlows() except +
         NonlinearTMMCpp* GetP1() except +
         NonlinearTMMCpp* GetP2() except +
         NonlinearTMMCpp* GetGen() except +
-        SweepResultSecondOrderNLTMMCpp* Sweep(TMMParamCpp param, Map[ArrayXd] &, Map[ArrayXd] &, int outmask, int layerNr, double layerZ) except +
-        FieldsZXCpp * GetGenWaveFields2D(Map[ArrayXd]& betasP1, Map[ArrayXd]& betasP2, Map[ArrayXcd]& E0sP1, Map[ArrayXcd]& E0sP2,Map[ArrayXd]& zs, Map[ArrayXd]& xs, WaveDirectionCpp dir) except +
-        pair[double, double] GetPowerFlowsGenForWave(Map[ArrayXd]& betasP1, Map[ArrayXd]& betasP2, Map[ArrayXcd]& E0sP1, Map[ArrayXcd]& E0sP2, int layerNr, double x0, double x1, double z, double Ly, WaveDirectionCpp dir) except +
-    
+        
+        void Solve() except +
+        SecondOrderNLPowerFlowsCpp GetPowerFlows() except +
+        SweepResultSecondOrderNLTMMCpp* Sweep(TMMParamCpp param, Map[ArrayXd] &, Map[ArrayXd] &, int outmask, int paramLayer, int layerNr, double layerZ) except +
+        
+        pair[double, double] WaveGetPowerFlows(int layerNr, double x0, double x1, double z) except +
+        FieldsZXCpp * WaveGetFields2D(Map[ArrayXd]& zs, Map[ArrayXd]& xs, WaveDirectionCpp dir) except +
