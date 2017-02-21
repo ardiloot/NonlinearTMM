@@ -65,10 +65,10 @@ namespace TMM {
 		switch (waveType)
 		{
 		case TMM::GAUSSIANWAVE:
-			fieldProfile = E0 * (-(xs * xs) / sqr(w0)).exp();
+			fieldProfile = E0 * (-(xs * xs) / sqr(w0 / 1.2533141369277430)).exp();
 			break;
 		case TMM::TUKEYWAVE:
-			fieldProfile = E0 * TukeyFunc(xs, w0, a);
+			fieldProfile = E0 * TukeyFunc(xs, w0 / (0.25 * a + 0.75), a);
 			break;
 		default:
 			std::cerr << "Unknown FFT wave type." << std::endl;
