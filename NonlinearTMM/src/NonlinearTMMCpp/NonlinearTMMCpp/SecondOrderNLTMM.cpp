@@ -305,7 +305,7 @@ namespace TMM {
 			throw std::invalid_argument("Both pump waves must have the same Ly.");
 		}
 		double Ly = LyP1;
-
+		std::cout << x0 << " " << x1 << " " << Ly << std::endl;
 		// Init memory
 		int nTot = betasP1.size() * betasP2.size();
 		Eigen::MatrixX2cd UsUnsorted(nTot, 2);
@@ -356,7 +356,6 @@ namespace TMM {
 		}
 
 		// Integrate powers
-		double PF = constNAN, PB = constNAN;
 		double wlGen = tmmGen.GetWl();
 		Polarization polGen = tmmGen.GetPolarization();
 		dcomplex epsLayer = tmmGen.GetLayer(layerNr)->eps;

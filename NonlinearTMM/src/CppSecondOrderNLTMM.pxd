@@ -101,6 +101,7 @@ cdef extern from "Waves.h" namespace "TMM":
         bool IsDynamicMaxXEnabled() except +
         double GetDynamicMaxXCoef() except +
         double GetMaxPhi() except +
+        pair[double, double] GetXRange() except +
         ArrayXd GetBetas() except +
         ArrayXd GetPhis() except +
         ArrayXd GetKxs() except +

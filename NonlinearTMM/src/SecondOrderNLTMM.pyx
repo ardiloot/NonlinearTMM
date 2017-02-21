@@ -258,6 +258,11 @@ cdef class _Wave:
         return self._thisptr.GetMaxPhi()
 
     @property
+    def xRange(self):
+        cdef pair[double, double] r = self._thisptr.GetXRange()
+        return (r.first, r.second) 
+
+    @property
     def betas(self):
         return ndarray_copy(self._thisptr.GetBetas()).squeeze()
 
@@ -543,7 +548,7 @@ cdef class _NonlinearLayer:
 
 cdef class NonlinearTMM:
     cdef NonlinearTMMCpp *_thisptr
-    cdef list materialsCache
+    cdef readonly list materialsCache
     cdef readonly list layers
     cdef bool _needDealloc
     cdef object _parent;
