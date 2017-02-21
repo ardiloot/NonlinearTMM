@@ -386,12 +386,13 @@ namespace TMM {
 		NonlinearLayer &lL = layers[layers.size() - 1];
 		if (mode == MODE_INCIDENT) {
 			if (!overrideE0) {
-				// Intensity given by I0
+				// Intensity given by I0 (intensity at normal incidence), I = I0 * cos(th0)				
+				double cosTh0 = real(l0.hw.GetKzF()) / real(l0.k);
 				if (pol == P_POL) {
-					inc = std::sqrt(2.0 * omega * constEps0 / std::real(l0.hw.kz(F)) * real(l0.eps) * I0);
+					inc = std::sqrt(2.0 * omega * constEps0 / std::real(l0.hw.kz(F)) * real(l0.eps) * I0 * cosTh0);
 				}
 				else if (pol == S_POL) {
-					inc = std::sqrt(2.0 * omega * constMu0 / std::real(l0.hw.kz(F)) * I0);
+					inc = std::sqrt(2.0 * omega * constMu0 / std::real(l0.hw.kz(F)) * I0 * cosTh0);
 				}
 				else {
 					throw std::runtime_error("Unknown polarization");
@@ -473,6 +474,12 @@ namespace TMM {
 		// Solve all layers
 		for (int i = 0; i < layers.size(); i++) {				
 			layers[i].Solve(wl, beta, pol);
+		}
+
+		// Check first layer
+		if (beta >= real(layers[0].n)) {
+			std::cerr << "Light cannot propagate in the first medium." << std::endl;
+			throw std::invalid_argument("Light cannot propagate in the first medium.");
 		}
 
 		// Solve
