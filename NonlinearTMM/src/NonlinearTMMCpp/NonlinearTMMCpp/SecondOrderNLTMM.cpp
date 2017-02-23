@@ -153,11 +153,11 @@ namespace TMM {
 		SolveGeneratedField();
 	}
 
-	SecondOrderNLPowerFlows SecondOrderNLTMM::GetPowerFlows() const{
-		SecondOrderNLPowerFlows res;
-		res.P1 = tmmP1.GetPowerFlows();
-		res.P2 = tmmP2.GetPowerFlows();
-		res.Gen = tmmGen.GetPowerFlows();
+	SecondOrderNLIntensities SecondOrderNLTMM::GetIntensities() const{
+		SecondOrderNLIntensities res;
+		res.P1 = tmmP1.GetIntensities();
+		res.P2 = tmmP2.GetIntensities();
+		res.Gen = tmmGen.GetIntensities();
 		return res;
 	}
 

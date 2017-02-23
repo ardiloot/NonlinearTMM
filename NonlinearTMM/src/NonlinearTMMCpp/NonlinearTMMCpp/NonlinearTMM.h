@@ -18,19 +18,19 @@ namespace TMM {
 	void OuterProductGoodEigenComplexAdd(const ArrayXcd& X, const ArrayXcd& Y, MatrixXcd& R);
 
 	//---------------------------------------------------------------
-	// PowerFlows
+	// Intensities
 	//---------------------------------------------------------------
 
-	class PowerFlows {
+	class Intensities {
 	private:
 	public:
 		dcomplex inc, r, t;
 		double I, R, T;
 		
-		PowerFlows(dcomplex inc_ = 0.0, dcomplex r_ = 0.0, dcomplex t_ = 0.0, 
+		Intensities(dcomplex inc_ = 0.0, dcomplex r_ = 0.0, dcomplex t_ = 0.0, 
 			double I_ = 0.0, double R_ = 0.0, double T_ = 0.0);
 
-		friend std::ostream& operator<<(std::ostream& os, const PowerFlows& dt);
+		friend std::ostream& operator<<(std::ostream& os, const Intensities& dt);
 	};
 
 	//---------------------------------------------------------------
@@ -44,13 +44,30 @@ namespace TMM {
 		double layerZ;
 	public:
 		ArrayXcd inc, r, t;
-		ArrayXd I, R, T, A;
+		ArrayXd II, IR, IT, IA;
 		ArrayXd enh;
 
 		SweepResultNonlinearTMM(int n, int outmask_, int layerNr_, double layerZ_);
 		int GetOutmask();
 		void SetValues(int nr, NonlinearTMM &tmm);
-		void SetWaveValues(int nr, NonlinearTMM &tmm);
+	};
+
+	//---------------------------------------------------------------
+	// WaveSweepResultNonlinearTMM
+	//---------------------------------------------------------------
+
+	class WaveSweepResultNonlinearTMM {
+	private:
+		int outmask;
+		int layerNr;
+		double layerZ;
+	public:
+		ArrayXd PI, PR, PT;
+		ArrayXd enh;
+
+		WaveSweepResultNonlinearTMM(int n, int outmask_, int layerNr_, double layerZ_);
+		int GetOutmask();
+		void SetValues(int nr, NonlinearTMM &tmm);
 	};
 
 	//---------------------------------------------------------------
@@ -143,8 +160,8 @@ namespace TMM {
 
 		// Plane wave functionality
 		void Solve();
-		PowerFlows GetPowerFlows() const;
-		double GetAbsorbedPower() const;
+		Intensities GetIntensities() const;
+		double GetAbsorbedIntensity() const;
 		double GetEnhancement(int layerNr, double z);
 		SweepResultNonlinearTMM* Sweep(TMMParam param, const Eigen::Map<ArrayXd> &values, int outmask = SWEEP_PWRFLOWS, int paramLayer = -1, int layerNr = 0, double layerZ = 0);
 		FieldsZ* GetFields(const Eigen::Map<ArrayXd> &zs, WaveDirection dir = TOT);
@@ -154,7 +171,7 @@ namespace TMM {
 		Wave* GetWave();
 		pairdd WaveGetPowerFlows(int layerNr, double x0 = constNAN, double x1 = constNAN, double z = 0.0);
 		double WaveGetEnhancement(int layerNr, double z);
-		SweepResultNonlinearTMM * WaveSweep(TMMParam param, const Eigen::Map<ArrayXd> &values, int outmask = SWEEP_PWRFLOWS, int paramLayer = -1, int layerNr = 0, double layerZ = 0);
+		WaveSweepResultNonlinearTMM * WaveSweep(TMMParam param, const Eigen::Map<ArrayXd> &values, int outmask = SWEEP_PWRFLOWS, int paramLayer = -1, int layerNr = 0, double layerZ = 0);
 		FieldsZX* WaveGetFields2D(const Eigen::Map<ArrayXd> &zs, const Eigen::Map<ArrayXd> &xs, WaveDirection dir = TOT);
 	};
 

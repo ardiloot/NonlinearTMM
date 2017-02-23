@@ -5,13 +5,13 @@
 namespace TMM {
 
 	//---------------------------------------------------------------
-	// SecondOrderNLPowerFlows
+	// SecondOrderNLIntensities
 	//---------------------------------------------------------------
 
-	class SecondOrderNLPowerFlows {
+	class SecondOrderNLIntensities {
 	private:
 	public:
-		PowerFlows P1, P2, Gen;
+		Intensities P1, P2, Gen;
 	};
 
 	//---------------------------------------------------------------
@@ -52,7 +52,7 @@ namespace TMM {
 		
 		// Planewaves
 		void Solve();
-		SecondOrderNLPowerFlows GetPowerFlows() const;
+		SecondOrderNLIntensities GetIntensities() const;
 		SweepResultSecondOrderNLTMM* Sweep(TMMParam param, const Eigen::Map<ArrayXd> &valuesP1, const Eigen::Map<ArrayXd> &valuesP2, int outmask = 1, int paramLayer = -1, int layerNr = 0, double layerZ = 0.0);
 
 		// Waves

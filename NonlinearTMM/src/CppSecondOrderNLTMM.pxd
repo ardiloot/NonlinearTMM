@@ -125,9 +125,9 @@ cdef extern from "NonlinearLayer.h" namespace "TMM":
         HomogeneousWaveCpp* GetHw() except +
         void SetThickness(double d_) except +
         double GetThickness() except +
-        double GetPowerFlow(double z) except +
-        double GetAbsorbedPower() except +
-        double GetSrcPower() except +
+        double GetIntensity(double z) except +
+        double GetAbsorbedIntensity() except +
+        double GetSrcIntensity() except +
         
 #===============================================================================
 # NonlinearTMM.h
@@ -135,13 +135,18 @@ cdef extern from "NonlinearLayer.h" namespace "TMM":
 
 cdef extern from "NonlinearTMM.h" namespace "TMM":
 
-    cdef cppclass PowerFlowsCpp "TMM::PowerFlows":
+    cdef cppclass IntensitiesCpp "TMM::Intensities":
         double complex inc, r, t
         double I, R, T
         
     cdef cppclass SweepResultNonlinearTMMCpp "TMM::SweepResultNonlinearTMM":
         ArrayXcd inc, r, t;
-        ArrayXd I, R, T, A, enh;
+        ArrayXd II, IR, IT, IA, enh;
+        
+        int GetOutmask();
+
+    cdef cppclass WaveSweepResultNonlinearTMMCpp "TMM::WaveSweepResultNonlinearTMM":
+        ArrayXd PI, PR, PT, enh;
         
         int GetOutmask();
 
@@ -180,18 +185,18 @@ cdef extern from "NonlinearTMM.h" namespace "TMM":
        
         # Plane waves
         void Solve() except +
-        PowerFlowsCpp GetPowerFlows() except +
+        IntensitiesCpp GetIntensities() except +
         SweepResultNonlinearTMMCpp* Sweep(TMMParamCpp param, Map[ArrayXd] &, int outmask, int paramLayer, int layerNr, double layerZ) except +
         FieldsZCpp* GetFields(Map[ArrayXd] &, WaveDirectionCpp dir) except +
         FieldsZXCpp* GetFields2D(Map[ArrayXd] &, Map[ArrayXd] &, WaveDirectionCpp dir) except +
-        double GetAbsorbedPower() except +
+        double GetAbsorbedIntensity() except +
         double GetEnhancement(int layerNr, double z) except +
         
         # Waves
         WaveCpp* GetWave() except +
         pair[double, double] WaveGetPowerFlows(int layerNr, double x0, double x1, double z) except +
         double WaveGetEnhancement(int layerNr, double z) except +
-        SweepResultNonlinearTMMCpp* WaveSweep(TMMParamCpp param, Map[ArrayXd] &, int outmask, int paramLayer, int layerNr, double layerZ) except +
+        WaveSweepResultNonlinearTMMCpp* WaveSweep(TMMParamCpp param, Map[ArrayXd] &, int outmask, int paramLayer, int layerNr, double layerZ) except +
         FieldsZXCpp* WaveGetFields2D(Map[ArrayXd] &, Map[ArrayXd] &, WaveDirectionCpp) except +
       
         
@@ -201,8 +206,8 @@ cdef extern from "NonlinearTMM.h" namespace "TMM":
 
 cdef extern from "SecondOrderNLTMM.h" namespace "TMM":
 
-    cdef cppclass SecondOrderNLPowerFlowsCpp "TMM::SecondOrderNLPowerFlows":
-        PowerFlowsCpp P1, P2, Gen;
+    cdef cppclass SecondOrderNLIntensitiesCpp "TMM::SecondOrderNLIntensities":
+        IntensitiesCpp P1, P2, Gen;
         
     cdef cppclass SweepResultSecondOrderNLTMMCpp "TMM::SweepResultSecondOrderNLTMM":
         SweepResultNonlinearTMMCpp P1, P2, Gen;
@@ -217,7 +222,7 @@ cdef extern from "SecondOrderNLTMM.h" namespace "TMM":
         NonlinearTMMCpp* GetGen() except +
         
         void Solve() except +
-        SecondOrderNLPowerFlowsCpp GetPowerFlows() except +
+        SecondOrderNLIntensitiesCpp GetIntensities() except +
         SweepResultSecondOrderNLTMMCpp* Sweep(TMMParamCpp param, Map[ArrayXd] &, Map[ArrayXd] &, int outmask, int paramLayer, int layerNr, double layerZ) except +
         
         pair[double, double] WaveGetPowerFlows(int layerNr, double x0, double x1, double z) except +

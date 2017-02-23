@@ -341,17 +341,17 @@ cdef class _Wave:
      
 
 #===============================================================================
-# PowerFlows
+# Intensities
 #===============================================================================
 
-cdef class _PowerFlows:
+cdef class _Intensities:
     cdef readonly double complex inc, r, t
     cdef readonly double I, R, T
     
     def __cinit__(self):
         pass
     
-    cdef _Init(self, PowerFlowsCpp *ptr):
+    cdef _Init(self, IntensitiesCpp *ptr):
         self.inc = ptr.inc
         self.r = ptr.r
         self.t = ptr.t
@@ -366,7 +366,7 @@ cdef class _PowerFlows:
 cdef class _SweepResultNonlinearTMM:
     cdef SweepResultNonlinearTMMCpp *_thisptr 
     cdef readonly np.ndarray inc, r, t
-    cdef readonly np.ndarray I, R, T, A, enh
+    cdef readonly np.ndarray II, IR, IT, IA, enh
     cdef bool _needDealloc;
     cdef object _parent;
     
@@ -386,12 +386,40 @@ cdef class _SweepResultNonlinearTMM:
         self.inc = ndarray_view(self._thisptr.inc).squeeze()
         self.r = ndarray_view(self._thisptr.r).squeeze()
         self.t = ndarray_view(self._thisptr.t).squeeze()
-        self.I = ndarray_view(self._thisptr.I).squeeze()
-        self.R = ndarray_view(self._thisptr.R).squeeze()
-        self.T = ndarray_view(self._thisptr.T).squeeze()
-        self.A = ndarray_view(self._thisptr.A).squeeze()
+        self.II = ndarray_view(self._thisptr.II).squeeze()
+        self.IR = ndarray_view(self._thisptr.IR).squeeze()
+        self.IT = ndarray_view(self._thisptr.IT).squeeze()
+        self.IA = ndarray_view(self._thisptr.IA).squeeze()
         self.enh = ndarray_view(self._thisptr.enh).squeeze()
 
+
+#===============================================================================
+# SweepResultNonlinearTMM
+#===============================================================================
+
+cdef class _WaveSweepResultNonlinearTMM:
+    cdef WaveSweepResultNonlinearTMMCpp *_thisptr 
+    cdef readonly np.ndarray PI, PR, PT, enh
+    cdef bool _needDealloc;
+    cdef object _parent;
+    
+    def __cinit__(self):
+        self._needDealloc = False
+        pass
+    
+    def __dealloc__(self):
+        if self._needDealloc:
+            del self._thisptr
+
+    cdef _Init(self, WaveSweepResultNonlinearTMMCpp *ptr, bool needDealloc = True, object parent = None):
+        self._thisptr = ptr
+        self._needDealloc = needDealloc
+        self._parent = parent # To avoid dealloc of parent before this
+   
+        self.PI = ndarray_view(self._thisptr.PI).squeeze()
+        self.PR = ndarray_view(self._thisptr.PR).squeeze()
+        self.PT = ndarray_view(self._thisptr.PT).squeeze()
+        self.enh = ndarray_view(self._thisptr.enh).squeeze()
 
 #===============================================================================
 # FieldsZ
@@ -518,14 +546,14 @@ cdef class _NonlinearLayer:
         hw._Init(self._thisptr.GetHw())
         self.hw = hw
         
-    def GetPowerFlow(self, double z):
-        return self._thisptr.GetPowerFlow(z);
+    def GetIntensity(self, double z):
+        return self._thisptr.GetIntensity(z);
     
-    def GetAbsorbedPower(self):
-        return self._thisptr.GetAbsorbedPower();
+    def GetAbsorbedIntensity(self):
+        return self._thisptr.GetAbsorbedIntensity();
     
-    def GetSrcPower(self):
-        return self._thisptr.GetSrcPower();
+    def GetSrcIntensity(self):
+        return self._thisptr.GetSrcIntensity();
     
     # Getter
     #--------------------------------------------------------------------------- 
@@ -606,9 +634,9 @@ cdef class NonlinearTMM:
         self.SetParams(**kwargs)
         self._thisptr.Solve()
             
-    def GetPowerFlows(self):
-        cdef PowerFlowsCpp resCpp = self._thisptr.GetPowerFlows()
-        res = _PowerFlows()
+    def GetIntensities(self):
+        cdef IntensitiesCpp resCpp = self._thisptr.GetIntensities()
+        res = _Intensities()
         res._Init(&resCpp)
         return res 
     
@@ -650,8 +678,8 @@ cdef class NonlinearTMM:
         res._Init(resCpp)
         return res
     
-    def GetAbsorbedPower(self):
-        return self._thisptr.GetAbsorbedPower();
+    def GetAbsorbedIntensity(self):
+        return self._thisptr.GetAbsorbedIntensity();
     
     def GetEnhancement(self, int layerNr, double z = 0.0):
         cdef double res
@@ -675,7 +703,7 @@ cdef class NonlinearTMM:
             int layerNr = 0, double layerZ = 0.0, bool outPwr = True, \
             outR = False, outT = False, outEnh = False):
         
-        cdef SweepResultNonlinearTMMCpp *resCpp;
+        cdef WaveSweepResultNonlinearTMMCpp *resCpp;
         cdef int outmask = 0
         
         if outPwr:
@@ -696,7 +724,7 @@ cdef class NonlinearTMM:
             param = TmmParamFromStr(paramStr)
             
         resCpp = self._thisptr.WaveSweep(TmmParamFromStr(paramStr), Map[ArrayXd](values), outmask, paramLayer, layerNr, layerZ)
-        res = _SweepResultNonlinearTMM()
+        res = _WaveSweepResultNonlinearTMM()
         res._Init(resCpp);
         return res
            
@@ -774,23 +802,23 @@ cdef class NonlinearTMM:
         
 
 #===============================================================================
-# SecondOrderNLPowerFlows
+# SecondOrderNLIntensities
 #===============================================================================
 
-cdef class _SecondOrderNLPowerFlows:
+cdef class _SecondOrderNLIntensities:
     cdef readonly object P1, P2, Gen
     
     def __cinit__(self):
         pass
     
-    cdef _Init(self, SecondOrderNLPowerFlowsCpp* ptr):
-        P1 = _PowerFlows()
+    cdef _Init(self, SecondOrderNLIntensitiesCpp* ptr):
+        P1 = _Intensities()
         P1._Init(&ptr.P1)
     
-        P2 = _PowerFlows()
+        P2 = _Intensities()
         P2._Init(&ptr.P2)
         
-        Gen = _PowerFlows()
+        Gen = _Intensities()
         Gen._Init(&ptr.Gen)
         
         self.P1 = P1
@@ -883,11 +911,11 @@ cdef class SecondOrderNLTMM:
     def Solve(self):
         self._thisptr.Solve()
         
-    def GetPowerFlows(self):
-        cdef SecondOrderNLPowerFlowsCpp resCpp;
-        resCpp = self._thisptr.GetPowerFlows();
+    def GetIntensities(self):
+        cdef SecondOrderNLIntensitiesCpp resCpp;
+        resCpp = self._thisptr.GetIntensities();
         
-        res = _SecondOrderNLPowerFlows()
+        res = _SecondOrderNLIntensities()
         res._Init(&resCpp)
         return res
         
