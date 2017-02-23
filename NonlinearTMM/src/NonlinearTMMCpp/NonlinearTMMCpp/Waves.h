@@ -32,7 +32,8 @@ namespace TMM {
 		bool overrideE0;
 		double E0OverrideValue;
 		double w0;
-		Material *material;
+		Material *materialLayer0;
+		Material *materialLayerThis;
 		double Ly;
 		double a; // Tukey param
 		int nPointsInteg;
@@ -49,9 +50,15 @@ namespace TMM {
 		ArrayXd phis, kxs, kzs, fieldProfileXs, fieldProfile;
 		ArrayXcd expansionCoefsKx;
 		Eigen::FFT<double> fft;
+		double E0;
+		double k;
+		double nLayer0;
+		double nLayerThis;
+		double thLayer0;
+		double thLayerThis;
 
-		void SolvePlaneWave(double E0, double th0, double k);
-		void SolveFFTWave(double E0, double th0, double k);
+		void SolvePlaneWave();
+		void SolveFFTWave();
 
 	public:
 
@@ -63,7 +70,6 @@ namespace TMM {
 		void SetOverrideE0(bool overrideE0_);
 		void SetE0(double E0_);
 		void SetW0(double w0_);
-		void SetMaterial(Material *material_);
 		void SetLy(double Ly_);
 		void SetA(double a_);
 		void SetNPointsInteg(int nPointsInteg_);
@@ -74,7 +80,7 @@ namespace TMM {
 		void SetParam(TMMParam param, double value);
 
 		// Solve
-		void Solve(double wl, double beta, Material *material_ = NULL);
+		void Solve(double wl_, double beta_, Material *materialLayer0_, Material *materialLayerThis_);
 
 		// Getters
 		double GetPwr();

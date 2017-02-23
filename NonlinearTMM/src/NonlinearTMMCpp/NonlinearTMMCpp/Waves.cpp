@@ -25,7 +25,7 @@ namespace TMM {
 		return res;
 	}
 
-	void Wave::SolvePlaneWave(double E0, double th0, double k) {
+	void Wave::SolvePlaneWave() {
 		// Plane waves
 		phis = ArrayXd(1);
 		kxs = ArrayXd(1);
@@ -34,12 +34,12 @@ namespace TMM {
 		fieldProfileXs = ArrayXd(0);
 		fieldProfile = ArrayXd(0);
 		phis(0) = 0.0;
-		kxs(0) = k * std::sin(th0);
-		kzs(0) = k * std::cos(th0);
+		kxs(0) = k * std::sin(thLayer0);
+		kzs(0) = k * std::cos(thLayer0);
 		expansionCoefsKx(0) = E0;
 	}
 
-	void Wave::SolveFFTWave(double E0, double th0, double k) {
+	void Wave::SolveFFTWave() {
 		if (nPointsInteg < 2) {
 			std::cerr << "nPointsInteg too small" << std::endl;
 			throw std::runtime_error("nPointsInteg too small");
@@ -48,7 +48,7 @@ namespace TMM {
 		double maxXByPhi = (nPointsInteg / 2) * PI / (std::sin(maxPhi) * k);
 		// Calc maxX
 		if (dynamicMaxX) {
-			maxXThis = dynamicMaxXCoef * (0.5 * w0 / std::cos(th0));
+			maxXThis = dynamicMaxXCoef * (0.5 * w0 / std::cos(thLayer0));
 		}
 		else {
 			maxXThis = maxX;
@@ -85,16 +85,16 @@ namespace TMM {
 		phis = (kxPs / k).asin();
 
 		// Check for backward-propagating waves
-		if (phis.maxCoeff() + th0 >= PI / 2.0) {
+		if (phis.maxCoeff() + thLayer0 >= PI / 2.0) {
 			std::cerr << "Phi larger than 90 deg." << std::endl;
 			throw std::runtime_error("Phi larger than 90 deg.");
 		}
 
 		// Save result
 		ArrayXd kzPs = phis.cos() * k;
-		kxs = kxPs * std::cos(th0) + kzPs * std::sin(th0);
-		kzs = -kxPs * std::sin(th0) + kzPs * std::cos(th0);
-		expansionCoefsKx = fieldProfileSpectrum / std::cos(th0);
+		kxs = kxPs * std::cos(thLayer0) + kzPs * std::sin(thLayer0);
+		kzs = -kxPs * std::sin(thLayer0) + kzPs * std::cos(thLayer0);
+		expansionCoefsKx = fieldProfileSpectrum / std::cos(thLayer0);
 	}
 
 	Wave::Wave() : phis(0), kxs(0), kzs(0), expansionCoefsKx(0), fieldProfileXs(0), fieldProfile(0) {
@@ -103,7 +103,8 @@ namespace TMM {
 		overrideE0 = false;
 		E0OverrideValue = 1.0;
 		w0 = 100e-6;
-		material = NULL;
+		materialLayer0 = NULL;
+		materialLayerThis = NULL;
 		Ly = 1e-3;
 		a = 0.7;
 		nPointsInteg = 100;
@@ -113,6 +114,16 @@ namespace TMM {
 		maxXThis = 0.0;
 		solved = false;
 		maxPhi = 0.17;
+
+		wl = 0.0;
+		beta = 0.0;
+		k0 = 0.0;
+		E0 = 0.0;
+		k = 0.0;
+		nLayer0 = 0.0;
+		nLayerThis = 0.0;
+		thLayer0 = 0.0;
+		thLayerThis = 0.0;
 	}
 
 	void Wave::SetWaveType(WaveType waveType_) {
@@ -133,10 +144,6 @@ namespace TMM {
 
 	void Wave::SetW0(double w0_) {
 		w0 = w0_;
-	}
-
-	void Wave::SetMaterial(Material * material_) {
-		material = material_;
 	}
 
 	void Wave::SetLy(double Ly_) {
@@ -179,22 +186,14 @@ namespace TMM {
 		}
 	}
 
-	void Wave::Solve(double wl_, double beta_, Material *material_) {
+	void Wave::Solve(double wl_, double beta_, Material *materialLayer0_, Material *materialLayerThis_) {
 		wl = wl_;
 		beta = beta_;
+		materialLayer0 = materialLayer0_;
+		materialLayerThis = materialLayerThis_;
 		maxXThis = maxX;
 
-		if (material_ != NULL) {
-			SetMaterial(material_);
-		}
-		
-		if (material == NULL) {
-			std::cerr << "Material is not set." << std::endl;
-			throw std::runtime_error("Material is not set.");
-		}
-
-		// E0
-		double E0;
+		// Calc E0
 		if (!overrideE0) {
 			double I0 = pwr / (Ly * w0);
 			E0 = std::sqrt(2.0 * constMu0 * constC * I0);
@@ -203,16 +202,20 @@ namespace TMM {
 			E0 = E0OverrideValue;
 		}
 
+		// Precalc variables
 		k0 = 2.0 * PI / wl;
-		double n = real(material->GetN(wl));
-		double k = k0 * n;
-		double th0 = std::asin(beta / n);
+		nLayer0 = real(materialLayer0->GetN(wl));
+		nLayerThis = real(materialLayerThis->GetN(wl));
+		k = k0 * nLayer0;
+		thLayer0 = std::asin(beta / nLayer0);
+		thLayerThis = std::asin(beta / nLayerThis);
 
+		// Solve
 		if (waveType == PLANEWAVE) {
-			SolvePlaneWave(E0, th0, k);
+			SolvePlaneWave();
 		}
 		else {
-			SolveFFTWave(E0, th0, k);
+			SolveFFTWave();
 		}
 		solved = true;
 	}

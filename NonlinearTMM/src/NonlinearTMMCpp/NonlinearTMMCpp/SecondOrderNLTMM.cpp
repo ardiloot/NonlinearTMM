@@ -219,15 +219,18 @@ namespace TMM {
 		tmmGen.CheckPrerequisites(PARAM_BETA);
 
 		// Solve wave P1
+		Material *matLayerF = tmmP1.GetLayer(0)->GetMaterial();
+		Material *matLayerL = tmmP1.GetLayer(tmmP1.LayersCount() - 1)->GetMaterial();
+
 		Wave *waveP1 = tmmP1.GetWave();
-		waveP1->Solve(tmmP1.GetWl(), tmmP1.GetBeta(), tmmP1.GetLayer(0)->GetMaterial());
+		waveP1->Solve(tmmP1.GetWl(), tmmP1.GetBeta(), matLayerF, matLayerL);
 		double LyP1 = waveP1->GetLy();
 		ArrayXd betasP1 = waveP1->GetBetas();
 		ArrayXcd E0sP1 = waveP1->GetExpansionCoefsKx();
 
 		// Solve wave P2
 		Wave *waveP2 = tmmP2.GetWave();
-		waveP2->Solve(tmmP2.GetWl(), tmmP2.GetBeta(), tmmP2.GetLayer(0)->GetMaterial());
+		waveP2->Solve(tmmP2.GetWl(), tmmP2.GetBeta(), matLayerF, matLayerL);
 		double LyP2 = waveP2->GetLy();
 		ArrayXd betasP2 = waveP2->GetBetas();
 		ArrayXcd E0sP2 = waveP2->GetExpansionCoefsKx();
@@ -276,16 +279,19 @@ namespace TMM {
 			throw std::invalid_argument("Invalid layer index.");
 		}
 
+		Material *matLayer0 = tmmP1.GetLayer(0)->GetMaterial();
+		Material *matLayerThis = tmmP1.GetLayer(layerNr)->GetMaterial();
+
 		// Solve wave P1
 		Wave *waveP1 = tmmP1.GetWave();
-		waveP1->Solve(tmmP1.GetWl(), tmmP1.GetBeta(), tmmP1.GetLayer(0)->GetMaterial());
+		waveP1->Solve(tmmP1.GetWl(), tmmP1.GetBeta(), matLayer0, matLayerThis);
 		double LyP1 = waveP1->GetLy();
 		ArrayXd betasP1 = waveP1->GetBetas();
 		ArrayXcd E0sP1 = waveP1->GetExpansionCoefsKx();
 
 		// Solve wave P2
 		Wave *waveP2 = tmmP2.GetWave();
-		waveP2->Solve(tmmP2.GetWl(), tmmP2.GetBeta(), tmmP2.GetLayer(0)->GetMaterial());
+		waveP2->Solve(tmmP2.GetWl(), tmmP2.GetBeta(), matLayer0, matLayerThis);
 		double LyP2 = waveP2->GetLy();
 		ArrayXd betasP2 = waveP2->GetBetas();
 		ArrayXcd E0sP2 = waveP2->GetExpansionCoefsKx();

@@ -88,8 +88,6 @@ cdef extern from "Waves.h" namespace "TMM":
         void SetDynamicMaxXCoef(double dynamicMaxXCoef_) except +
         void SetMaxPhi(double maxPhi_) except +
         
-        void Solve(double wl, double beta) except +
-        
         double GetPwr() except +
         bool GetOverrideE0() except +
         double GetE0() except +

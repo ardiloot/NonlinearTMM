@@ -203,9 +203,6 @@ cdef class _Wave:
                 raise ValueError("Unknown kwarg %s" % (name))
             setattr(self, name, value)
         
-    def Solve(self, double wl, double beta):
-        self._thisptr.Solve(wl, beta)
-        
     # Getters
     #--------------------------------------------------------------------------- 
         

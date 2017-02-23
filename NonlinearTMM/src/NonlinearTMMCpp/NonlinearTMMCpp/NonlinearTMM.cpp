@@ -595,7 +595,9 @@ namespace TMM {
 		}
 
 		// Solve wave
-		wave.Solve(wl, beta, layers[0].GetMaterial());
+		Material *matLayerF = layers[0].GetMaterial();
+		Material *matLayerL = layers[layers.size() - 1].GetMaterial();
+		wave.Solve(wl, beta, matLayerF, matLayerL);
 		double Ly = wave.GetLy();
 		ArrayXd betas = wave.GetBetas();
 		ArrayXcd E0s = wave.GetExpansionCoefsKx();
@@ -723,7 +725,9 @@ namespace TMM {
 		}
 
 		// Solve wave
-		wave.Solve(wl, beta, layers[0].GetMaterial());
+		Material *matLayer0 = layers[0].GetMaterial();
+		Material *matLayerThis = layers[layerNr].GetMaterial();
+		wave.Solve(wl, beta, matLayer0, matLayerThis);
 		double Ly = wave.GetLy();
 		ArrayXd betas = wave.GetBetas();
 		ArrayXcd E0s = wave.GetExpansionCoefsKx();
