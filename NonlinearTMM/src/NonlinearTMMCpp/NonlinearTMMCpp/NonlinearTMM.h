@@ -44,7 +44,7 @@ namespace TMM {
 		double layerZ;
 	public:
 		ArrayXcd inc, r, t;
-		ArrayXd II, IR, IT, IA;
+		ArrayXd Ii, Ir, It, Ia;
 		ArrayXd enh;
 
 		SweepResultNonlinearTMM(int n, int outmask_, int layerNr_, double layerZ_);
@@ -62,7 +62,7 @@ namespace TMM {
 		int layerNr;
 		double layerZ;
 	public:
-		ArrayXd PI, PR, PT;
+		ArrayXd Pi, Pr, Pt;
 		ArrayXd enh, beamArea;
 
 		WaveSweepResultNonlinearTMM(int n, int outmask_, int layerNr_, double layerZ_);

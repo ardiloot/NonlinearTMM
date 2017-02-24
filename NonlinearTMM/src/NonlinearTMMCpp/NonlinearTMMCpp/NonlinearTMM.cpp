@@ -105,17 +105,17 @@ namespace TMM {
 		return os;
 	}
 
-	SweepResultNonlinearTMM::SweepResultNonlinearTMM(int n, int outmask_, int layerNr_, double layerZ_) : inc(n), r(n), t(n), II(n), IR(n), IT(n), IA(n), enh(n) {
+	SweepResultNonlinearTMM::SweepResultNonlinearTMM(int n, int outmask_, int layerNr_, double layerZ_) : inc(n), r(n), t(n), Ii(n), Ir(n), It(n), Ia(n), enh(n) {
 		outmask = outmask_;
 		layerNr = layerNr_;
 		layerZ = layerZ_;
 		inc.setConstant(constNAN);
 		r.setConstant(constNAN);
 		t.setConstant(constNAN);
-		II.setConstant(constNAN);
-		IR.setConstant(constNAN);
-		IT.setConstant(constNAN);
-		IA.setConstant(constNAN);
+		Ii.setConstant(constNAN);
+		Ir.setConstant(constNAN);
+		It.setConstant(constNAN);
+		Ia.setConstant(constNAN);
 		enh.setConstant(constNAN);
 	}
 
@@ -130,14 +130,14 @@ namespace TMM {
 			inc(nr) = pf.inc;
 			r(nr) = pf.r;
 			t(nr) = pf.t;
-			II(nr) = pf.I;
-			IR(nr) = pf.R;
-			IT(nr) = pf.T;
+			Ii(nr) = pf.I;
+			Ir(nr) = pf.R;
+			It(nr) = pf.T;
 		}
 
 		if (outmask & SWEEP_ABS) {
 			double A_ = tmm.GetAbsorbedIntensity();
-			IA(nr) = A_;
+			Ia(nr) = A_;
 		}
 
 		if (outmask & SWEEP_ENH) {
@@ -883,13 +883,13 @@ namespace TMM {
 	}
 
 	
-	WaveSweepResultNonlinearTMM::WaveSweepResultNonlinearTMM(int n, int outmask_, int layerNr_, double layerZ_) : PI(n), PR(n), PT(n), enh(n), beamArea(n) {
+	WaveSweepResultNonlinearTMM::WaveSweepResultNonlinearTMM(int n, int outmask_, int layerNr_, double layerZ_) : Pi(n), Pr(n), Pt(n), enh(n), beamArea(n) {
 		outmask = outmask_;
 		layerNr = layerNr_;
 		layerZ = layerZ_;
-		PI.setConstant(constNAN);
-		PR.setConstant(constNAN);
-		PT.setConstant(constNAN);
+		Pi.setConstant(constNAN);
+		Pr.setConstant(constNAN);
+		Pt.setConstant(constNAN);
 		enh.setConstant(constNAN);
 		beamArea.setConstant(constNAN);
 	}
@@ -902,14 +902,14 @@ namespace TMM {
 		// First layer
 		if ((outmask & SWEEP_I) || (outmask & SWEEP_R)) {
 			pairdd pf0 = tmm.WaveGetPowerFlows(0);
-			PI(nr) = pf0.first;
-			PR(nr) = pf0.second;
+			Pi(nr) = pf0.first;
+			Pr(nr) = pf0.second;
 		}
 
 		// Last layer
 		if (outmask & SWEEP_T) {
 			pairdd pfL = tmm.WaveGetPowerFlows(tmm.LayersCount() - 1);
-			PT(nr) = pfL.first;
+			Pt(nr) = pfL.first;
 		}
 
 		if (outmask & SWEEP_ENH) {

@@ -363,7 +363,7 @@ cdef class _Intensities:
 cdef class _SweepResultNonlinearTMM:
     cdef SweepResultNonlinearTMMCpp *_thisptr 
     cdef readonly np.ndarray inc, r, t
-    cdef readonly np.ndarray II, IR, IT, IA, enh
+    cdef readonly np.ndarray Ii, Ir, It, Ia, enh
     cdef bool _needDealloc;
     cdef object _parent;
     
@@ -383,10 +383,10 @@ cdef class _SweepResultNonlinearTMM:
         self.inc = ndarray_view(self._thisptr.inc).squeeze()
         self.r = ndarray_view(self._thisptr.r).squeeze()
         self.t = ndarray_view(self._thisptr.t).squeeze()
-        self.II = ndarray_view(self._thisptr.II).squeeze()
-        self.IR = ndarray_view(self._thisptr.IR).squeeze()
-        self.IT = ndarray_view(self._thisptr.IT).squeeze()
-        self.IA = ndarray_view(self._thisptr.IA).squeeze()
+        self.Ii = ndarray_view(self._thisptr.Ii).squeeze()
+        self.Ir = ndarray_view(self._thisptr.Ir).squeeze()
+        self.It = ndarray_view(self._thisptr.It).squeeze()
+        self.Ia = ndarray_view(self._thisptr.Ia).squeeze()
         self.enh = ndarray_view(self._thisptr.enh).squeeze()
 
 
@@ -396,7 +396,7 @@ cdef class _SweepResultNonlinearTMM:
 
 cdef class _WaveSweepResultNonlinearTMM:
     cdef WaveSweepResultNonlinearTMMCpp *_thisptr 
-    cdef readonly np.ndarray PI, PR, PT, enh, beamArea
+    cdef readonly np.ndarray Pi, Pr, Pt, enh, beamArea
     cdef bool _needDealloc;
     cdef object _parent;
     
@@ -413,9 +413,9 @@ cdef class _WaveSweepResultNonlinearTMM:
         self._needDealloc = needDealloc
         self._parent = parent # To avoid dealloc of parent before this
    
-        self.PI = ndarray_view(self._thisptr.PI).squeeze()
-        self.PR = ndarray_view(self._thisptr.PR).squeeze()
-        self.PT = ndarray_view(self._thisptr.PT).squeeze()
+        self.Pi = ndarray_view(self._thisptr.Pi).squeeze()
+        self.Pr = ndarray_view(self._thisptr.Pr).squeeze()
+        self.Pt = ndarray_view(self._thisptr.Pt).squeeze()
         self.enh = ndarray_view(self._thisptr.enh).squeeze()
         self.beamArea = ndarray_view(self._thisptr.beamArea).squeeze()
         
