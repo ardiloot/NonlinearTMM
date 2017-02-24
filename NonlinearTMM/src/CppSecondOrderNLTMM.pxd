@@ -144,7 +144,7 @@ cdef extern from "NonlinearTMM.h" namespace "TMM":
         int GetOutmask();
 
     cdef cppclass WaveSweepResultNonlinearTMMCpp "TMM::WaveSweepResultNonlinearTMM":
-        ArrayXd PI, PR, PT, enh;
+        ArrayXd PI, PR, PT, enh, beamArea;
         
         int GetOutmask();
 

@@ -601,6 +601,7 @@ namespace TMM {
 		double Ly = wave.GetLy();
 		ArrayXd betas = wave.GetBetas();
 		ArrayXcd E0s = wave.GetExpansionCoefsKx();
+
 		ArrayXd kxs = betas * 2.0 * PI / wl;
 
 		// Allocate space (deletion is the responsibility of the caller!)
@@ -882,7 +883,7 @@ namespace TMM {
 	}
 
 	
-	WaveSweepResultNonlinearTMM::WaveSweepResultNonlinearTMM(int n, int outmask_, int layerNr_, double layerZ_) : PI(n), PR(n), PT(n), enh(n) {
+	WaveSweepResultNonlinearTMM::WaveSweepResultNonlinearTMM(int n, int outmask_, int layerNr_, double layerZ_) : PI(n), PR(n), PT(n), enh(n), beamArea(n) {
 		outmask = outmask_;
 		layerNr = layerNr_;
 		layerZ = layerZ_;
@@ -890,6 +891,7 @@ namespace TMM {
 		PR.setConstant(constNAN);
 		PT.setConstant(constNAN);
 		enh.setConstant(constNAN);
+		beamArea.setConstant(constNAN);
 	}
 
 	int WaveSweepResultNonlinearTMM::GetOutmask() {
@@ -914,6 +916,8 @@ namespace TMM {
 			double enh_ = tmm.WaveGetEnhancement(layerNr, layerZ);
 			enh(nr) = enh_;
 		}
+
+		beamArea(nr) = tmm.GetWave()->GetBeamArea();
 	}
 
 }

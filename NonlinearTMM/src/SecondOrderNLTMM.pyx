@@ -396,7 +396,7 @@ cdef class _SweepResultNonlinearTMM:
 
 cdef class _WaveSweepResultNonlinearTMM:
     cdef WaveSweepResultNonlinearTMMCpp *_thisptr 
-    cdef readonly np.ndarray PI, PR, PT, enh
+    cdef readonly np.ndarray PI, PR, PT, enh, beamArea
     cdef bool _needDealloc;
     cdef object _parent;
     
@@ -417,6 +417,8 @@ cdef class _WaveSweepResultNonlinearTMM:
         self.PR = ndarray_view(self._thisptr.PR).squeeze()
         self.PT = ndarray_view(self._thisptr.PT).squeeze()
         self.enh = ndarray_view(self._thisptr.enh).squeeze()
+        self.beamArea = ndarray_view(self._thisptr.beamArea).squeeze()
+        
 
 #===============================================================================
 # FieldsZ

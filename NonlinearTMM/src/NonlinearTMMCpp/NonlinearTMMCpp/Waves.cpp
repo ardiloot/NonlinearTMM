@@ -27,7 +27,7 @@ namespace TMM {
 
 	void Wave::SolvePlaneWave() {
 		maxXThis = (0.5 * w0 / std::cos(thLayer0));
-		
+
 		// Plane waves
 		phis = ArrayXd(1);
 		kxs = ArrayXd(1);
@@ -207,7 +207,7 @@ namespace TMM {
 		nLayer0 = real(materialLayer0->GetN(wl));
 		k = k0 * nLayer0;
 		thLayer0 = std::asin(beta / nLayer0);
-		
+		beamArea = w0 * Ly / std::cos(thLayer0);
 
 		// Solve
 		if (waveType == PLANEWAVE) {
@@ -331,6 +331,14 @@ namespace TMM {
 			throw std::runtime_error("Wave must be solved first.");
 		}
 		return expansionCoefsKx;
+	}
+
+	double Wave::GetBeamArea() {
+		if (!solved) {
+			std::cerr << "Wave must be solved first." << std::endl;
+			throw std::runtime_error("Wave must be solved first.");
+		}
+		return beamArea;
 	}
 
 }

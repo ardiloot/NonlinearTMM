@@ -54,6 +54,7 @@ namespace TMM {
 		double k;
 		double nLayer0;
 		double thLayer0;
+		double beamArea;
 
 		void SolvePlaneWave();
 		void SolveFFTWave();
@@ -101,6 +102,7 @@ namespace TMM {
 		ArrayXd GetFieldProfileXs();
 		ArrayXd GetFieldProfile();
 		ArrayXcd GetExpansionCoefsKx();
+		double GetBeamArea();
 	};
 
 

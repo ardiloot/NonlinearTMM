@@ -63,7 +63,7 @@ namespace TMM {
 		double layerZ;
 	public:
 		ArrayXd PI, PR, PT;
-		ArrayXd enh;
+		ArrayXd enh, beamArea;
 
 		WaveSweepResultNonlinearTMM(int n, int outmask_, int layerNr_, double layerZ_);
 		int GetOutmask();
