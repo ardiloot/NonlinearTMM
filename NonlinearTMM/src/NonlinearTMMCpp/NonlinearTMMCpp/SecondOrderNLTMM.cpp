@@ -2,16 +2,28 @@
 
 namespace TMM {
 
-	SweepResultSecondOrderNLTMM::SweepResultSecondOrderNLTMM(int n, int outmask, int layerNr_, double layerZ_) : 
-		P1(n, outmask, layerNr_, layerZ_), P2(n, outmask, layerNr_, layerZ_), Gen(n, outmask, layerNr_, layerZ_),
-		wlsGen(n), betasGen(n){}
+	SweepResultSecondOrderNLTMM::SweepResultSecondOrderNLTMM(int n, int outmask_, int layerNr_, double layerZ_) : 
+		P1(n, outmask_, layerNr_, layerZ_), P2(n, outmask_, layerNr_, layerZ_), Gen(n, outmask_ & ~(SWEEP_ENH), layerNr_, layerZ_),
+		wlsGen(n), betasGen(n)
+	{
+		outmask = outmask_;
+	}
 
 	void SweepResultSecondOrderNLTMM::SetValues(int nr, SecondOrderNLTMM & tmm) {
 		wlsGen(nr) = tmm.GetGen()->GetWl();
 		betasGen(nr) = tmm.GetGen()->GetBeta();
-		P1.SetValues(nr, *tmm.GetP1());
-		P2.SetValues(nr, *tmm.GetP2());
-		Gen.SetValues(nr, *tmm.GetGen());
+		
+		if (outmask & SWEEP_P1) {
+			P1.SetValues(nr, *tmm.GetP1());
+		}
+
+		if (outmask & SWEEP_P2) {
+			P2.SetValues(nr, *tmm.GetP2());
+		}
+
+		if (outmask & SWEEP_GEN) {
+			Gen.SetValues(nr, *tmm.GetGen());
+		}
 	}
 
 	void SecondOrderNLTMM::UpdateGenParams()
@@ -296,6 +308,12 @@ namespace TMM {
 		ArrayXd betasP2 = waveP2->GetBetas();
 		ArrayXcd E0sP2 = waveP2->GetExpansionCoefsKx();
 
+		// TODO
+		if (waveP1->GetW0() > waveP2->GetW0()) {
+			std::cerr << "Currently P2 must be at least as wide as P1." << std::endl;
+			throw std::invalid_argument("Currently P2 must be at least as wide as P1.");
+		}
+
 		// X-range (TODO)
 		pairdd xrangeP1 = waveP1->GetXRange();
 		if (isnan(x0)) {
@@ -311,7 +329,7 @@ namespace TMM {
 			throw std::invalid_argument("Both pump waves must have the same Ly.");
 		}
 		double Ly = LyP1;
-		std::cout << x0 << " " << x1 << " " << Ly << std::endl;
+		//std::cout << x0 << " " << x1 << " " << Ly << std::endl;
 		// Init memory
 		int nTot = betasP1.size() * betasP2.size();
 		Eigen::MatrixX2cd UsUnsorted(nTot, 2);
@@ -368,6 +386,77 @@ namespace TMM {
 
 		pairdd res = IntegrateWavePower(layerNr, polGen, wlGen, epsLayer, Us, kxs, kzs, x0, x1, z, Ly);
 		return res;
+	}
+
+	WaveSweepResultSecondOrderNLTMM * SecondOrderNLTMM::WaveSweep(TMMParam param, const Eigen::Map<ArrayXd>& valuesP1, const Eigen::Map<ArrayXd>& valuesP2, int outmask, int paramLayer, int layerNr, double layerZ) {
+		if (valuesP1.size() != valuesP2.size()) {
+			throw std::invalid_argument("Value arrays must have the same size.");
+		}
+
+		tmmP1.CheckPrerequisites(param);
+		tmmP2.CheckPrerequisites(param);
+		tmmGen.CheckPrerequisites(param);
+
+		// Alloc memory for result (dealloc is responsibility of the user)
+		WaveSweepResultSecondOrderNLTMM *res = new WaveSweepResultSecondOrderNLTMM(valuesP1.size(), outmask, layerNr, layerZ);
+
+#pragma omp parallel
+		{
+			// Make a copy
+			SecondOrderNLTMM nlTMMCopy = *this;
+
+			// Sweep
+#pragma omp for
+			for (int i = 0; i < valuesP1.size(); i++) {
+				//Set sweep param
+				nlTMMCopy.GetP1()->SetParam(param, valuesP1(i), paramLayer);
+				nlTMMCopy.GetP2()->SetParam(param, valuesP2(i), paramLayer);
+				if (GetParamType(param) == PTYPE_NONLINEAR_LAYER) {
+					// TODO
+					nlTMMCopy.GetGen()->SetParam(param, valuesP2(i), paramLayer);
+				}
+				nlTMMCopy.UpdateGenParams();
+				res->SetValues(i, nlTMMCopy);
+			}
+		}
+		return res;
+	}
+
+	WaveSweepResultSecondOrderNLTMM::WaveSweepResultSecondOrderNLTMM(int n, int outmask_, int layerNr_, double layerZ_) :
+		P1(n, outmask_, layerNr_, layerZ_), P2(n, outmask_, layerNr_, layerZ_), Gen(n, outmask_ & ~(SWEEP_ENH), layerNr_, layerZ_),
+		wlsGen(n), betasGen(n)
+	{
+		outmask = outmask_;
+	}
+
+	void WaveSweepResultSecondOrderNLTMM::SetValues(int nr, SecondOrderNLTMM & tmm) {
+		wlsGen(nr) = tmm.GetGen()->GetWl();
+		betasGen(nr) = tmm.GetGen()->GetBeta();
+
+		if (outmask & SWEEP_P1) {
+			P1.SetValues(nr, *tmm.GetP1());
+		}
+
+		if (outmask & SWEEP_P2) {
+			P2.SetValues(nr, *tmm.GetP2());
+		}
+
+		if (outmask & SWEEP_GEN) {
+			// First layer
+			if ((outmask & SWEEP_I) || (outmask & SWEEP_R)) {
+				pairdd pf0 = tmm.WaveGetPowerFlows(0);
+				Gen.Pi(nr) = pf0.first;
+				Gen.Pr(nr) = pf0.second;
+			}
+
+			// Last layer
+			if (outmask & SWEEP_T) {
+				pairdd pfL = tmm.WaveGetPowerFlows(tmm.GetGen()->LayersCount() - 1);
+				Gen.Pt(nr) = pfL.first;
+			}
+
+			Gen.beamArea(nr) = tmm.GetP1()->GetWave()->GetBeamArea();
+		}
 	}
 
 }

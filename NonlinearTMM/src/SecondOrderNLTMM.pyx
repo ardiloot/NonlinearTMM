@@ -857,6 +857,41 @@ cdef class _SweepResultSecondOrderNLTMM:
         self.Gen = Gen
         self.wlsGen = ndarray_view(self._thisptr.wlsGen).squeeze()
         self.betasGen = ndarray_view(self._thisptr.betasGen).squeeze()
+
+#===============================================================================
+# WaveSweepResultSecondOrderNLTMM
+#===============================================================================
+    
+cdef class _WaveSweepResultSecondOrderNLTMM:
+    cdef WaveSweepResultSecondOrderNLTMMCpp *_thisptr
+    cdef readonly object P1, P2, Gen
+    cdef readonly np.ndarray wlsGen, betasGen;
+    
+    def __cinit__(self):
+        self._thisptr = NULL
+        pass
+    
+    def __dealloc__(self):
+        if self._thisptr:
+            del self._thisptr   
+
+    cdef _Init(self, WaveSweepResultSecondOrderNLTMMCpp *ptr):
+        self._thisptr = ptr
+        
+        P1 = _WaveSweepResultNonlinearTMM()
+        P2 = _WaveSweepResultNonlinearTMM()
+        Gen = _WaveSweepResultNonlinearTMM()
+        
+        P1._Init(&ptr.P1, False, self)
+        P2._Init(&ptr.P2, False, self)
+        Gen._Init(&ptr.Gen, False, self)
+        
+        self.P1 = P1
+        self.P2 = P2
+        self.Gen = Gen
+        self.wlsGen = ndarray_view(self._thisptr.wlsGen).squeeze()
+        self.betasGen = ndarray_view(self._thisptr.betasGen).squeeze()
+
         
 #===============================================================================
 # SecondOrderNLTMM
@@ -918,9 +953,15 @@ cdef class SecondOrderNLTMM:
         res._Init(&resCpp)
         return res
         
-    def Sweep(self, str paramStr, np.ndarray[double, ndim = 1] valuesP1, np.ndarray[double, ndim = 1] valuesP2, int layerNr = 0, double layerZ = 0.0, bool outPwr = True, bool outAbs = False, outEnh = False):
+    def Sweep(self, str paramStr, np.ndarray[double, ndim = 1] valuesP1, np.ndarray[double, ndim = 1] valuesP2, int layerNr = 0, double layerZ = 0.0, bool outPwr = True, bool outAbs = False, outEnh = False, outP1 = True, outP2 = True, outGen = True):
         cdef SweepResultSecondOrderNLTMMCpp *resCpp;
         cdef int outmask = 0
+        if outP1:
+            outmask |= SWEEP_P1
+        if outP2:
+            outmask |= SWEEP_P2
+        if outGen:
+            outmask |= SWEEP_GEN
         if outPwr:
             outmask |= SWEEP_PWRFLOWS
         if outAbs:
@@ -945,6 +986,41 @@ cdef class SecondOrderNLTMM:
         cdef pair[double, double] res;
         res = self._thisptr.WaveGetPowerFlows(layerNr, x0, x1, z)
         return (res.first, res.second)
+    
+    def WaveSweep(self, str paramStr, np.ndarray[double, ndim = 1] valuesP1, \
+            np.ndarray[double, ndim = 1] valuesP2,
+            int layerNr = 0, double layerZ = 0.0, bool outPwr = True, \
+            outR = False, outT = False, outEnh = False, outP1 = True, outP2 = True, outGen = True):
+        
+        cdef WaveSweepResultSecondOrderNLTMMCpp *resCpp;
+        cdef int outmask = 0
+        if outP1:
+            outmask |= SWEEP_P1
+        if outP2:
+            outmask |= SWEEP_P2
+        if outGen:
+            outmask |= SWEEP_GEN
+        if outPwr:
+            outmask |= SWEEP_PWRFLOWS
+        if outEnh:
+            outmask |= SWEEP_ENH
+        if outR:
+            outmask |= SWEEP_R
+        if outT:
+            outmask |= SWEEP_T
+            
+        cdef TMMParamCpp param;
+        cdef int paramLayer = -1;
+        if (paramStr.startswith("d_")):
+            param = PARAM_LAYER_D
+            paramLayer = int(paramStr[2:])
+        else:
+            param = TmmParamFromStr(paramStr)
+            
+        resCpp = self._thisptr.WaveSweep(TmmParamFromStr(paramStr), Map[ArrayXd](valuesP1), Map[ArrayXd](valuesP2), outmask, paramLayer, layerNr, layerZ)
+        res = _WaveSweepResultSecondOrderNLTMM()
+        res._Init(resCpp);
+        return res
     
     def WaveGetFields2D(self, np.ndarray[double, ndim = 1] zs, np.ndarray[double, ndim = 1] xs, str dirStr = "total"):
         cdef FieldsZXCpp *resCpp;

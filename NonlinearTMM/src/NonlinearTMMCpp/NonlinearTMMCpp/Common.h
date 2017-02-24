@@ -94,7 +94,12 @@ namespace TMM {
 		SWEEP_T = (1 << 2),
 		SWEEP_ABS = (1 << 3),
 		SWEEP_ENH = (1 << 4),
+		SWEEP_P1 = (1 << 5),
+		SWEEP_P2 = (1 << 6),
+		SWEEP_GEN = (1 << 7),
 		SWEEP_PWRFLOWS = (SWEEP_I | SWEEP_R | SWEEP_T),
+		SWEEP_ALL_WAVES = (SWEEP_P1 | SWEEP_P2 | SWEEP_GEN),
+		SWEEP_ALL_WAVE_PWRS = (SWEEP_PWRFLOWS | SWEEP_ALL_WAVES),
 	};
 
 	//---------------------------------------------------------------

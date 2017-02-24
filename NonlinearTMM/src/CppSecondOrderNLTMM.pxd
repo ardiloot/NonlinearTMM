@@ -42,6 +42,11 @@ cdef extern from "Common.h" namespace "TMM":
         SWEEP_I,
         SWEEP_R,
         SWEEP_T,
+        SWEEP_P1,
+        SWEEP_P2,
+        SWEEP_GEN,
+        SWEEP_ALL_WAVES,
+        SWEEP_ALL_WAVE_PWRS,
 
 #===============================================================================
 # Material.h
@@ -210,6 +215,10 @@ cdef extern from "SecondOrderNLTMM.h" namespace "TMM":
     cdef cppclass SweepResultSecondOrderNLTMMCpp "TMM::SweepResultSecondOrderNLTMM":
         SweepResultNonlinearTMMCpp P1, P2, Gen;
         ArrayXd wlsGen, betasGen;
+    
+    cdef cppclass WaveSweepResultSecondOrderNLTMMCpp "TMM::WaveSweepResultSecondOrderNLTMM":
+        WaveSweepResultNonlinearTMMCpp P1, P2, Gen;
+        ArrayXd wlsGen, betasGen;
         
     cdef cppclass SecondOrderNLTMMCpp "TMM::SecondOrderNLTMM":
         SecondOrderNLTMM() except +
@@ -224,4 +233,5 @@ cdef extern from "SecondOrderNLTMM.h" namespace "TMM":
         SweepResultSecondOrderNLTMMCpp* Sweep(TMMParamCpp param, Map[ArrayXd] &, Map[ArrayXd] &, int outmask, int paramLayer, int layerNr, double layerZ) except +
         
         pair[double, double] WaveGetPowerFlows(int layerNr, double x0, double x1, double z) except +
+        WaveSweepResultSecondOrderNLTMMCpp * WaveSweep(TMMParamCpp param, Map[ArrayXd] & valuesP1, Map[ArrayXd] & valuesP2, int outmask, int paramLayer, int layerNr, double layerZ) except +
         FieldsZXCpp * WaveGetFields2D(Map[ArrayXd]& zs, Map[ArrayXd]& xs, WaveDirectionCpp dir) except +
