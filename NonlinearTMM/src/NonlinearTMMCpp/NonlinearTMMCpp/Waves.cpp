@@ -26,6 +26,8 @@ namespace TMM {
 	}
 
 	void Wave::SolvePlaneWave() {
+		maxXThis = (0.5 * w0 / std::cos(thLayer0));
+		
 		// Plane waves
 		phis = ArrayXd(1);
 		kxs = ArrayXd(1);
@@ -121,9 +123,7 @@ namespace TMM {
 		E0 = 0.0;
 		k = 0.0;
 		nLayer0 = 0.0;
-		nLayerThis = 0.0;
 		thLayer0 = 0.0;
-		thLayerThis = 0.0;
 	}
 
 	void Wave::SetWaveType(WaveType waveType_) {
@@ -205,10 +205,9 @@ namespace TMM {
 		// Precalc variables
 		k0 = 2.0 * PI / wl;
 		nLayer0 = real(materialLayer0->GetN(wl));
-		nLayerThis = real(materialLayerThis->GetN(wl));
 		k = k0 * nLayer0;
 		thLayer0 = std::asin(beta / nLayer0);
-		thLayerThis = std::asin(beta / nLayerThis);
+		
 
 		// Solve
 		if (waveType == PLANEWAVE) {

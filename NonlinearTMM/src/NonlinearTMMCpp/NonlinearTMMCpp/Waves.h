@@ -53,9 +53,7 @@ namespace TMM {
 		double E0;
 		double k;
 		double nLayer0;
-		double nLayerThis;
 		double thLayer0;
-		double thLayerThis;
 
 		void SolvePlaneWave();
 		void SolveFFTWave();
