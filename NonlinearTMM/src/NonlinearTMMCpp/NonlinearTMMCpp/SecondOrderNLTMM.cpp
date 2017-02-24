@@ -339,6 +339,8 @@ namespace TMM {
 		// Solve for every beta
 		bool oldOverrideE0P1 = tmmP1.GetOverrideE0();
 		bool oldOverrideE0P2 = tmmP2.GetOverrideE0();
+		double oldBetaP1 = tmmP1.GetBeta();
+		double oldBetaP2 = tmmP2.GetBeta();
 		tmmP1.SetOverrideE0(true);
 		tmmP2.SetOverrideE0(true);
 		for (int i = 0; i < betasP1.size(); i++) {
@@ -357,6 +359,8 @@ namespace TMM {
 		}
 		tmmP1.SetOverrideE0(oldOverrideE0P1);
 		tmmP2.SetOverrideE0(oldOverrideE0P2);
+		tmmP1.SetBeta(oldBetaP1);
+		tmmP2.SetBeta(oldBetaP2);
 
 		// Sort values by kxs
 		Eigen::ArrayXi indices(nTot);
