@@ -227,6 +227,7 @@ cdef extern from "SecondOrderNLTMM.h" namespace "TMM":
         NonlinearTMMCpp* GetP1() except +
         NonlinearTMMCpp* GetP2() except +
         NonlinearTMMCpp* GetGen() except +
+        void UpdateGenParams() except +
         
         void Solve() except +
         SecondOrderNLIntensitiesCpp GetIntensities() except +

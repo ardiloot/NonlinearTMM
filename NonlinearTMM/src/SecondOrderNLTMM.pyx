@@ -945,6 +945,9 @@ cdef class SecondOrderNLTMM:
     def Solve(self):
         self._thisptr.Solve()
         
+    def UpdateGenParams(self):
+        self._thisptr.UpdateGenParams()
+        
     def GetIntensities(self):
         cdef SecondOrderNLIntensitiesCpp resCpp;
         resCpp = self._thisptr.GetIntensities();

@@ -52,7 +52,6 @@ namespace TMM {
 		NonlinearProcess process;
 		NonlinearTMM tmmP1, tmmP2, tmmGen;
 
-		void UpdateGenParams();
 		void CalcInhomogeneosWaveParams(int layerNr, Material *material, InhomogeneosWaveParams *kpS, InhomogeneosWaveParams *kpA);
 		void SolveFundamentalFields();
 		void SolveGeneratedField();
@@ -64,6 +63,7 @@ namespace TMM {
 		NonlinearTMM* GetP1();
 		NonlinearTMM* GetP2();
 		NonlinearTMM* GetGen();
+		void UpdateGenParams();
 		
 		// Planewaves
 		void Solve();

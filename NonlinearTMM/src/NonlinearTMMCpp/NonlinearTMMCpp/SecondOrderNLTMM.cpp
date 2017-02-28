@@ -50,6 +50,9 @@ namespace TMM {
 			throw std::runtime_error("Unknown process.");
 			break;
 		}
+
+		tmmGen.SetWl(wlGen);
+		tmmGen.SetBeta(betaGen);
 	}
 	void SecondOrderNLTMM::CalcInhomogeneosWaveParams(int layerNr, Material *material, InhomogeneosWaveParams * kpS, InhomogeneosWaveParams * kpA)
 	{
@@ -118,10 +121,7 @@ namespace TMM {
 		tmmP1.Solve();
 		tmmP2.Solve();
 	}
-	void SecondOrderNLTMM::SolveGeneratedField() {
-		tmmGen.SetWl(wlGen);
-		tmmGen.SetBeta(betaGen);
-		
+	void SecondOrderNLTMM::SolveGeneratedField() {		
 		// Insert nonlinearities
 		for (int i = 0; i < tmmGen.LayersCount(); i++) {
 			Material *material = tmmGen.GetLayer(i)->GetMaterial();
