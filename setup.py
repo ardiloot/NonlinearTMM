@@ -22,7 +22,7 @@ ext = Extension("NonlinearTMM._SecondOrderNLTMMCython",
     )
 
 setup(name = "NonlinearTMM",
-      version = "1.2.2",
+      version = "1.2.3",
       author = "Ardi Loot",
       author_email = "ardi.loot@outlook.com",
       packages = ["NonlinearTMM"],
