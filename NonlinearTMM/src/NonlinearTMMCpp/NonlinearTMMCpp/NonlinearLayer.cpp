@@ -427,15 +427,17 @@ namespace TMM{
 	double NonlinearLayer::GetAbsorbedIntensity() const {
 		if (!solved) {
 			throw std::runtime_error("NonlinearLayer must be solved first.");
+			std::cerr << "NonlinearLayer must be solved first." << std::endl;
 		}
 
-		if (abs(imag(eps)) < 1e-20) {
+		if (abs(imag(eps)) < 1e-14) {
 			//Layer not absorbing
 			return 0.0;
 		}
 
 		if (IsNonlinear()) {
 			throw std::runtime_error("Absorbed power calculation is not allowed in nonlinear media.");
+			std::cerr << "Absorbed power calculation is not allowed in nonlinear media." << std::endl;
 		}
 
 		dcomplex kzF = hw.kz(F);
