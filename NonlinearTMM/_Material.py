@@ -4,8 +4,28 @@ from  NonlinearTMM import _SecondOrderNLTMMCython  # @UnresolvedImport
 __all__ = ["Material"]
 
 class Material(_SecondOrderNLTMMCython.Material):# @UndefinedVariable
+    __doc__ = _SecondOrderNLTMMCython.Material.__doc__
+    
     @staticmethod
     def Static(n):
+        """Helper method to make material with constant refractive index.
+        
+        Parameters
+        ----------
+        n : float or complex
+            Constant value for refractive index
+            
+        Returns
+        -------
+        None
+        
+        Examples
+        --------
+        >>> mat = Material.Static(1.5)
+        >>> mat.GetN(532e-9)
+        1.5
+        
+        """
         wls = np.array([-1.0, 1.0])
         ns = np.array([n, n], dtype = complex)
         res = Material(wls, ns)

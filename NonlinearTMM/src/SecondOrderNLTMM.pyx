@@ -80,6 +80,12 @@ cdef TMMParamCpp TmmParamFromStr(str paramStr):
 #===============================================================================
 
 cdef class _Chi2Tensor:
+    """
+    This class is helper class for Material to accommodate the second-order
+    susceptibility tensor. Allows setting nonlinearities by chi2- and by d-values.
+    Possible to rotate initial tensor around all three axes.
+    
+    """
     cdef Chi2TensorCpp* _thisptr;
     cdef object _parent;
     
@@ -96,6 +102,43 @@ cdef class _Chi2Tensor:
         self._parent = parent # Avoid dealloc of parent
     
     def Update(self, **kwargs):
+        """Update(**kwargs)
+        This method changes the values of second-order nonlinearity tensor. By
+        default the tensor is zero, not rotated and distinctFields set to True.
+        
+        Parameters
+        ----------
+        chiXYZ : float, optional
+            Updates tensor value of second-order nonlinearity, where X, Y, Z
+            denote numbers from 1..3 corresponding to x-, y-, z-axis.
+        dXK : float, optional
+            Updates tensor values by contracted notation, where dXK = 0.5 * chiXYZ
+            and K is defined as: 1 = 11; 2 = 22; 3 = 33; 4 = 23, 32; 5 = 31, 13; 6 = 12, 21.
+        distinctFields : bool, optional
+            If set to True, then assumes that two input waves in nonlinear process
+            are the same (e.g second harmonic generation). If False, then the
+            input fields are not equal (as a result the result will be multiplied by 2).
+            Default is true.
+        phiX : float, optional
+            The rotation angle (radians) around x-axis of the second order nonlinear tensor. 
+        phiY : float, optional
+            The rotation angle (radians) around y-axis of the second order nonlinear tensor. 
+        phiZ : float, optional
+            The rotation angle (radians) around z-axis of the second order nonlinear tensor.
+            
+        Returns
+        -------
+        None
+        
+        Examples
+        --------
+        Updates nonlinear tensor of material and then rotates it.
+        
+        >>> mat = Material.Static(1.5)
+        >>> mat.chi2.Update(d11 = 1e-12, d22 = 2e-12, chi23 = 3e-12)
+        >>> mat.chi2.Update(phiX = 0.2, phiY = 0.5, phiZ = -0.1)
+                 
+        """
         cdef int i1, i2, i3;
         cdef double value;
         
@@ -113,9 +156,9 @@ cdef class _Chi2Tensor:
         for k in list(kwargs.keys()):
             if (not k.startswith("chi")) or (len(k) != 6):
                 continue
-            i1 = int(k[1])
-            i2 = int(k[2])
-            i3 = int(k[3])
+            i1 = int(k[3])
+            i2 = int(k[4])
+            i3 = int(k[5])
             value = kwargs.pop(k)
             self._thisptr.SetChi2(i1, i2, i3, value)
         
@@ -138,6 +181,14 @@ cdef class _Chi2Tensor:
             raise ValueError("Unknown kwarg %s" % (k))
         
     def GetChi2Tensor(self):
+        """
+        Returns rotated 3x3x3 second-order nonlinearity tensor.
+        
+        Returns
+        -------
+        ndarray of floats
+            Has shape (3, 3, 3)
+        """
         cdef int i, j, k
         cdef np.ndarray res = np.zeros([3, 3, 3], dtype = float)
         
@@ -153,6 +204,24 @@ cdef class _Chi2Tensor:
 #===============================================================================
 
 cdef class Material:
+    """
+    This class describes the optical parameters of nonlinear medium. Default
+    contructor takes arrays of wavelengths and complex refractive indices and
+    does linear interpolation. For shortcut __call__ is defined as GetN.
+    
+    Parameters
+    ----------
+    wls : ndarray of floats
+        Array of wavelengths (m)
+    ns : ndarray of complex floats
+        Corresponding complex refractive indices to the `wls` array.
+    
+    Attributes
+    ----------
+    chi2 : `_Chi2Tensor`
+        Instance of the `_Chi2Tensor` helper class to store second-order nonlinearity tensor.
+        
+    """
     cdef MaterialCpp *_thisptr
     cdef readonly object chi2
 
@@ -172,9 +241,40 @@ cdef class Material:
         return self.GetN(wl)
         
     def GetN(self, wl):
+        """GetN(wl)
+        Returns refractive index of material at specified wavelength.
+        
+        Parameters
+        ----------
+        wl : float
+            Wavelength in meters.
+        
+        Returns
+        -------
+        complex
+            Complex refractive index at wavelength `wl`.
+        
+        Examples
+        --------
+        >>> wls = np.array([400e-9, 600e-9, 800e-9], dtype = float)
+        >>> ns = np.array([1.5 + 0.3j, 1.7 + 0.2j, 1.8 + 0.1j], dtype = complex)
+        >>> mat = Material(wls, ns)
+        >>> mat(600e-9)
+        1.7 + 0.2j
+        
+        """
         return self._thisptr.GetN(wl)
         
     def IsNonlinear(self):
+        """
+        This method returns True if material nonlinearity tensor `chi2` is nonzero,
+        False otherwise.
+        
+        Returns
+        -------
+        bool
+            True if chi2 tensor is nonzero, False otherwise.
+        """
         return self._thisptr.IsNonlinear()
 
 #===============================================================================
