@@ -80,7 +80,8 @@ cdef TMMParamCpp TmmParamFromStr(str paramStr):
 #===============================================================================
 
 cdef class _Chi2Tensor:
-    """
+    """_Chi2Tensor()
+    
     This class is helper class for Material to accommodate the second-order
     susceptibility tensor. Allows setting nonlinearities by chi2- and by d-values.
     Possible to rotate initial tensor around all three axes.
@@ -103,6 +104,7 @@ cdef class _Chi2Tensor:
     
     def Update(self, **kwargs):
         """Update(**kwargs)
+        
         This method changes the values of second-order nonlinearity tensor. By
         default the tensor is zero, not rotated and distinctFields set to True.
         
@@ -126,10 +128,6 @@ cdef class _Chi2Tensor:
         phiZ : float, optional
             The rotation angle (radians) around z-axis of the second order nonlinear tensor.
             
-        Returns
-        -------
-        None
-        
         Examples
         --------
         Updates nonlinear tensor of material and then rotates it.
@@ -186,8 +184,7 @@ cdef class _Chi2Tensor:
         
         Returns
         -------
-        ndarray of floats
-            Has shape (3, 3, 3)
+        ndarray(3, 3, 3) of floats
         """
         cdef int i, j, k
         cdef np.ndarray res = np.zeros([3, 3, 3], dtype = float)
@@ -215,12 +212,12 @@ cdef class Material:
     wls : ndarray of floats
         Array of wavelengths (m)
     ns : ndarray of complex floats
-        Corresponding complex refractive indices to the `wls` array.
+        Corresponding complex refractive indices to the wls array.
     
     Attributes
     ----------
-    chi2 : `_Chi2Tensor`
-        Instance of the `_Chi2Tensor` helper class to store second-order nonlinearity tensor.
+    chi2 : :class:`_Chi2Tensor`
+        Instance of the :class:`_Chi2Tensor` helper class to store second-order nonlinearity tensor.
         
     """
     cdef MaterialCpp *_thisptr
@@ -254,7 +251,7 @@ cdef class Material:
         Returns
         -------
         complex
-            Complex refractive index at wavelength `wl`.
+            Complex refractive index at wavelength wl.
         
         Examples
         --------
@@ -270,7 +267,7 @@ cdef class Material:
     def IsNonlinear(self):
         """IsNonlinear()
         
-        This method returns True if material nonlinearity tensor `chi2` is nonzero,
+        This method returns True if material nonlinearity tensor :any:`chi2` is nonzero,
         False otherwise.
         
         Returns
@@ -285,7 +282,8 @@ cdef class Material:
 #===============================================================================
 
 cdef class _Wave:
-    """
+    """_Wave()
+    
     This is a helper class for using non plane waves as an input.
         
     Attributes
@@ -297,13 +295,13 @@ cdef class _Wave:
             Standard Gaussian beam with waist size w0
         'tukey':
             Rectangular wave with cosine tapered edges (Tukey window). The width
-            is given by `w0` and the tapered region is determined by `a`.
-        Default is `planewave`.
+            is given by :any:`w0` and the tapered region is determined by :any:`a`.
+        Default is 'planewave'.
     pwr : float
         Power of the wave (in watts). Default 1.0. The area of the beam is
         calculated as w0 * Ly.
     overrideE0 : bool
-        if True, then `pwr` is ignored and `E0` is used. Default False.
+        if True, then :any:`pwr` is ignored and :any:`E0` is used. Default False.
     E0 : float
         Maximum electrical field of the beam in vacuum.
     w0 : float
@@ -323,18 +321,18 @@ cdef class _Wave:
         dynamicMaxX is False. Default is 1 mm.
     dynamicMaxX : bool
         Selects between dynamic determination of x-span of the wave (region
-        where `nPointsInteg` samples are taken) or fixed span by `maxX`.
+        where :any:`nPointsInteg` samples are taken) or fixed span by :any:`maxX`.
         Default is True.
     dynamicMaxXCoef : float
         Dynamic maxX equals to the beam width (corrected to the angle of
-        incidence) times `dynamicMaxXCoef`. Default is 2.0.
+        incidence) times :any:`dynamicMaxXCoef`. Default is 2.0.
     maxPhi : float
         Determines the maximum angle of deviation form the direction of
         propagation of the participating fields. Increases the range of x-span
-        (i.e `maxX`) if it is neccesary to limit the angular distribution of the
+        (i.e :any:`maxX`) if it is neccesary to limit the angular distribution of the
         participating plane waves. Default is 0.17 rad.
     xRange : tuple of floats (xMin, xMax)
-        Current x-span calculated from `maxX`, `dynamicMaxXCoef` and `maxPhi`.
+        Current x-span calculated from :any:`maxX`, :any:`dynamicMaxXCoef` and :any:`maxPhi`.
         The wave must be solved to access this quantity.
     betas : ndarray of floats
         Normalized tangential wave vectors of plane wave expansion. The wave
@@ -350,12 +348,13 @@ cdef class _Wave:
         Same information as in betas, but converted to the z-component of the
         wave vector. The wave must be solved to access this quantity.
     fieldProfile : tuple(2,) of ndarray of floats (xs, fiedProfile)
-        The field profile of the input wave sample by `nPointsInteg` points. The
+        The field profile of the input wave sample by :any:`nPointsInteg` points. The
         wave must be solved to access this quantity.
     expansionCoefsKx : ndarray of complex
         Array of plane wave expansion coefs.
                 
     """
+    
     cdef WaveCpp *_thisptr
     cdef bool _needsDealloc;
     
@@ -527,7 +526,7 @@ cdef class _Wave:
 
 cdef class _Intensities:
     """
-    Helper class to store intensities for `NonlinearTMM`.
+    Helper class to store intensities for :class:`NonlinearTMM`.
     
     Attributes
     ----------
@@ -565,7 +564,7 @@ cdef class _Intensities:
 
 cdef class _SweepResultNonlinearTMM:
     """
-    Helper class to store the result of the `Sweep` method.
+    Helper class to store the result of the :any:`NonlinearTMM.Sweep` method.
     
     Attributes
     ----------
@@ -934,10 +933,12 @@ cdef class _NonlinearLayer:
 #===============================================================================
 
 cdef class NonlinearTMM:
-    """This class is mainly used to calculate linear propagation of plane waves
+    """NonlinearTMM()
+    
+    This class is mainly used to calculate linear propagation of plane waves
     in stratified medium. It can work like ordinary TMM and calculate the propagation
     of the input waves. It is also capable of nonlinear calculations, but
-    for this purpose use specialized class `SecondOrderNLTMM`.
+    for this purpose use specialized class :any:`SecondOrderNLTMM`.
     
     Default constructor takes no arguments.
     
@@ -945,32 +946,32 @@ cdef class NonlinearTMM:
     ----------
     E0 : complex
         The amplitude of the input plane wave (given in vaccuum, not in the first layer).
-        Only used if `overrideE0` is set to True (default is False), otherwise intensity
-        `I0` is used instead.
+        Only used if :any:`overrideE0` is set to True (default is False), otherwise intensity
+        :any:`I0` is used instead.
         Default: 1.0.
     I0 : float
         The intensity of the input beam in the first medium. Only used if
-        `overrideE0` is set to False (default).
+        :any:`overrideE0` is set to False (default).
         Default: 1.0.
     beta : float
         Normalized tangential wave vector. Determines the angle of incidence through
         relation beta = sin(theta) * n_p, where theta is angle of incidence and 
         n_p is the refractive index of the prism.
         Default: not defined.
-    layers : list of helper class `_NonlinerLayer`  
+    layers : list of helper class :any:`_NonlinerLayer`  
         Allows to access layers by index.
     mode : str
         By default "incident" which corresponds to Ordinary TMM. Other mode is, 
-        "nonlinear" but it is automatically set by `SecondOrderNLTMM` (i.e, this
+        "nonlinear" but it is automatically set by :any:`SecondOrderNLTMM` (i.e, this
         parameter has to be modified only in special cases).
     overrideE0 : bool
-        If True, then parameter `E0` is used, otherwise intensity `I0` is used.
+        If True, then parameter :any:`E0` is used, otherwise intensity :any:`I0` is used.
         Default: False.
     pol : str
         "p" or "s" corresponding to p- and s-polarization, respectively.
         Default: Not defined.
-    wave : `_Wave`
-        Innstance of helper class `_Wave` for non plane wave calculations.
+    wave : :any:`_Wave`
+        Innstance of helper class :any:`_Wave` for non plane wave calculations.
     wl : float
         Wavelength of calculations in meters.
     
@@ -1021,12 +1022,8 @@ cdef class NonlinearTMM:
         d : float
             Thickness of the layer in meters. First and the last medium have
             infinite thickness.
-        material : `Material`
-            Instance of the helper class `Material`
-        
-        Returns
-        -------
-        None
+        material : :any:`Material`
+            Instance of the helper class :any:`Material`
         
         Examples
         --------
@@ -1052,11 +1049,7 @@ cdef class NonlinearTMM:
         """SetParams(**kwargs)
         
         Helper method to set the values of all the attributes. See the docstring
-        of `NonlinearTMM`.
-        
-        Returns
-        -------
-        None
+        of :any:`NonlinearTMM`.
         
         """
         for name, value in kwargs.iteritems():
@@ -1078,17 +1071,13 @@ cdef class NonlinearTMM:
         beta : float, optional
             Normalized tangential wave vector.
         E0 : complex, optional
-            Input plane wave amplitude in vacuum. Only used if `overrideE0` is
+            Input plane wave amplitude in vacuum. Only used if :any:`overrideE0` is
             True.
         I0 : float, optional
             Input plane wave intensity in the first layer. Only used if
-            `overrideE0` is False.
+            :any:`overrideE0` is False.
         overrideE0 : bool, optional
-            Selects between `E0` and `I0`.
-        
-        Returns
-        -------
-        None
+            Selects between :any:`E0` and :any:`I0`.
         
         Examples
         --------
@@ -1106,7 +1095,7 @@ cdef class NonlinearTMM:
         
         Returns
         -------
-        _Intensities
+        :any:`_Intensities`
             Helper class to hold intensity data.
         """
         cdef IntensitiesCpp resCpp = self._thisptr.GetIntensities()
@@ -1117,7 +1106,7 @@ cdef class NonlinearTMM:
     def Sweep(self, str paramStr, np.ndarray[double, ndim = 1] values, int layerNr = 0, double layerZ = 0.0, bool outPwr = True, bool outAbs = False, outEnh = False):
         """Sweep(paramStr, values, layerNr = 0, layerZ = 0, outPwr = True, outAbs = False, outEnh = False)
         
-        Solves the structure for series of `values` of param `paramStr`. Using
+        Solves the structure for series of :any:`values` of param :any:`paramStr`. Using
         this function is more confortable and faster than just changing params
         and solving the structure.
         
@@ -1132,22 +1121,22 @@ cdef class NonlinearTMM:
                 intensity of the wave
             'd_i': thikness of layer i (0..N-1)
         values : ndarray of floats
-            Correspondig values of param `paramStr`.
+            Correspondig values of param :any:`paramStr`.
         layerNr : int
             Specifies layer, where electrical field enhancment is calculated.
         layerZ : double
-            Specifies z-coordinate of enchncment calculation inside `layerNr`.
+            Specifies z-coordinate of enchncment calculation inside :any:`layerNr`.
         outPwr : bool
             Turns calculation of intensities on/off.
         outAbs : bool
             Turns calculation of absoprtiopn in the entire structure on/off.
         outEnh : bool
-            Turns calculation of enhancment in layer `layerNr` at distance
-            `layerZ` on/off.values
+            Turns calculation of enhancment in layer :any:`layerNr` at distance
+            :any:`layerZ` on/off.values
         
         Returns
         -------
-        _SweepResultNonlinearTMM
+        :any:`_SweepResultNonlinearTMM`
             Helper class to store the result.
             
         """
@@ -1190,7 +1179,7 @@ cdef class NonlinearTMM:
             
         Returns
         -------
-        _FieldsZ
+        :any:`_FieldsZ`
             Helper class to store electric and magnetic fields.
             
         """
@@ -1218,7 +1207,7 @@ cdef class NonlinearTMM:
             
         Returns
         -------
-        _FieldsZX
+        :any:`_FieldsZX`
             Helper class to store electric and magnetic fields in regular grid.
             
         """
@@ -1270,7 +1259,7 @@ cdef class NonlinearTMM:
     def WaveGetPowerFlows(self, int layerNr, double x0 = float("nan"), double x1 = float("nan"), double z = 0.0):
         """WaveGetPowerFlows(layerNr, x0 = float("nan"), x1 = float("nan"), z = 0.0)
         
-        Analogous to the `GetIntensities`, but calculates the powers of the
+        Analogous to the :any:`GetIntensities`, but calculates the powers of the
         beams instead of the intensities of the plane-waves.
         
         Parameters
@@ -1279,11 +1268,11 @@ cdef class NonlinearTMM:
             Specifies layer number where to calculate the power of the beam.
         x0 : float
             Specifies the starting point of the integration of the power in the
-            x-direction. By default this parameter is selected by the `_Wave`
+            x-direction. By default this parameter is selected by the :any:`_Wave`
             class.
         x1 : float
             Specifies the end point of the integration of the power in the
-            x-direction. By default this parameter is selected by the `_Wave`
+            x-direction. By default this parameter is selected by the :any:`_Wave`
             class.
         z : float
             Specifies the z-position of the line through which the integration
@@ -1291,7 +1280,7 @@ cdef class NonlinearTMM:
             
         Returns
         -------
-        tuple of floats : (PB, PF)
+        tuple of floats (PB, PF)
             PB is the power propageted into netagtive infinity and PF denotes
             the power propagation to the positive direction of z-axis.
             
@@ -1305,7 +1294,7 @@ cdef class NonlinearTMM:
         """WaveGetEnhancement(layerNr, z = 0.0)
         
         Calculates enhencment of electical field norm in comparison to the imput
-        beam in vacuum. Analogous to `GetEnhancement`.
+        beam in vacuum. Analogous to :any:`GetEnhancement`.
         
         Parameters
         ----------
@@ -1330,9 +1319,9 @@ cdef class NonlinearTMM:
             bool outR = False, bool outT = False, bool outEnh = False):
         """WaveSweep(paramStr, values, layerNr = 0, layerZ = 0.0, outPwr = True, outR = False, outT = False, outEnh = False)
         
-        Solves the structure for waves for series of `values` of param
-        `paramStr`. Using this function is more confortable and faster than just
-        changing params and solving the structure. Analogous to `Sweep`.
+        Solves the structure for waves for series of :any:`values` of param
+        :any:`paramStr`. Using this function is more confortable and faster than just
+        changing params and solving the structure. Analogous to :any:`Sweep`.
         
         Parameters
         ----------
@@ -1348,11 +1337,11 @@ cdef class NonlinearTMM:
             'w0':
                 waist size of the input beam
         values : ndarray of floats
-            Correspondig values of param `paramStr`.
+            Correspondig values of param :any:`paramStr`.
         layerNr : int
             Specifies layer, where electrical field enhancment is calculated.
         layerZ : double
-            Specifies z-coordinate of enchncment calculation inside `layerNr`.
+            Specifies z-coordinate of enchncment calculation inside :any:`layerNr`.
         outPwr : bool
             Turns calculation of all powers on/off.
         outR : bool
@@ -1360,12 +1349,12 @@ cdef class NonlinearTMM:
         outT : bool
             Turns calculation of transmitted power on/off.
         outEnh : bool
-            Turns calculation of enhancment in layer `layerNr` at distance
-            `layerZ` on/off.
+            Turns calculation of enhancment in layer layerNr at distance
+            :any:`layerZ` on/off.
         
         Returns
         -------
-        _SweepResultNonlinearTMM
+        :any:`_SweepResultNonlinearTMM`
             Helper class to store the result.
             
         """
@@ -1399,7 +1388,7 @@ cdef class NonlinearTMM:
         """WaveGetFields2D(zs, xs, dirStr = "total")
         
         Calculates 2D electric and magnetic fields of beam propagating in the
-        structure. Analogous to the `GetFields2D` of plane waves.
+        structure. Analogous to the :any:`GetFields2D` of plane waves.
         
         Parameters
         ----------
@@ -1413,7 +1402,7 @@ cdef class NonlinearTMM:
             
         Returns
         -------
-        _FieldsZX
+        :any:`_FieldsZX`
             Helper class to store electric and magnetic fields in regular grid.
         
         """
