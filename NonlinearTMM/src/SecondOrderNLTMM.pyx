@@ -674,6 +674,48 @@ cdef class _NonlinearLayer:
 #===============================================================================
 
 cdef class NonlinearTMM:
+    """This class is mainly used to calculate linear propagation of plane waves
+    in stratified medium. It can work like ordinary TMM and calculate the propagation
+    of the input waves. It is also capable of nonlinear calculations, but
+    for this purpose use specialized class `SecondOrderNLTMM`.
+    
+    Default constructor takes no arguments.
+    
+    Attributes
+    ----------
+    E0 : complex
+        The amplitude of the input plane wave (given in vaccuum, not in the first layer).
+        Only used if `overrideE0` is set to True (default is False), otherwise intensity
+        `I0` is used instead.
+        Default: 1.0.
+    I0 : float
+        The intensity of the input beam in the first medium. Only used if
+        `overrideE0` is set to False (default).
+        Default: 1.0.
+    beta : float
+        Normalized tangential wave vector. Determines the angle of incidence through
+        relation beta = sin(theta) * n_p, where theta is angle of incidence and 
+        n_p is the refractive index of the prism.
+        Default: not defined.
+    layers : list of helper class `_NonlinerLayer`  
+        Allows to access layers by index.
+    mode : str
+        By default "incident" which corresponds to Ordinary TMM. Other mode is, 
+        "nonlinear" but it is automatically set by `SecondOrderNLTMM` (i.e, this
+        parameter has to be modified only in special cases).
+    overrideE0 : bool
+        If True, then parameter `E0` is used, otherwise intensity `I0` is used.
+        Default: False.
+    pol : str
+        "p" or "s" corresponding to p- and s-polarization, respectively.
+        Default: Not defined.
+    wave : `_Wave`
+        Innstance of helper class `_Wave` for non plane wave calculations.
+    wl : float
+        Wavelength of calculations in meters.
+    
+    """
+    
     cdef NonlinearTMMCpp *_thisptr
     cdef readonly list materialsCache
     cdef readonly list layers
@@ -710,6 +752,29 @@ cdef class NonlinearTMM:
     #---------------------------------------------------------------------------
         
     def AddLayer(self, double d, Material material):
+        """AddLayer(d, material)
+        
+        Adds layer to the TMM.
+        
+        Parameters
+        ----------
+        d : float
+            Thickness of the layer in meters. First and the last medium have
+            infinite thickness.
+        material : `Material`
+            Instance of the helper class `Material`
+        
+        Returns
+        -------
+        None
+        
+        Examples
+        --------
+        >>> tmm = TMM()
+        >>> tmm.AddLayer(float("inf"), Material.Static(1.5))
+        >>> tmm.AddLayer(50e-9, Material.Static(0.3 + 3j))
+        >>> tmm.AddLayer(float("inf"), Material.Static(1.0))
+        """
         # No copy of material is made
         self._thisptr.AddLayer(d, material._thisptr)
         
@@ -724,22 +789,108 @@ cdef class NonlinearTMM:
         self.layers.append(layer)
         
     def SetParams(self, **kwargs):
+        """SetParams(**kwargs)
+        
+        Helper method to set the values of all the attributes. See the docstring
+        of `NonlinearTMM`.
+        
+        Returns
+        -------
+        None
+        
+        """
         for name, value in kwargs.iteritems():
             if name not in paramDict:
                 raise ValueError("Unknown kwarg %s" % (name))
             setattr(self, name, value)
         
     def Solve(self, **kwargs):
+        """Solve(**kwargs)
+        
+        Solves the structure.
+        
+        Parameters
+        ----------
+        wl : float, optional
+             Wavelength in meters.
+        pol : str, optional
+            "p" or "s" denoting the polarization of the waves.
+        beta : float, optional
+            Normalized tangential wave vector.
+        E0 : complex, optional
+            Input plane wave amplitude in vacuum. Only used if `overrideE0` is
+            True.
+        I0 : float, optional
+            Input plane wave intensity in the first layer. Only used if
+            `overrideE0` is False.
+        overrideE0 : bool, optional
+            Selects between `E0` and `I0`.
+        
+        Returns
+        -------
+        None
+        
+        Examples
+        --------
+        >>> tmm.Solve(wl = 532e-9, beta = 0.0)
+            
+        """
         self.SetParams(**kwargs)
         self._thisptr.Solve()
             
     def GetIntensities(self):
+        """GetIntensities()
+        
+        Returns the intensities and amplitutes of incident, reflected and
+        transmitted wave. The structure must be solved first.
+        
+        Returns
+        -------
+        _Intensities
+            Helper class to hold intensity data.
+        """
         cdef IntensitiesCpp resCpp = self._thisptr.GetIntensities()
         res = _Intensities()
         res._Init(&resCpp)
         return res 
     
     def Sweep(self, str paramStr, np.ndarray[double, ndim = 1] values, int layerNr = 0, double layerZ = 0.0, bool outPwr = True, bool outAbs = False, outEnh = False):
+        """Sweep(paramStr, values, layerNr = 0, layerZ = 0, outPwr = True, outAbs = False, outEnh = False)
+        
+        Solves the structure for series of `values` of param `paramStr`. Using
+        this function is more confortable and faster than just changing params
+        and solving the structure.
+        
+        Parameters
+        ----------
+        paramStr : str
+            'wl':
+                Wavelength in meters
+            'beta':
+                normalized tangential wavevector
+            'I0':
+                intensity of the wave
+            'd_i': thikness of layer i (0..N-1)
+        values : ndarray of floats
+            Correspondig values of param `paramStr`.
+        layerNr : int
+            Specifies layer, where electrical field enhancment is calculated.
+        layerZ : double
+            Specifies z-coordinate of enchncment calculation inside `layerNr`.
+        outPwr : bool
+            Turns calculation of intensities on/off.
+        outAbs : bool
+            Turns calculation of absoprtiopn in the entire structure on/off.
+        outEnh : bool
+            Turns calculation of enhancment in layer `layerNr` at distance
+            `layerZ` on/off.values
+        
+        Returns
+        -------
+        _SweepResultNonlinearTMM
+            Helper class to store the result.
+            
+        """
         cdef SweepResultNonlinearTMMCpp *resCpp;
         cdef int outmask = 0
         
@@ -764,6 +915,25 @@ cdef class NonlinearTMM:
         return res
     
     def GetFields(self, np.ndarray[double, ndim = 1] zs, str dir = "total"):
+        """GetFields(zs, dir = "total")
+        
+        Calculates electical and magnetic fields along z-axis. The structure
+        must be solved first.
+        
+        Parameters
+        ----------
+        zs : ndarray of floats
+            Points on z-axis where to calculate the fields. The beginning of the
+            first layer is at z = 0.
+        dir : {'total', 'forward', 'backward'}
+            Specifies the components of the output fields.
+            
+        Returns
+        -------
+        _FieldsZ
+            Helper class to store electric and magnetic fields.
+            
+        """
         cdef FieldsZCpp *resCpp;
         resCpp = self._thisptr.GetFields(Map[ArrayXd](zs), WaveDirectionFromStr(dir))
         res = _FieldsZ()
@@ -771,6 +941,27 @@ cdef class NonlinearTMM:
         return res
     
     def GetFields2D(self, np.ndarray[double, ndim = 1] zs, np.ndarray[double, ndim = 1] xs, str dir = "total"):
+        """GetFields2D(zs, xs, dir = "total")
+        
+        Calculates electical and magnetic fields in xz-plane. Made as fast as
+        possible. The structure must be solved first.
+        
+        Parameters
+        ----------
+        zs : ndarray of floats
+            Points on z-axis where to calculate the fields. The beginning of the
+            first layer is at z = 0.
+        xs : ndarray of floats
+            Points on x-axis where to calculate the fields.
+        dir : {'total', 'forward', 'backward'}
+            Specifies the components of the output fields.
+            
+        Returns
+        -------
+        _FieldsZX
+            Helper class to store electric and magnetic fields in regular grid.
+            
+        """
         cdef FieldsZXCpp *resCpp;
         resCpp = self._thisptr.GetFields2D(Map[ArrayXd](zs), Map[ArrayXd](xs), WaveDirectionFromStr(dir))
         res = _FieldsZX()
@@ -778,9 +969,38 @@ cdef class NonlinearTMM:
         return res
     
     def GetAbsorbedIntensity(self):
+        """GetAbsorbedIntensity()
+        
+        Calculates intensity of absorption. The structure must be solved first.
+        
+        Returns
+        -------
+        float
+            Absorption intensity
+            
+        """
         return self._thisptr.GetAbsorbedIntensity();
     
     def GetEnhancement(self, int layerNr, double z = 0.0):
+        """GetEnhancement(layerNr, z = 0.0)
+        
+        Calculates the enhancement of electical field norm at specified layer at
+        fixed z-cooridnate.
+        
+        Parameters
+        ----------
+        layerNr : int
+            Number of layer where to calculate the enhancement.
+        z : float
+            Z-distance from the beginning of the layer.
+            
+        Returns
+        -------
+        float
+            The enhancment of the electrical field norm in comparison to the
+            input wave in the vacuum.
+        
+        """
         cdef double res
         res = self._thisptr.GetEnhancement(layerNr, z)
         return res
@@ -788,20 +1008,107 @@ cdef class NonlinearTMM:
     # Waves
     
     def WaveGetPowerFlows(self, int layerNr, double x0 = float("nan"), double x1 = float("nan"), double z = 0.0):
+        """WaveGetPowerFlows(layerNr, x0 = float("nan"), x1 = float("nan"), z = 0.0)
+        
+        Analogous to the `GetIntensities`, but calculates the powers of the
+        beams instead of the intensities of the plane-waves.
+        
+        Parameters
+        ----------
+        layerNr : int
+            Specifies layer number where to calculate the power of the beam.
+        x0 : float
+            Specifies the starting point of the integration of the power in the
+            x-direction. By default this parameter is selected by the `_Wave`
+            class.
+        x1 : float
+            Specifies the end point of the integration of the power in the
+            x-direction. By default this parameter is selected by the `_Wave`
+            class.
+        z : float
+            Specifies the z-position of the line through which the integration
+            of the power of the beam is done.
+            
+        Returns
+        -------
+        tuple of floats : (PB, PF)
+            PB is the power propageted into netagtive infinity and PF denotes
+            the power propagation to the positive direction of z-axis.
+            
+        """
         # NonlinearLayer has its own specific method
         cdef pair[double, double] res;
         res = self._thisptr.WaveGetPowerFlows(layerNr, x0, x1, z)
         return (res.first, res.second)
     
     def WaveGetEnhancement(self, int layerNr, double z = 0.0):
+        """WaveGetEnhancement(layerNr, z = 0.0)
+        
+        Calculates enhencment of electical field norm in comparison to the imput
+        beam in vacuum. Analogous to `GetEnhancement`.
+        
+        Parameters
+        ----------
+        layerNr : int
+            Number of layer where to calculate the enhancement.
+        z : float
+            Z-distance from the beginning of the layer.
+            
+        Returns
+        -------
+        float
+            The enhancment of the electrical field norm in comparison to the
+            input wave in the vacuum.
+        
+        """
         cdef double res
         res = self._thisptr.WaveGetEnhancement(layerNr, z)
         return res
     
     def WaveSweep(self, str paramStr, np.ndarray[double, ndim = 1] values, \
             int layerNr = 0, double layerZ = 0.0, bool outPwr = True, \
-            outR = False, outT = False, outEnh = False):
+            bool outR = False, bool outT = False, bool outEnh = False):
+        """WaveSweep(paramStr, values, layerNr = 0, layerZ = 0.0, outPwr = True, outR = False, outT = False, outEnh = False)
         
+        Solves the structure for waves for series of `values` of param
+        `paramStr`. Using this function is more confortable and faster than just
+        changing params and solving the structure. Analogous to `Sweep`.
+        
+        Parameters
+        ----------
+        paramStr : str
+            'wl':
+                Wavelength in meters
+            'beta':
+                normalized tangential wavevector
+            'I0':
+                intensity of the wave
+            'd_i':
+                thikness of layer i (0..N-1)
+            'w0':
+                waist size of the input beam
+        values : ndarray of floats
+            Correspondig values of param `paramStr`.
+        layerNr : int
+            Specifies layer, where electrical field enhancment is calculated.
+        layerZ : double
+            Specifies z-coordinate of enchncment calculation inside `layerNr`.
+        outPwr : bool
+            Turns calculation of all powers on/off.
+        outR : bool
+            Turns calculation of reflected power on/off.
+        outT : bool
+            Turns calculation of transmitted power on/off.
+        outEnh : bool
+            Turns calculation of enhancment in layer `layerNr` at distance
+            `layerZ` on/off.
+        
+        Returns
+        -------
+        _SweepResultNonlinearTMM
+            Helper class to store the result.
+            
+        """
         cdef WaveSweepResultNonlinearTMMCpp *resCpp;
         cdef int outmask = 0
         
@@ -829,7 +1136,27 @@ cdef class NonlinearTMM:
            
     def WaveGetFields2D(self, np.ndarray[double, ndim = 1] zs, \
             np.ndarray[double, ndim = 1] xs, str dirStr = "total"):
+        """WaveGetFields2D(zs, xs, dirStr = "total")
         
+        Calculates 2D electric and magnetic fields of beam propagating in the
+        structure. Analogous to the `GetFields2D` of plane waves.
+        
+        Parameters
+        ----------
+        zs : ndarray of floats
+            Points on z-axis where to calculate the fields. The beginning of the
+            first layer is at z = 0.
+        xs : ndarray of floats
+            Points on x-axis where to calculate the fields.
+        dir : {'total', 'forward', 'backward'}
+            Specifies the components of the output fields.
+            
+        Returns
+        -------
+        _FieldsZX
+            Helper class to store electric and magnetic fields in regular grid.
+        
+        """
         cdef FieldsZXCpp *resCpp;
         cdef WaveDirectionCpp direction = WaveDirectionFromStr(dirStr)
         resCpp = self._thisptr.WaveGetFields2D(Map[ArrayXd](zs), Map[ArrayXd](xs), direction)
