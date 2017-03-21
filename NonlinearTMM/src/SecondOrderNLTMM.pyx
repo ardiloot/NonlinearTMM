@@ -204,7 +204,8 @@ cdef class _Chi2Tensor:
 #===============================================================================
 
 cdef class Material:
-    """
+    """Material(wls, ns)
+    
     This class describes the optical parameters of nonlinear medium. Default
     contructor takes arrays of wavelengths and complex refractive indices and
     does linear interpolation. For shortcut __call__ is defined as GetN.
@@ -242,6 +243,7 @@ cdef class Material:
         
     def GetN(self, wl):
         """GetN(wl)
+        
         Returns refractive index of material at specified wavelength.
         
         Parameters
@@ -266,7 +268,8 @@ cdef class Material:
         return self._thisptr.GetN(wl)
         
     def IsNonlinear(self):
-        """
+        """IsNonlinear()
+        
         This method returns True if material nonlinearity tensor `chi2` is nonzero,
         False otherwise.
         
@@ -282,6 +285,77 @@ cdef class Material:
 #===============================================================================
 
 cdef class _Wave:
+    """
+    This is a helper class for using non plane waves as an input.
+        
+    Attributes
+    ----------
+    waveType : str
+        'planewave':
+            Usual plane wave
+        'gaussian':
+            Standard Gaussian beam with waist size w0
+        'tukey':
+            Rectangular wave with cosine tapered edges (Tukey window). The width
+            is given by `w0` and the tapered region is determined by `a`.
+        Default is `planewave`.
+    pwr : float
+        Power of the wave (in watts). Default 1.0. The area of the beam is
+        calculated as w0 * Ly.
+    overrideE0 : bool
+        if True, then `pwr` is ignored and `E0` is used. Default False.
+    E0 : float
+        Maximum electrical field of the beam in vacuum.
+    w0 : float
+        Waist size of the beam (in meters). Dafualt is 0.1 mm.
+    Ly : float
+        Beam size in y-direction (in meters).
+        Default is 1 mm.
+    a : float
+        Parameter used for Tukey wave. If a = 1, then the wave is perfect
+        rectangle, if a = 0.5, then half of the profile is tapered by cosines.
+        Defualt is 0.7.
+    nPointsInteg : int
+        Number of points used to represenbt the profile of the wave.
+        Default is 100.
+    maxX : float
+        The wave profile is given in x-range (-maxX..maxX). Only used if
+        dynamicMaxX is False. Default is 1 mm.
+    dynamicMaxX : bool
+        Selects between dynamic determination of x-span of the wave (region
+        where `nPointsInteg` samples are taken) or fixed span by `maxX`.
+        Default is True.
+    dynamicMaxXCoef : float
+        Dynamic maxX equals to the beam width (corrected to the angle of
+        incidence) times `dynamicMaxXCoef`. Default is 2.0.
+    maxPhi : float
+        Determines the maximum angle of deviation form the direction of
+        propagation of the participating fields. Increases the range of x-span
+        (i.e `maxX`) if it is neccesary to limit the angular distribution of the
+        participating plane waves. Default is 0.17 rad.
+    xRange : tuple of floats (xMin, xMax)
+        Current x-span calculated from `maxX`, `dynamicMaxXCoef` and `maxPhi`.
+        The wave must be solved to access this quantity.
+    betas : ndarray of floats
+        Normalized tangential wave vectors of plane wave expansion. The wave
+        must be solved to access this quantity.
+    phis : ndarray of floats
+        Same information as in betas, but converted to angles in respect to the
+        direction of the propagation. The wave must be solved to access this
+        quantity.
+    kxs : ndarray of floats
+        Same information as in betas, but converted to the x-component of the
+        wave vector. The wave must be solved to access this quantity.
+    kzs : ndarray of floats
+        Same information as in betas, but converted to the z-component of the
+        wave vector. The wave must be solved to access this quantity.
+    fieldProfile : tuple(2,) of ndarray of floats (xs, fiedProfile)
+        The field profile of the input wave sample by `nPointsInteg` points. The
+        wave must be solved to access this quantity.
+    expansionCoefsKx : ndarray of complex
+        Array of plane wave expansion coefs.
+                
+    """
     cdef WaveCpp *_thisptr
     cdef bool _needsDealloc;
     
@@ -298,6 +372,16 @@ cdef class _Wave:
             del self._thisptr
         
     def SetParams(self, **kwargs):
+        """SetParams(**kwargs)
+        
+        Helper method to set all the attributes of the class.
+        
+        Returns 
+        -------
+        None
+        
+        """
+        
         for name, value in kwargs.iteritems():
             if name not in waveParamsSet:
                 raise ValueError("Unknown kwarg %s" % (name))
@@ -442,6 +526,25 @@ cdef class _Wave:
 #===============================================================================
 
 cdef class _Intensities:
+    """
+    Helper class to store intensities for `NonlinearTMM`.
+    
+    Attributes
+    ----------
+    inc : complex
+        Electical field amplitute of the incident plane wave.
+    r : complex
+        Electical field amplitute of the reflected plane wave.
+    t : complex
+        Electrical field amplitute of the transmitted plane wave.
+    I : float
+        Intensity of the incident plane wave.
+    R : float
+        Intensity of the reflected plane wave.
+    T : float
+        Intensity of the transmitted plane wave.
+        
+    """
     cdef readonly double complex inc, r, t
     cdef readonly double I, R, T
     
@@ -461,6 +564,29 @@ cdef class _Intensities:
 #===============================================================================
 
 cdef class _SweepResultNonlinearTMM:
+    """
+    Helper class to store the result of the `Sweep` method.
+    
+    Attributes
+    ----------
+    inc : ndarray of complex
+        The complex amplitutes of the incident plane waves.
+    r : ndarray of complex
+        The complex amplitutes of the reflected plane waves.
+    t : ndarray of complex
+        The complex amplitutes of the transmitted plane waves.
+    Ii : ndarray of double
+        The intensities of the incident plane waves.
+    Ir : ndarray of double
+        The intensities of the reflected plane waves.
+    It : ndarray of double
+        The intensities of the transmitted plane waves.
+    Ia : ndarray of double
+        The intensities of asborption in the structure.
+    enh : ndarray of double
+        The enhancment values of the electrical field norm.
+        
+    """
     cdef SweepResultNonlinearTMMCpp *_thisptr 
     cdef readonly np.ndarray inc, r, t
     cdef readonly np.ndarray Ii, Ir, It, Ia, enh
@@ -495,6 +621,23 @@ cdef class _SweepResultNonlinearTMM:
 #===============================================================================
 
 cdef class _WaveSweepResultNonlinearTMM:
+    """
+    The helper class to store the results of `WaveSweep`.
+    
+    Attributes
+    ----------
+    Pi : ndarray of floats
+        The power of the incident beam.
+    Pr : ndarray of floats
+        The power of the reflected beam.
+    Pt : ndarray of floats
+        The power of the transmitted beam.
+    enh : ndarray of floats
+        The enhancment of the beam.
+    beamArea : ndarray of floats
+        The area of the beam with correction of angle of incidence.
+        
+    """
     cdef WaveSweepResultNonlinearTMMCpp *_thisptr 
     cdef readonly np.ndarray Pi, Pr, Pt, enh, beamArea
     cdef bool _needDealloc;
@@ -519,12 +662,26 @@ cdef class _WaveSweepResultNonlinearTMM:
         self.enh = ndarray_view(self._thisptr.enh).squeeze()
         self.beamArea = ndarray_view(self._thisptr.beamArea).squeeze()
         
-
 #===============================================================================
 # FieldsZ
 #===============================================================================
     
 cdef class _FieldsZ:
+    """
+    Helper class to store the results of `GetFields`.
+    
+    Attributes
+    ----------
+    E : ndarray(N, 3) of complex
+        Electrical fields along z-coordinate. First index is determines the
+        z-coorinate and the second corrorrespond to the x-, y-, z-component
+        (0..2).
+    H : ndarray(N, 3) of complex
+        Magnetic fields along z-coordinate. First index is determines the
+        z-coorinate and the second corrorrespond to the x-, y-, z-component
+        (0..2).
+        
+    """
     cdef FieldsZCpp *_thisptr; 
     cdef readonly np.ndarray E, H;
 
@@ -545,6 +702,37 @@ cdef class _FieldsZ:
 #===============================================================================
     
 cdef class _FieldsZX:
+    """
+    Helper class to store the result of `GetFields2D` and `WaveGetFields2D`.
+    
+    Attributes
+    ----------
+    Ex : ndarray(N, M) of complex
+        Electrical field x-component in zx-plane. First index corresponds to
+        z-coorinate and the second to the x-coordinate.
+    Ey : ndarray(N, M) of complex
+        Electrical field y-component in zx-plane. First index corresponds to
+        z-coorinate and the second to the x-coordinate.
+    Ez : ndarray(N, M) of complex
+        Electrical field z-component in zx-plane. First index corresponds to
+        z-coorinate and the second to the x-coordinate.    
+    EN : ndarray(N, M) of float
+        Electical field norm in zx-plane. First index corresponds to
+        z-coorinate and the second to the x-coordinate. 
+    Hx : ndarray(N, M) of complex
+        Magnetic field x-component in zx-plane. First index corresponds to
+        z-coorinate and the second to the x-coordinate.    
+    Hy : ndarray(N, M) of complex
+        Magnetic field y-component in zx-plane. First index corresponds to
+        z-coorinate and the second to the x-coordinate.
+    Hz : ndarray(N, M) of complex
+        Magnetic field z-component in zx-plane. First index corresponds to
+        z-coorinate and the second to the x-coordinate.
+    HN : ndarray(N, M) of float
+        Magnetic field norm in zx-plane. First index corresponds to
+        z-coorinate and the second to the x-coordinate.
+          
+    """
     cdef FieldsZXCpp *_thisptr; 
     cdef readonly np.ndarray Ex, Ey, Ez, Hx, Hy, Hz;
 
@@ -602,6 +790,17 @@ cdef class _FieldsZX:
 #===============================================================================
 
 cdef class _HomogeneousWave:
+    """
+    Helper class for `NonlinearLayer` to describe the parameters of the
+    homogeneous waves in the layer.
+    
+    Attributes
+    ----------
+    kzF : complex
+        Z-component of the wave vector.
+    kx : float
+        X-component of the wave vector.
+    """
     cdef HomogeneousWaveCpp *_thisptr
     
     def __cinit__(self):
@@ -611,6 +810,24 @@ cdef class _HomogeneousWave:
         self._thisptr = ptr
         
     def GetMainFields(self, double z):
+        """GetMainFields(z)
+        
+        Returns forward and backward component of the main fields at the
+        distance z.  In case of s-pol the main field is Ey and in case of p-pol
+        the main field is Hy.
+        
+        Parameters
+        ----------
+        z : float 
+            z-coorinate for the main fields calculation. z=0 is the beginning of
+            the layer.
+        
+        Returns
+        -------
+        ndarray(2,) of complex
+            The foreard and backward component of the main fields.
+        
+        """
         # Have to copy, because result is in stack
         return ndarray_copy(self._thisptr.GetMainFields(z))
         
@@ -627,6 +844,15 @@ cdef class _HomogeneousWave:
 #===============================================================================
 
 cdef class _NonlinearLayer:
+    """
+        Helper class for layer specific data and mathods.
+        
+        Attributes
+        ----------
+        d : float
+            The thikness of the layer.
+            
+    """
     cdef NonlinearLayerCpp *_thisptr
     cdef readonly object hw
     cdef object _parent;
@@ -646,12 +872,46 @@ cdef class _NonlinearLayer:
         self.hw = hw
         
     def GetIntensity(self, double z):
+        """GetIntensity(z)
+        
+        Returns intensity of the plane wave at coordinate `z`.
+        
+        Parameters
+        ----------
+        z : float
+            z-coorinate
+        
+        Returns
+        -------
+        float
+            The intensity of the plane waves in layer.
+        
+        """
         return self._thisptr.GetIntensity(z);
     
     def GetAbsorbedIntensity(self):
+        """GetAbsorbedIntensity()
+        
+        Returns absorbed intensity in the layer.
+        
+        Returns
+        -------
+        float
+        
+        """
         return self._thisptr.GetAbsorbedIntensity();
     
     def GetSrcIntensity(self):
+        """GetSrcIntensity()
+        
+        Calculates source power of the layer. Only nonzero if the material is
+        nonlinear.
+        
+        Returns
+        -------
+        float
+        
+        """
         return self._thisptr.GetSrcIntensity();
     
     # Getter
@@ -1232,6 +1492,23 @@ cdef class NonlinearTMM:
 #===============================================================================
 
 cdef class _SecondOrderNLIntensities:
+    """_SecondOrderNLIntensities()
+    This is a helper class for `SecondOrderNLTMM`. It stores the results of
+    `GetIntensities`.
+    
+    Attributes
+    ----------
+    P1 : `_Intensities`
+        Instance of `_Intensities` class and holds the intensities of second
+        inuput wave.
+    P2 : `_Intensities`
+        Instance of `_Intensities` class and holds the intensities of first
+        inuput wave.
+    Gen : `_Intensities`
+        Instance of `_Intensities` class and holds the intensities of generated
+        wave.
+        
+    """
     cdef readonly object P1, P2, Gen
     
     def __cinit__(self):
@@ -1256,6 +1533,23 @@ cdef class _SecondOrderNLIntensities:
 #===============================================================================
     
 cdef class _SweepResultSecondOrderNLTMM:
+    """_SweepResultSecondOrderNLTMM()
+    Helper class for `SecondOrderNLTMM`. Stores the results of `Sweep` method.
+    
+    Attributes
+    ----------
+    P1 : `_SweepResultNonlinearTMM`
+        Sweep results for the first input wave.
+    P2 : `_SweepResultNonlinearTMM`
+        Sweep results for the second input wave.
+    Gen : `_SweepResultNonlinearTMM`
+        Sweep results for the generated wave.
+    wlsGen : ndarray of floats
+        Stores the wavelength of the generated wave.
+    betasGen : ndarray of floats
+        Stores the normalized tangential wave vector the generated wave.
+        
+    """
     cdef SweepResultSecondOrderNLTMMCpp *_thisptr
     cdef readonly object P1, P2, Gen
     cdef readonly np.ndarray wlsGen, betasGen;
@@ -1290,6 +1584,24 @@ cdef class _SweepResultSecondOrderNLTMM:
 #===============================================================================
     
 cdef class _WaveSweepResultSecondOrderNLTMM:
+    """_WaveSweepResultSecondOrderNLTMM()
+    Helper class for `SecondOrderNLTMM`. Stores the results of `WaveSweep`
+    method.
+    
+    Attributes
+    ----------
+    P1 : `_WaveSweepResultNonlinearTMM`
+        The sweep result of the first input beam. 
+    P1 : `_WaveSweepResultNonlinearTMM`
+        The sweep result of the second input beam.
+    Gen : `_WaveSweepResultNonlinearTMM`
+        The sweep result of the generated beam.
+    wlsGen : ndarray of floats
+        Stores the wavelength of the generated wave.
+    betasGen : ndarray of floats
+        Stores the normalized tangential wave vector the generated wave.
+    
+    """
     cdef WaveSweepResultSecondOrderNLTMMCpp *_thisptr
     cdef readonly object P1, P2, Gen
     cdef readonly np.ndarray wlsGen, betasGen;
@@ -1325,6 +1637,17 @@ cdef class _WaveSweepResultSecondOrderNLTMM:
 #===============================================================================
 
 cdef class SecondOrderNLTMM:
+    """SecondOrderNLTMM(mode)
+    
+    This class calculates second-order nonliner processes (e.g. sum-frequency
+    and difference frequency generation) in layered structures. Relies on the
+    functionality of `NonlinearTMM` class.
+    
+    Parameters
+    ----------
+    mode : str {'sfg', 'dfg'}
+    
+    """
     cdef SecondOrderNLTMMCpp *_thisptr
     cdef list materialsCache
     cdef readonly object P1, P2, Gen
