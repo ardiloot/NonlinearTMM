@@ -1,0 +1,427 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Getting started &#8212; NonlinearTMM 1.2.3 documentation</title>
+    
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.2.3',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="API reference" href="Reference.html" />
+    <link rel="prev" title="Introduction" href="Introduction.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="Reference.html" title="API reference"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="Introduction.html" title="Introduction"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">NonlinearTMM 1.2.3 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="getting-started">
+<h1>Getting started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<p>Installation of NonlinearTMM package is possible through pip or from source
+code.</p>
+<p>Requirements:</p>
+<ul class="simple">
+<li><a class="reference external" href="https://www.python.org/">Python &gt;3.0</a></li>
+<li>C++ compiler</li>
+<li><a class="reference external" href="http://cython.org/">Cython</a> for wrapping C++ code to Python</li>
+<li><a class="reference external" href="http://www.numpy.org/">Numpy</a> for general arrays</li>
+<li><a class="reference external" href="https://github.com/wouterboomsma/eigency">Eigency</a> for Eigen and Numpy array conversion</li>
+<li><a class="reference external" href="http://matplotlib.org/">Matplotlib</a> for plotting in examples</li>
+<li><a class="reference external" href="http://doc.pytest.org/">Pytest</a> for testing</li>
+</ul>
+<p>Dependencies:</p>
+<ul class="simple">
+<li>C++ code depends on <a class="reference external" href="http://eigen.tuxfamily.org/">Eigen library</a> (already included in package)</li>
+</ul>
+<p>Installation through pip is done like:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>pip install NonlinearTMM
+</pre></div>
+</div>
+<p>Alternatively, it is possible to install the package form the source code by commands</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>python setup.py install
+</pre></div>
+</div>
+<p>or</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>pip intall .
+</pre></div>
+</div>
+<p>in the source code folder.</p>
+</div>
+<div class="section" id="package-structure">
+<h2>Package structure<a class="headerlink" href="#package-structure" title="Permalink to this headline">¶</a></h2>
+<p>The package has three main classes:</p>
+<ul class="simple">
+<li><a class="reference internal" href="Material.html#NonlinearTMM.Material" title="NonlinearTMM.Material"><code class="xref py py-class docutils literal"><span class="pre">Material</span></code></a></li>
+<li><a class="reference internal" href="TMM.html#NonlinearTMM.TMM" title="NonlinearTMM.TMM"><code class="xref py py-class docutils literal"><span class="pre">TMM</span></code></a></li>
+<li><a class="reference internal" href="SecondOrderNLTMM.html#NonlinearTMM.SecondOrderNLTMM" title="NonlinearTMM.SecondOrderNLTMM"><code class="xref py py-class docutils literal"><span class="pre">SecondOrderNLTMM</span></code></a></li>
+</ul>
+<p>Class <a class="reference internal" href="Material.html#NonlinearTMM.Material" title="NonlinearTMM.Material"><code class="xref py py-class docutils literal"><span class="pre">Material</span></code></a> is responsible to represent the properties of optical
+material. Mainly wavelength dependent refractive indices and second-order
+suceptibility tensor for nonlinear processes.</p>
+<p>Class <a class="reference internal" href="TMM.html#NonlinearTMM.TMM" title="NonlinearTMM.TMM"><code class="xref py py-class docutils literal"><span class="pre">TMM</span></code></a> (alias of <a class="reference internal" href="TMM.html#NonlinearTMM.NonlinearTMM" title="NonlinearTMM.NonlinearTMM"><code class="xref py py-class docutils literal"><span class="pre">NonlinearTMM</span></code></a>) is has all the standard TMM features:</p>
+<ul class="simple">
+<li>Both p- and s-polarization</li>
+<li>Arbritarty angle of incidence</li>
+<li>Calculation of reflection, transmission and absorption of plane waves (<a class="reference internal" href="TMM.html#NonlinearTMM.NonlinearTMM.GetIntensities" title="NonlinearTMM.NonlinearTMM.GetIntensities"><code class="xref any py py-meth docutils literal"><span class="pre">GetIntensities</span></code></a> and <a class="reference internal" href="TMM.html#NonlinearTMM.NonlinearTMM.GetAbsorbedIntensity" title="NonlinearTMM.NonlinearTMM.GetAbsorbedIntensity"><code class="xref any py py-meth docutils literal"><span class="pre">GetAbsorbedIntensity</span></code></a>)</li>
+<li>Calculaion of electric and magnetic fields inside structure (<a class="reference internal" href="TMM.html#NonlinearTMM.NonlinearTMM.GetFields" title="NonlinearTMM.NonlinearTMM.GetFields"><code class="xref any py py-meth docutils literal"><span class="pre">GetFields</span></code></a> and <a class="reference internal" href="TMM.html#NonlinearTMM.NonlinearTMM.GetFields2D" title="NonlinearTMM.NonlinearTMM.GetFields2D"><code class="xref any py py-meth docutils literal"><span class="pre">GetFields2D</span></code></a>)</li>
+<li>Calculation of field enhancement (<a class="reference internal" href="TMM.html#NonlinearTMM.NonlinearTMM.GetEnhancement" title="NonlinearTMM.NonlinearTMM.GetEnhancement"><code class="xref any py py-meth docutils literal"><span class="pre">GetEnhancement</span></code></a>)</li>
+<li>Sweep over any parameter (<a class="reference internal" href="TMM.html#NonlinearTMM.NonlinearTMM.Sweep" title="NonlinearTMM.NonlinearTMM.Sweep"><code class="xref any py py-meth docutils literal"><span class="pre">Sweep</span></code></a>)</li>
+</ul>
+<p>In addition to those standard features, the class has similar functionality to
+work with waves with arbritarty profile (e.g. Gaussian beam). The configuration
+of the beam is done through attribute <code class="xref any docutils literal"><span class="pre">wave</span></code> (see class <a class="reference internal" href="TMM.html#NonlinearTMM._Wave" title="NonlinearTMM._Wave"><code class="xref any py py-class docutils literal"><span class="pre">_Wave</span></code></a>).
+The interface for the calculations with arbritarty beams is similar to standard TMM:</p>
+<ul class="simple">
+<li>Calculation of reflection, transmission and absorption of beams (<a class="reference internal" href="TMM.html#NonlinearTMM.NonlinearTMM.WaveGetPowerFlows" title="NonlinearTMM.NonlinearTMM.WaveGetPowerFlows"><code class="xref any py py-meth docutils literal"><span class="pre">WaveGetPowerFlows</span></code></a>)</li>
+<li>Calculaion of electric and magnetic fields inside structure (<a class="reference internal" href="TMM.html#NonlinearTMM.NonlinearTMM.WaveGetFields2D" title="NonlinearTMM.NonlinearTMM.WaveGetFields2D"><code class="xref any py py-meth docutils literal"><span class="pre">WaveGetFields2D</span></code></a>)</li>
+<li>Calculation of field enhancement (<a class="reference internal" href="TMM.html#NonlinearTMM.NonlinearTMM.WaveGetEnhancement" title="NonlinearTMM.NonlinearTMM.WaveGetEnhancement"><code class="xref any py py-meth docutils literal"><span class="pre">WaveGetEnhancement</span></code></a>)</li>
+<li>Sweep over any parameter (<a class="reference internal" href="TMM.html#NonlinearTMM.NonlinearTMM.WaveSweep" title="NonlinearTMM.NonlinearTMM.WaveSweep"><code class="xref any py py-meth docutils literal"><span class="pre">WaveSweep</span></code></a>)</li>
+</ul>
+<p>Finally, <a class="reference internal" href="SecondOrderNLTMM.html#NonlinearTMM.SecondOrderNLTMM" title="NonlinearTMM.SecondOrderNLTMM"><code class="xref py py-class docutils literal"><span class="pre">SecondOrderNLTMM</span></code></a> class ic capable of calculating second-order
+nonlinear processes like second-harmonic generation, sum-frequency generation and
+difference frequency generation. This has similar interface as <a class="reference internal" href="TMM.html"><span class="doc">TMM</span></a> - it
+supports both the plane waves and beams.</p>
+</div>
+<div class="section" id="standard-tmm">
+<h2>Standard TMM<a class="headerlink" href="#standard-tmm" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="plane-waves-example">
+<h3>Plane waves example<a class="headerlink" href="#plane-waves-example" title="Permalink to this headline">¶</a></h3>
+<p>As an example three layer structure consisting of a prism (z &lt; 0), 50 nm thick silver
+film and air is studied. Such kind of structure supports surface plasmon
+resonance (SPP) if excited by p-polarized light and is named Kretschmann
+configuration. The example code is shown bellow and could be divided into
+following steps:</p>
+<ol class="arabic simple">
+<li>Specifying materials refractive indices.</li>
+<li>Initializing <a class="reference internal" href="TMM.html#NonlinearTMM.TMM" title="NonlinearTMM.TMM"><code class="xref py py-class docutils literal"><span class="pre">TMM</span></code></a>, setting params and adding layers.</li>
+<li>By using <a class="reference internal" href="TMM.html#NonlinearTMM.NonlinearTMM.Sweep" title="NonlinearTMM.NonlinearTMM.Sweep"><code class="xref any py py-meth docutils literal"><span class="pre">Sweep</span></code></a> calculate the dependence of reflection, transmission and enhancment factor on the angle of incidence.</li>
+<li>Find the plasmonic resonance by maximum enhancment.</li>
+<li>Calculate 1D fields at plasmonic resonance by <a class="reference internal" href="TMM.html#NonlinearTMM.NonlinearTMM.GetFields" title="NonlinearTMM.NonlinearTMM.GetFields"><code class="xref any py py-meth docutils literal"><span class="pre">GetFields</span></code></a>.</li>
+<li>Calculate 2D fields at plasmonic resonance by <a class="reference internal" href="TMM.html#NonlinearTMM.NonlinearTMM.GetFields2D" title="NonlinearTMM.NonlinearTMM.GetFields2D"><code class="xref any py py-meth docutils literal"><span class="pre">GetFields2D</span></code></a>.</li>
+<li>Plot all results</li>
+</ol>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pylab</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">NonlinearTMM</span> <span class="k">import</span> <span class="n">TMM</span><span class="p">,</span> <span class="n">Material</span>
+
+<span class="k">def</span> <span class="nf">CalcSpp</span><span class="p">():</span>
+    <span class="c1"># Parameters</span>
+    <span class="c1">#---------------------------------------------------------------------------</span>
+    <span class="n">wl</span> <span class="o">=</span> <span class="mf">532e-9</span>  <span class="c1"># Wavelength</span>
+    <span class="n">pol</span> <span class="o">=</span> <span class="s2">&quot;p&quot;</span>  <span class="c1"># Polarization</span>
+    <span class="n">I0</span> <span class="o">=</span> <span class="mf">1.0</span>  <span class="c1"># Intensity of incident wave</span>
+    <span class="n">metalD</span> <span class="o">=</span> <span class="mf">50e-9</span>  <span class="c1"># Metal film thickness</span>
+    <span class="n">enhLayer</span> <span class="o">=</span> <span class="mi">2</span>  <span class="c1"># Measure enhancment in the last layer</span>
+    <span class="n">ths</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">80.0</span><span class="p">,</span> <span class="mi">500</span><span class="p">))</span>  <span class="c1"># Angle of incidences</span>
+    <span class="n">xs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mf">2e-6</span><span class="p">,</span> <span class="mf">2e-6</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>  <span class="c1"># Field calculation coordinates</span>
+    <span class="n">zs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mf">2e-6</span><span class="p">,</span> <span class="mf">2e-6</span><span class="p">,</span> <span class="mi">201</span><span class="p">)</span>  <span class="c1"># Field calculation coordinates</span>
+    
+    <span class="c1"># Specify materials</span>
+    <span class="c1">#---------------------------------------------------------------------------</span>
+    <span class="n">prism</span> <span class="o">=</span> <span class="n">Material</span><span class="o">.</span><span class="n">Static</span><span class="p">(</span><span class="mf">1.5</span><span class="p">)</span>
+    <span class="n">ag</span> <span class="o">=</span> <span class="n">Material</span><span class="o">.</span><span class="n">Static</span><span class="p">(</span><span class="mf">0.054007</span> <span class="o">+</span> <span class="mf">3.4290</span><span class="n">j</span><span class="p">)</span>  <span class="c1"># Johnson &amp; Christie @ 532nm</span>
+    <span class="n">dielectric</span> <span class="o">=</span> <span class="n">Material</span><span class="o">.</span><span class="n">Static</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
+    
+    <span class="c1"># Init TMM</span>
+    <span class="c1">#---------------------------------------------------------------------------</span>
+    <span class="n">tmm</span> <span class="o">=</span> <span class="n">TMM</span><span class="p">(</span><span class="n">wl</span> <span class="o">=</span> <span class="n">wl</span><span class="p">,</span> <span class="n">pol</span> <span class="o">=</span> <span class="n">pol</span><span class="p">,</span> <span class="n">I0</span> <span class="o">=</span> <span class="n">I0</span><span class="p">)</span>
+    <span class="n">tmm</span><span class="o">.</span><span class="n">AddLayer</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="s2">&quot;inf&quot;</span><span class="p">),</span> <span class="n">prism</span><span class="p">)</span>
+    <span class="n">tmm</span><span class="o">.</span><span class="n">AddLayer</span><span class="p">(</span><span class="n">metalD</span><span class="p">,</span> <span class="n">ag</span><span class="p">)</span>
+    <span class="n">tmm</span><span class="o">.</span><span class="n">AddLayer</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="s2">&quot;inf&quot;</span><span class="p">),</span> <span class="n">dielectric</span><span class="p">)</span>
+    
+    <span class="c1"># Solve</span>
+    <span class="c1">#---------------------------------------------------------------------------</span>
+    
+    <span class="c1"># Calculate reflection, transmission and field enhancement</span>
+    <span class="n">betas</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">ths</span><span class="p">)</span> <span class="o">*</span> <span class="n">prism</span><span class="o">.</span><span class="n">GetN</span><span class="p">(</span><span class="n">wl</span><span class="p">)</span><span class="o">.</span><span class="n">real</span>
+    <span class="n">sweepRes</span> <span class="o">=</span> <span class="n">tmm</span><span class="o">.</span><span class="n">Sweep</span><span class="p">(</span><span class="s2">&quot;beta&quot;</span><span class="p">,</span> <span class="n">betas</span><span class="p">,</span> <span class="n">outEnh</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">layerNr</span> <span class="o">=</span> <span class="n">enhLayer</span><span class="p">)</span> 
+    
+    <span class="c1"># Calculate fields at the reflection dip (excitation of SPPs)</span>
+    <span class="n">betaMaxEnh</span> <span class="o">=</span> <span class="n">betas</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">sweepRes</span><span class="o">.</span><span class="n">enh</span><span class="p">)]</span>
+    <span class="n">tmm</span><span class="o">.</span><span class="n">Solve</span><span class="p">(</span><span class="n">beta</span> <span class="o">=</span> <span class="n">betaMaxEnh</span><span class="p">)</span>
+    
+    <span class="c1"># Calculate 1D fields</span>
+    <span class="n">fields1D</span> <span class="o">=</span> <span class="n">tmm</span><span class="o">.</span><span class="n">GetFields</span><span class="p">(</span><span class="n">zs</span><span class="p">)</span>
+    
+    <span class="c1"># Calculate 2D fields</span>
+    <span class="n">fields2D</span> <span class="o">=</span> <span class="n">tmm</span><span class="o">.</span><span class="n">GetFields2D</span><span class="p">(</span><span class="n">zs</span><span class="p">,</span> <span class="n">xs</span><span class="p">)</span>
+    
+    <span class="c1"># Ploting</span>
+    <span class="c1">#---------------------------------------------------------------------------</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+    <span class="n">thMaxEnh</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arcsin</span><span class="p">(</span><span class="n">betaMaxEnh</span> <span class="o">/</span> <span class="n">prism</span><span class="o">.</span><span class="n">GetN</span><span class="p">(</span><span class="n">wl</span><span class="p">)</span><span class="o">.</span><span class="n">real</span><span class="p">)</span>
+    
+    <span class="c1"># Reflection / transmission</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">221</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span><span class="n">ths</span><span class="p">),</span> <span class="n">sweepRes</span><span class="o">.</span><span class="n">Ir</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="s2">&quot;R&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span><span class="n">ths</span><span class="p">),</span> <span class="n">sweepRes</span><span class="o">.</span><span class="n">It</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="s2">&quot;T&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span><span class="n">thMaxEnh</span><span class="p">),</span> <span class="n">ls</span> <span class="o">=</span> <span class="s2">&quot;--&quot;</span><span class="p">,</span> <span class="n">color</span> <span class="o">=</span> <span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="n">lw</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$\theta$ ($\degree$)&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;Intensity (a.u)&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+    
+    <span class="c1"># Field enhancement</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">222</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span><span class="n">ths</span><span class="p">),</span> <span class="n">sweepRes</span><span class="o">.</span><span class="n">enh</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span><span class="n">thMaxEnh</span><span class="p">),</span> <span class="n">ls</span> <span class="o">=</span> <span class="s2">&quot;--&quot;</span><span class="p">,</span> <span class="n">color</span> <span class="o">=</span> <span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="n">lw</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$\theta$ ($\degree$)&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;Field enhancement&quot;</span><span class="p">)</span>
+    
+    <span class="c1"># Fields 1D</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">223</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="mf">1e6</span> <span class="o">*</span> <span class="n">zs</span><span class="p">,</span> <span class="n">fields1D</span><span class="o">.</span><span class="n">E</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">real</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;$E_x$&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="mf">1e6</span> <span class="o">*</span> <span class="n">zs</span><span class="p">,</span> <span class="n">fields1D</span><span class="o">.</span><span class="n">E</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">real</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;$E_z$&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="mf">1e6</span> <span class="o">*</span> <span class="n">zs</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">fields1D</span><span class="o">.</span><span class="n">E</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">1</span><span class="p">),</span> <span class="n">label</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;‖E‖&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;z (μm)&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;(V/m)&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+    
+    <span class="c1"># Fields 2D</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">224</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">pcolormesh</span><span class="p">(</span><span class="mf">1e6</span> <span class="o">*</span> <span class="n">zs</span><span class="p">,</span> <span class="mf">1e6</span> <span class="o">*</span> <span class="n">xs</span><span class="p">,</span> <span class="n">fields2D</span><span class="o">.</span><span class="n">Ez</span><span class="o">.</span><span class="n">real</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">rasterized</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;z (μm)&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;x (μm)&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">label</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;$E_z$ (V/m)&quot;</span><span class="p">)</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">CalcSpp</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>The results of the calculations are shown bellow. Indeed there is a sharrp dip
+in the reflection (R) near the angle of incidence ca 44 degrees. At the same angle
+the field enhancement factor is maximum and is more than 12 times. In the second
+the results of the fields calculations at plasmonic resonance is presented. Indeed,
+surface wave on the silver-air interface is excited and characteristic pattern of
+fields for SPP is visible.</p>
+<img alt="_images/TMM-example.png" src="_images/TMM-example.png" />
+</div>
+<div class="section" id="gaussian-wave-example">
+<h3>Gaussian wave example<a class="headerlink" href="#gaussian-wave-example" title="Permalink to this headline">¶</a></h3>
+<p>Previous example was entirely about standard TMM. Now, the calculations are
+extended to the beams, in this case Gaussian beam. The steps of the calculations
+remain the same, except <a class="reference internal" href="TMM.html#NonlinearTMM._Wave" title="NonlinearTMM._Wave"><code class="xref py py-class docutils literal"><span class="pre">_Wave</span></code></a> parameters must be set (<a class="reference internal" href="TMM.html#NonlinearTMM.TMM" title="NonlinearTMM.TMM"><code class="xref py py-class docutils literal"><span class="pre">TMM</span></code></a> has
+attribute <code class="xref any docutils literal"><span class="pre">TMM.wave</span></code>). Gaussian beam power is set to 10 mW and waist size
+to 10 μm.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pylab</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">NonlinearTMM</span> <span class="k">import</span> <span class="n">TMM</span><span class="p">,</span> <span class="n">Material</span>
+
+<span class="k">def</span> <span class="nf">CalcSppGaussianBeam</span><span class="p">():</span>
+    <span class="c1"># Parameters</span>
+    <span class="c1">#---------------------------------------------------------------------------</span>
+    <span class="n">wl</span> <span class="o">=</span> <span class="mf">532e-9</span>  <span class="c1"># Wavelength</span>
+    <span class="n">pol</span> <span class="o">=</span> <span class="s2">&quot;p&quot;</span>  <span class="c1"># Polarization</span>
+    <span class="n">I0</span> <span class="o">=</span> <span class="mf">1.0</span>  <span class="c1"># Intensity of incident wave</span>
+    <span class="n">metalD</span> <span class="o">=</span> <span class="mf">50e-9</span>  <span class="c1"># Metal film thickness</span>
+    <span class="n">enhLayer</span> <span class="o">=</span> <span class="mi">2</span>  <span class="c1"># Measure enhancment in the last layer</span>
+    <span class="n">ths</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">75.0</span><span class="p">,</span> <span class="mi">500</span><span class="p">))</span>  <span class="c1"># Angle of incidences</span>
+    <span class="n">xs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mf">50e-6</span><span class="p">,</span> <span class="mf">50e-6</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>  <span class="c1"># Field calculation coordinates</span>
+    <span class="n">zs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mf">25e-6</span><span class="p">,</span> <span class="mf">5e-6</span><span class="p">,</span> <span class="mi">201</span><span class="p">)</span>  <span class="c1"># Field calculation coordinates</span>
+    <span class="n">waveType</span> <span class="o">=</span> <span class="s2">&quot;gaussian&quot;</span>  <span class="c1"># Wave type</span>
+    <span class="n">pwr</span> <span class="o">=</span> <span class="mf">10e-3</span>  <span class="c1"># Beam power [W]</span>
+    <span class="n">w0</span> <span class="o">=</span> <span class="mf">10e-6</span>  <span class="c1"># Beam waist size</span>
+    
+    <span class="c1"># Specify materials</span>
+    <span class="c1">#---------------------------------------------------------------------------</span>
+    <span class="n">prism</span> <span class="o">=</span> <span class="n">Material</span><span class="o">.</span><span class="n">Static</span><span class="p">(</span><span class="mf">1.5</span><span class="p">)</span>
+    <span class="n">ag</span> <span class="o">=</span> <span class="n">Material</span><span class="o">.</span><span class="n">Static</span><span class="p">(</span><span class="mf">0.054007</span> <span class="o">+</span> <span class="mf">3.4290</span><span class="n">j</span><span class="p">)</span>  <span class="c1"># Johnson &amp; Christie @ 532nm</span>
+    <span class="n">dielectric</span> <span class="o">=</span> <span class="n">Material</span><span class="o">.</span><span class="n">Static</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
+    
+    <span class="c1"># Init TMM</span>
+    <span class="c1">#---------------------------------------------------------------------------</span>
+    <span class="n">tmm</span> <span class="o">=</span> <span class="n">TMM</span><span class="p">(</span><span class="n">wl</span> <span class="o">=</span> <span class="n">wl</span><span class="p">,</span> <span class="n">pol</span> <span class="o">=</span> <span class="n">pol</span><span class="p">,</span> <span class="n">I0</span> <span class="o">=</span> <span class="n">I0</span><span class="p">)</span>
+    <span class="n">tmm</span><span class="o">.</span><span class="n">AddLayer</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="s2">&quot;inf&quot;</span><span class="p">),</span> <span class="n">prism</span><span class="p">)</span>
+    <span class="n">tmm</span><span class="o">.</span><span class="n">AddLayer</span><span class="p">(</span><span class="n">metalD</span><span class="p">,</span> <span class="n">ag</span><span class="p">)</span>
+    <span class="n">tmm</span><span class="o">.</span><span class="n">AddLayer</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="s2">&quot;inf&quot;</span><span class="p">),</span> <span class="n">dielectric</span><span class="p">)</span>
+    
+    <span class="c1"># Init wave params</span>
+    <span class="n">tmm</span><span class="o">.</span><span class="n">wave</span><span class="o">.</span><span class="n">SetParams</span><span class="p">(</span><span class="n">waveType</span> <span class="o">=</span> <span class="n">waveType</span><span class="p">,</span> <span class="n">w0</span> <span class="o">=</span> <span class="n">w0</span><span class="p">,</span> <span class="n">pwr</span> <span class="o">=</span> <span class="n">pwr</span><span class="p">,</span> \
+                       <span class="n">dynamicMaxX</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">maxX</span> <span class="o">=</span> <span class="n">xs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    
+    <span class="c1"># Solve</span>
+    <span class="c1">#---------------------------------------------------------------------------</span>
+    
+    <span class="c1"># Calculate reflection, transmission and field enhancement</span>
+    <span class="n">betas</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">ths</span><span class="p">)</span> <span class="o">*</span> <span class="n">prism</span><span class="o">.</span><span class="n">GetN</span><span class="p">(</span><span class="n">wl</span><span class="p">)</span><span class="o">.</span><span class="n">real</span>
+    <span class="n">sweepRes</span> <span class="o">=</span> <span class="n">tmm</span><span class="o">.</span><span class="n">WaveSweep</span><span class="p">(</span><span class="s2">&quot;beta&quot;</span><span class="p">,</span> <span class="n">betas</span><span class="p">,</span> <span class="n">outEnh</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">layerNr</span> <span class="o">=</span> <span class="n">enhLayer</span><span class="p">)</span> 
+    
+    <span class="c1"># Calculate fields at the reflection dip (excitation of SPPs)</span>
+    <span class="n">betaMaxEnh</span> <span class="o">=</span> <span class="n">betas</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">sweepRes</span><span class="o">.</span><span class="n">enh</span><span class="p">)]</span>
+    <span class="n">tmm</span><span class="o">.</span><span class="n">Solve</span><span class="p">(</span><span class="n">beta</span> <span class="o">=</span> <span class="n">betaMaxEnh</span><span class="p">)</span>
+    <span class="n">fields2D</span> <span class="o">=</span> <span class="n">tmm</span><span class="o">.</span><span class="n">WaveGetFields2D</span><span class="p">(</span><span class="n">zs</span><span class="p">,</span> <span class="n">xs</span><span class="p">)</span>
+    
+    <span class="c1"># Ploting</span>
+    <span class="c1">#---------------------------------------------------------------------------</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+    <span class="n">ax1</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot2grid</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+    <span class="n">ax2</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot2grid</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+    <span class="n">ax3</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot2grid</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">rowspan</span> <span class="o">=</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">thMaxEnh</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arcsin</span><span class="p">(</span><span class="n">betaMaxEnh</span> <span class="o">/</span> <span class="n">prism</span><span class="o">.</span><span class="n">GetN</span><span class="p">(</span><span class="n">wl</span><span class="p">)</span><span class="o">.</span><span class="n">real</span><span class="p">)</span>
+    
+    <span class="c1"># Reflection / transmission</span>
+    <span class="n">ax1</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span><span class="n">ths</span><span class="p">),</span> <span class="mf">1e3</span> <span class="o">*</span> <span class="n">sweepRes</span><span class="o">.</span><span class="n">Pi</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;$P_i$&quot;</span><span class="p">)</span>
+    <span class="n">ax1</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span><span class="n">ths</span><span class="p">),</span> <span class="mf">1e3</span> <span class="o">*</span> <span class="n">sweepRes</span><span class="o">.</span><span class="n">Pr</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;$P_r$&quot;</span><span class="p">)</span>
+    <span class="n">ax1</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span><span class="n">ths</span><span class="p">),</span> <span class="mf">1e3</span> <span class="o">*</span> <span class="n">sweepRes</span><span class="o">.</span><span class="n">Pt</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;$P_t$&quot;</span><span class="p">)</span>
+    <span class="n">ax1</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span><span class="n">thMaxEnh</span><span class="p">),</span> <span class="n">ls</span> <span class="o">=</span> <span class="s2">&quot;--&quot;</span><span class="p">,</span> <span class="n">color</span> <span class="o">=</span> <span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="n">lw</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">)</span>
+    <span class="n">ax1</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$\theta$ ($\degree$)&quot;</span><span class="p">)</span>
+    <span class="n">ax1</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;Power (mW)&quot;</span><span class="p">)</span>
+    <span class="n">ax1</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+    
+    <span class="c1"># Field enhancement</span>
+    <span class="n">ax2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span><span class="n">ths</span><span class="p">),</span> <span class="n">sweepRes</span><span class="o">.</span><span class="n">enh</span><span class="p">)</span>
+    <span class="n">ax2</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span><span class="n">thMaxEnh</span><span class="p">),</span> <span class="n">ls</span> <span class="o">=</span> <span class="s2">&quot;--&quot;</span><span class="p">,</span> <span class="n">color</span> <span class="o">=</span> <span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="n">lw</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">)</span>
+    <span class="n">ax2</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$\theta$ ($\degree$)&quot;</span><span class="p">)</span>
+    <span class="n">ax2</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;Field enhancement&quot;</span><span class="p">)</span>
+    
+    <span class="c1"># Fields 2D</span>
+    <span class="n">cm</span> <span class="o">=</span> <span class="n">ax3</span><span class="o">.</span><span class="n">pcolormesh</span><span class="p">(</span><span class="mf">1e6</span> <span class="o">*</span> <span class="n">zs</span><span class="p">,</span> <span class="mf">1e6</span> <span class="o">*</span> <span class="n">xs</span><span class="p">,</span> <span class="mf">1e-3</span> <span class="o">*</span> <span class="n">fields2D</span><span class="o">.</span><span class="n">EN</span><span class="o">.</span><span class="n">real</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">vmax</span> <span class="o">=</span> <span class="mf">5e1</span><span class="p">)</span>
+    <span class="n">ax3</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;z (μm)&quot;</span><span class="p">)</span>
+    <span class="n">ax3</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;x (μm)&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">cm</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;$‖E‖$ (kV/m)&quot;</span><span class="p">)</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">CalcSppGaussianBeam</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>The results of those calculations are bellow. Despite the fact, that the structure
+is the same, the dip in the reflection is different. The reason for this behaviour
+is that as the resonances of SPPs are narrow, they also require well collimated
+beam to excite them. Also field enhancment is ca 3 times lower, as expected. On
+the right side, the electrical field norm is shown. It is clearly visible, that
+Gaussian beam is incident form the left, and it gets reflected from the metal film (z = 0).
+Part of the energy is transmitted to excite SPPs at the metal-air interface. The
+excited SPPs are propagating on the metal film and are absorbe after ca 20 μm of
+propagation.</p>
+<img alt="_images/TMMForWaves-example.png" src="_images/TMMForWaves-example.png" />
+</div>
+</div>
+<div class="section" id="second-order-nonlinear-tmm">
+<h2>Second-order nonlinear TMM<a class="headerlink" href="#second-order-nonlinear-tmm" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id1">
+<h3>Plane waves example<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p>Will be added in near future.</p>
+</div>
+<div class="section" id="id2">
+<h3>Gaussian wave example<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<p>Will be added in near future.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Getting started</a><ul>
+<li><a class="reference internal" href="#installation">Installation</a></li>
+<li><a class="reference internal" href="#package-structure">Package structure</a></li>
+<li><a class="reference internal" href="#standard-tmm">Standard TMM</a><ul>
+<li><a class="reference internal" href="#plane-waves-example">Plane waves example</a></li>
+<li><a class="reference internal" href="#gaussian-wave-example">Gaussian wave example</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#second-order-nonlinear-tmm">Second-order nonlinear TMM</a><ul>
+<li><a class="reference internal" href="#id1">Plane waves example</a></li>
+<li><a class="reference internal" href="#id2">Gaussian wave example</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="Introduction.html"
+                        title="previous chapter">Introduction</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="Reference.html"
+                        title="next chapter">API reference</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/GettingStarted.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="Reference.html" title="API reference"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="Introduction.html" title="Introduction"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">NonlinearTMM 1.2.3 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Ardi Loot.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.3.
+    </div>
+  </body>
+</html>

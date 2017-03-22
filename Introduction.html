@@ -26,7 +26,7 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Examples" href="Examples.html" />
+    <link rel="next" title="Getting started" href="GettingStarted.html" />
     <link rel="prev" title="Welcome to NonlinearTMM’s documentation!" href="index.html" /> 
   </head>
   <body role="document">
@@ -37,7 +37,7 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="Examples.html" title="Examples"
+          <a href="GettingStarted.html" title="Getting started"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="index.html" title="Welcome to NonlinearTMM’s documentation!"
@@ -53,11 +53,37 @@
             
   <div class="section" id="introduction">
 <h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="about">
-<h2>About<a class="headerlink" href="#about" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>Transfer-matrix method (TMM) is powerful analytical method to solve Maxwell
+equations in layered structures. However, standard TMM is limited by infinite
+plane waves (e.g no Gaussian beam excitation) and it is only limited to linear
+processes (i.e calculation of second-harmonic, sum-frequency, difference-frequency
+generation is not possible). The aim of this package is extand standard TMM to
+include those features. The physics of those extensionsare described in the
+follwoing publications, first extends the standard TMM to nonlinear processes
+and the second extends to the beams with arbritary profiles.</p>
+<ol class="arabic simple">
+<li><a class="reference external" href="https://link.springer.com/article/10.1007%2Fs00339-016-0733-0">A. Loot and V. Hizhnyakov, “Extension of standard transfer-matrix method for three-wave mixing for plasmonic structures,” Appl. Phys. A, vol. 123, no. 3, p. 152, 2017.</a></li>
+<li>TPB</li>
+</ol>
+<div class="section" id="main-features">
+<h3>Main features<a class="headerlink" href="#main-features" title="Permalink to this headline">¶</a></h3>
+<p>In addition to the standard TMM features this package also supports:</p>
+<ul class="simple">
+<li>Calculation of Gaussian beam (or any other beam) propagartion inside layered structures</li>
+<li>Calculation of nonlinear processes SHG/SFG/DFG</li>
+</ul>
 </div>
-<div class="section" id="getting-started">
-<h2>Getting started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="technical-features">
+<h3>Technical features<a class="headerlink" href="#technical-features" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Written in C++</li>
+<li>Python wrappers written in Cython</li>
+<li>Parallerization through OpenMP</li>
+<li>Use of SSE instructions for speedup</li>
+</ul>
+</div>
 </div>
 </div>
 
@@ -70,8 +96,11 @@
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Introduction</a><ul>
-<li><a class="reference internal" href="#about">About</a></li>
-<li><a class="reference internal" href="#getting-started">Getting started</a></li>
+<li><a class="reference internal" href="#overview">Overview</a><ul>
+<li><a class="reference internal" href="#main-features">Main features</a></li>
+<li><a class="reference internal" href="#technical-features">Technical features</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -80,8 +109,8 @@
   <p class="topless"><a href="index.html"
                         title="previous chapter">Welcome to NonlinearTMM&#8217;s documentation!</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="Examples.html"
-                        title="next chapter">Examples</a></p>
+  <p class="topless"><a href="GettingStarted.html"
+                        title="next chapter">Getting started</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -110,7 +139,7 @@
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="Examples.html" title="Examples"
+          <a href="GettingStarted.html" title="Getting started"
              >next</a> |</li>
         <li class="right" >
           <a href="index.html" title="Welcome to NonlinearTMM’s documentation!"

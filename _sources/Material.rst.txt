@@ -1,10 +1,10 @@
 .. py:currentmodule:: NonlinearTMM
 
 Material
-*********
+########
 
 Main class
---------------
+**********
 
 .. autoclass:: NonlinearTMM.Material
    :members:
@@ -12,7 +12,7 @@ Main class
    :show-inheritance:
    
 Helper classes
---------------
+**************
 
 .. autoclass:: NonlinearTMM._Chi2Tensor
    :members:

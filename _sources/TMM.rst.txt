@@ -1,10 +1,10 @@
 .. py:currentmodule:: NonlinearTMM
 
 TMM
-***
+###
 
 Main class
-----------
+**********
 
 .. autoclass:: NonlinearTMM.TMM
    :members:
@@ -17,7 +17,7 @@ Main class
    :show-inheritance:
 
 Helper classes
---------------
+**************
 
 .. autoclass:: NonlinearTMM._Intensities
    :members:

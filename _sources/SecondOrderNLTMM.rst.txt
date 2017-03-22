@@ -1,10 +1,10 @@
 .. py:currentmodule:: NonlinearTMM
 
 Second-order NLTMM
-******************
+##################
 
 Main class
-----------
+**********
 
 .. autoclass:: NonlinearTMM.SecondOrderNLTMM
    :members:
@@ -12,7 +12,7 @@ Main class
    :show-inheritance:
    
 Helper classes
---------------
+**************
 
 .. autoclass:: NonlinearTMM._WaveSweepResultSecondOrderNLTMM
    :members:
