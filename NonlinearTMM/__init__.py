@@ -1,3 +1,5 @@
+__version__ = "1.2.3"
+
 from ._Material import *
 from ._NonlinearTMM import *
 from ._SecondOrderNLTMM import *
