@@ -20,3 +20,5 @@ NonlinearTMM/src/SecondOrderNLTMM.cpp
 /.pydevproject
 /git/
 /cloc.txt
+/MANIFEST
+/dist/
