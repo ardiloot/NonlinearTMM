@@ -7,7 +7,7 @@ Transfer-matrix method (TMM) is powerful analytical method to solve Maxwell equa
 1. [A. Loot and V. Hizhnyakov, “Extension of standard transfer-matrix method for three-wave mixing for plasmonic structures,” Appl. Phys. A, vol. 123, no. 3, p. 152, 2017.](https://link.springer.com/article/10.1007%2Fs00339-016-0733-0)
 2. TBP
 
-For additional details see our documentation https://ardiloot.github.io/NonlinearTMM/.
+For additional details see our documentation https://ardiloot.github.io/NonlinearTMM/. For getting started guide see [Getting started](https://ardiloot.github.io/NonlinearTMM/GettingStarted.html).
 
 ## Main features
 
