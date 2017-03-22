@@ -1,10 +1,10 @@
 .. py:currentmodule:: NonlinearTMM
 
 Getting started
-***************
+###############
 
 Installation
-------------
+************
 
 Installation of NonlinearTMM package is possible through pip or from source
 code.
@@ -43,7 +43,7 @@ in the source code folder.
 
 
 Package structure
------------------
+*****************
 
 The package has three main classes:
 
@@ -80,7 +80,7 @@ difference frequency generation. This has similar interface as :any:`TMM` - it
 supports both the plane waves and beams. 
 
 Standard TMM
-------------
+************
 
 .. literalinclude:: ../Examples/ExampleTMM.py
 
