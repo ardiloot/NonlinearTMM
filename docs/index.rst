@@ -10,7 +10,7 @@ Welcome to NonlinearTMM's documentation!
    :maxdepth: 3
    
    Introduction
-   Examples
+   GettingStarted
    Reference
 
 
