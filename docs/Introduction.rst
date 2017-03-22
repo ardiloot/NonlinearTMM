@@ -23,8 +23,7 @@ Main features
 
 In addition to the standard TMM features this package also supports:
 
-* Calculation of Gaussian beam (or any other beam) propagartion inside layered
-  structures
+* Calculation of Gaussian beam (or any other beam) propagartion inside layered structures
 * Calculation of nonlinear processes SHG/SFG/DFG
 
 Technical features

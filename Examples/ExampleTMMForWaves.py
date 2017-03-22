@@ -10,7 +10,7 @@ def CalcSppGaussianBeam():
     I0 = 1.0  # Intensity of incident wave
     metalD = 50e-9  # Metal film thickness
     enhLayer = 2  # Measure enhancment in the last layer
-    ths = np.radians(np.linspace(0.0, 80.0, 500))  # Angle of incidences
+    ths = np.radians(np.linspace(0.0, 75.0, 500))  # Angle of incidences
     xs = np.linspace(-50e-6, 50e-6, 200)  # Field calculation coordinates
     zs = np.linspace(-25e-6, 5e-6, 201)  # Field calculation coordinates
     waveType = "gaussian"  # Wave type
