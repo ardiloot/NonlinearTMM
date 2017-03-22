@@ -19,6 +19,8 @@ Requirements:
 * `Matplotlib <http://matplotlib.org/>`_ for plotting in examples
 * `Pytest <http://doc.pytest.org/>`_ for testing
 
+Tested with Python 3.6, Windows 10 x64, Visual studio C++ 2015.
+
 Dependencies:
 
 * C++ code depends on `Eigen library <http://eigen.tuxfamily.org/>`_ (already included in package) 
