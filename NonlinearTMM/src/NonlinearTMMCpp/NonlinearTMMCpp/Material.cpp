@@ -23,7 +23,7 @@ namespace TMM {
 		// indices are from 1..3
 		isNonlinear = true;
 
-		if (std::max<int>(i1, std::max<int>(i2, i3)) > 3 || std::min<int>(i1, std::min<int>(i2, i3))) {
+		if (std::max<int>(i1, std::max<int>(i2, i3)) > 3 || std::min<int>(i1, std::min<int>(i2, i3)) < 1) {
 			throw std::runtime_error("chi2 index not in range 1..3");
 		}
 
