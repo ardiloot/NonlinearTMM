@@ -1642,12 +1642,28 @@ cdef class SecondOrderNLTMM:
     ----------
     mode : str {'sfg', 'dfg'}
     
+    Attributes
+    ----------
+    deltaWlSpdc : float
+        The spectral collection window (in nanometers) of the SPDC signal. 
+        Only used if :any:`mode` is set to :any:`SPDC`
+        Default: NaN.
+    solidAngleSpdc : float
+        The collection solid angle (srad) of the detector (given in vacuum). 
+        Only used if :any:`mode` is set to :any:`SPDC`
+        Default: NaN.
+    deltaThetaSpdc : float
+        The horizontal collection window (rad) of the detector (given in vacuum).
+        It is used to calculate the vertical span of the detector. 
+        Only used if :any:`mode` is set to :any:`SPDC`
+        Default: NaN.
+    
     """
     cdef SecondOrderNLTMMCpp *_thisptr
     cdef list materialsCache
     cdef readonly object P1, P2, Gen
 
-    def __cinit__(self, str mode = "sfg"):
+    def __cinit__(self, str mode = "sfg", **kwargs):
         self._thisptr = new SecondOrderNLTMMCpp()
         self._thisptr.SetProcess(NonlinearProcessFromStr(mode))
         self.materialsCache = []
@@ -1670,7 +1686,10 @@ cdef class SecondOrderNLTMM:
         # Save to members
         self.P1 = tmmP1Py
         self.P2 = tmmP2Py
-        self.Gen = tmmGenPy 
+        self.Gen = tmmGenPy
+        
+        # Set params
+        self.SetParams(**kwargs) 
     
     def __dealloc__(self):
         del self._thisptr
