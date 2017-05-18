@@ -186,7 +186,7 @@ namespace TMM {
 	}
 
 	void SecondOrderNLTMM::SetDeltaWlSpdc(double value) {
-		deltaThetaSpdc = value;
+		deltaWlSpdc = value;
 	}
 
 	void SecondOrderNLTMM::SetSolidAngleSpdc(double value) {
@@ -249,6 +249,7 @@ namespace TMM {
 			throw std::invalid_argument("Value arrays must have the same size.");
 		}
 
+		CheckPrerequisites();
 		tmmP1.CheckPrerequisites(param);
 		tmmP2.CheckPrerequisites(param);
 		tmmGen.CheckPrerequisites(param);

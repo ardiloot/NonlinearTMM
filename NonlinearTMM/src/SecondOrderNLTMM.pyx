@@ -1059,7 +1059,7 @@ cdef class NonlinearTMM:
         
         """
         for name, value in kwargs.iteritems():
-            if name not in paramDictSecondOrderNLTMM:
+            if name not in paramDict:
                 raise ValueError("Unknown kwarg %s" % (name))
             setattr(self, name, value)
         
