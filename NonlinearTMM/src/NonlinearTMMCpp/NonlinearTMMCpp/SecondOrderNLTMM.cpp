@@ -26,6 +26,21 @@ namespace TMM {
 		}
 	}
 
+	void SecondOrderNLTMM::CheckPrerequisites() {
+		// Check SPDC specific values
+		if (process == TMM::SPDC) {
+			if (isnan(deltaWlSpdc)) {
+				throw std::invalid_argument("deltaWlSpdc is not set.");
+			}
+			if (isnan(solidAngleSpdc)) {
+				throw std::invalid_argument("solidAngleSpdc is not set.");
+			}
+			if (isnan(deltaThetaSpdc)) {
+				throw std::invalid_argument("deltaThetaSpdc is not set.");
+			}
+		}
+	}
+
 	void SecondOrderNLTMM::UpdateGenParams()
 	{
 		double wlP1 = tmmP1.GetWl();
@@ -83,6 +98,7 @@ namespace TMM {
 			kpA->pB = chi2.GetNonlinearPolarization(FP1B.E, FP2F.E);
 			break;
 		case TMM::DFG:
+		case TMM::SPDC:
 			kpS->kSzF = kzFP1 - std::conj(kzFP2);
 			kpA->kSzF = kzFP1 + std::conj(kzFP2);
 			kpS->pF = chi2.GetNonlinearPolarization(FP1F.E, FP2F.E.conjugate());

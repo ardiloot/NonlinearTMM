@@ -60,6 +60,10 @@ cdef paramDict = {"wl": PARAM_WL, \
                   "mode": PARAM_MODE,
                   "w0": PARAM_WAVE_W0}
     
+cdef paramDictSecondOrderNLTMM = set(["deltaWlSpdc",
+                                      "solidAngleSpdc",
+                                      "deltaThetaSpdc"])
+    
 cdef waveParamsSet = set(["waveType",
                 "pwr",
                 "overrideE0",
@@ -1055,7 +1059,7 @@ cdef class NonlinearTMM:
         
         """
         for name, value in kwargs.iteritems():
-            if name not in paramDict:
+            if name not in paramDictSecondOrderNLTMM:
                 raise ValueError("Unknown kwarg %s" % (name))
             setattr(self, name, value)
         
@@ -1674,6 +1678,18 @@ cdef class SecondOrderNLTMM:
     # Methods
     #---------------------------------------------------------------------------
         
+    def SetParams(self, **kwargs):
+        """SetParams(**kwargs)
+        
+        Helper method to set the values of all the attributes. See the docstring
+        of :any:`SecondOrderNLTMM`.
+        
+        """
+        for name, value in kwargs.iteritems():
+            if name not in paramDictSecondOrderNLTMM:
+                raise ValueError("Unknown kwarg %s" % (name))
+            setattr(self, name, value)
+        
     def AddLayer(self, double d, Material material):
         # No copy of material is made
         self.P1.AddLayer(d, material)
@@ -1773,4 +1789,34 @@ cdef class SecondOrderNLTMM:
         res = _FieldsZX()
         res._Init(resCpp)
         return res
+    
+    # Getter
+    #---------------------------------------------------------------------------
+
+    @property
+    def deltaWlSpdc(self):
+        return self._thisptr.GetDeltaWlSpdc()    
+
+    @property
+    def solidAngleSpdc(self):
+        return self._thisptr.GetSolidAngleSpdc()  
+
+    @property
+    def deltaThetaSpdc(self):
+        return self._thisptr.GetDeltaThetaSpdc()  
+            
+    # Setter
+    #--------------------------------------------------------------------------- 
+        
+    @deltaWlSpdc.setter
+    def deltaWlSpdc(self, value):  # @DuplicatedSignature
+        self._thisptr.SetDeltaWlSpdc(<double>value)    
+
+    @solidAngleSpdc.setter
+    def solidAngleSpdc(self, value):  # @DuplicatedSignature
+        self._thisptr.SetSolidAngleSpdc(<double>value)  
+
+    @deltaThetaSpdc.setter
+    def deltaThetaSpdc(self, value):  # @DuplicatedSignature
+        self._thisptr.SetDeltaThetaSpdc(<double>value) 
         

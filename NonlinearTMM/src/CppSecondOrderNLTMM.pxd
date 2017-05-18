@@ -224,10 +224,16 @@ cdef extern from "SecondOrderNLTMM.h" namespace "TMM":
     cdef cppclass SecondOrderNLTMMCpp "TMM::SecondOrderNLTMM":
         SecondOrderNLTMM() except +
         void SetProcess(NonlinearProcessCpp process_) except +
+        void SetDeltaWlSpdc(double value) except +
+        void SetSolidAngleSpdc(double value) except +
+        void SetDeltaThetaSpdc(double value) except +
         void AddLayer(double d_, MaterialCpp *material_) except +
         NonlinearTMMCpp* GetP1() except +
         NonlinearTMMCpp* GetP2() except +
         NonlinearTMMCpp* GetGen() except +
+        double GetDeltaWlSpdc() except +
+        double GetSolidAngleSpdc() except +
+        double GetDeltaThetaSpdc() except +
         void UpdateGenParams() except +
         
         void Solve() except +
