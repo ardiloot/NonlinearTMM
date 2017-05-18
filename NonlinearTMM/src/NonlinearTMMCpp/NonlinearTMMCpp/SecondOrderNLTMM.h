@@ -71,20 +71,7 @@ namespace TMM {
 		double GetSolidAngleSpdc();
 		double GetDeltaThetaSpdc();
 
-		void CheckPrerequisites() {
-			// Check SPDC specific values
-			if (process == TMM::SPDC) {
-				if (isnan(deltaWlSpdc)) {
-					throw std::invalid_argument("deltaWlSpdc is not set.");
-				}
-				if (isnan(solidAngleSpdc)) {
-					throw std::invalid_argument("solidAngleSpdc is not set.");
-				}
-				if (isnan(deltaThetaSpdc)) {
-					throw std::invalid_argument("deltaThetaSpdc is not set.");
-				}
-			}
-		}
+		void CheckPrerequisites();
 		void UpdateGenParams();
 		
 		// Planewaves
