@@ -49,6 +49,7 @@ namespace TMM {
 	class SecondOrderNLTMM {
 	private:
 		double wlGen, betaGen;
+		double deltaWlSpdc, solidAngleSpdc, deltaThetaSpdc;
 		NonlinearProcess process;
 		NonlinearTMM tmmP1, tmmP2, tmmGen;
 
@@ -59,10 +60,31 @@ namespace TMM {
 	public:
 		SecondOrderNLTMM();
 		void SetProcess(NonlinearProcess process_);
+		void SetDeltaWlSpdc(double value);
+		void SetSolidAngleSpdc(double value);
+		void SetDeltaThetaSpdc(double value);
 		void AddLayer(double d_, Material *material_);
 		NonlinearTMM* GetP1();
 		NonlinearTMM* GetP2();
 		NonlinearTMM* GetGen();
+		double GetDeltaWlSpdc();
+		double GetSolidAngleSpdc();
+		double GetDeltaThetaSpdc();
+
+		void CheckPrerequisites() {
+			// Check SPDC specific values
+			if (process == TMM::SPDC) {
+				if (isnan(deltaWlSpdc)) {
+					throw std::invalid_argument("deltaWlSpdc is not set.");
+				}
+				if (isnan(solidAngleSpdc)) {
+					throw std::invalid_argument("solidAngleSpdc is not set.");
+				}
+				if (isnan(deltaThetaSpdc)) {
+					throw std::invalid_argument("deltaThetaSpdc is not set.");
+				}
+			}
+		}
 		void UpdateGenParams();
 		
 		// Planewaves

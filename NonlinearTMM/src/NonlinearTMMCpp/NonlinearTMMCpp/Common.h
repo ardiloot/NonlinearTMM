@@ -53,6 +53,7 @@ namespace TMM {
 		SHG,
 		SFG,
 		DFG,
+		SPDC,
 		PROCESS_NOT_DEFINED,
 	};
 

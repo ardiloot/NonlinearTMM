@@ -36,6 +36,8 @@ cdef NonlinearProcessCpp NonlinearProcessFromStr(str processStr):
         return SFG
     elif processStr == "dfg":
         return DFG
+    elif processStr == "spdc":
+        return SPDC
     else:
         raise ValueError()
 

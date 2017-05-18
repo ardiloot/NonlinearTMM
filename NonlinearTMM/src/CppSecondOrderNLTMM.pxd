@@ -34,6 +34,7 @@ cdef extern from "Common.h" namespace "TMM":
     cdef enum NonlinearProcessCpp "TMM::NonlinearProcess":
         SFG,
         DFG,
+        SPDC,
         
     cdef enum SweepOutputCpp "TMM::SweepOutput":
         SWEEP_PWRFLOWS,

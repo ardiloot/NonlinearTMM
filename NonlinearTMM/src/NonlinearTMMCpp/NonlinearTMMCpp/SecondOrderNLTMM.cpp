@@ -46,6 +46,10 @@ namespace TMM {
 			wlGen = OmegaToWl(WlToOmega(wlP1) - WlToOmega(wlP2));
 			betaGen = wlGen * (betaP1 / wlP1 - betaP2 / wlP2);
 			break;
+		case TMM::SPDC:
+			wlGen = OmegaToWl(WlToOmega(wlP1) - WlToOmega(wlP2));
+			betaGen = wlGen * (betaP1 / wlP1 - betaP2 / wlP2);
+			break;
 		default:
 			throw std::runtime_error("Unknown process.");
 			break;
@@ -54,6 +58,7 @@ namespace TMM {
 		tmmGen.SetWl(wlGen);
 		tmmGen.SetBeta(betaGen);
 	}
+
 	void SecondOrderNLTMM::CalcInhomogeneosWaveParams(int layerNr, Material *material, InhomogeneosWaveParams * kpS, InhomogeneosWaveParams * kpA)
 	{
 		dcomplex kzFP1 = tmmP1.GetLayer(layerNr)->GetHw()->GetKz()(F);
@@ -118,6 +123,16 @@ namespace TMM {
 	}
 
 	void SecondOrderNLTMM::SolveFundamentalFields() {
+		if (process == TMM::SPDC) {
+			// Calc vacuum fluctuations stength
+			double EVac = 1.0; // TODO
+
+			// Set value of vacuum fluctuations
+			tmmP2.SetOverrideE0(true);
+			tmmP2.SetE0(EVac);
+		}
+
+
 		tmmP1.Solve();
 		tmmP2.Solve();
 	}
@@ -144,11 +159,26 @@ namespace TMM {
 		tmmP1.SetMode(MODE_INCIDENT);
 		tmmP2.SetMode(MODE_INCIDENT);
 		tmmGen.SetMode(MODE_NONLINEAR);
+		deltaWlSpdc = constNAN;
+		solidAngleSpdc = constNAN;
+		deltaThetaSpdc = constNAN;
 	}
 
 	void SecondOrderNLTMM::SetProcess(NonlinearProcess process_)
 	{
 		process = process_;
+	}
+
+	void SecondOrderNLTMM::SetDeltaWlSpdc(double value) {
+		deltaThetaSpdc = value;
+	}
+
+	void SecondOrderNLTMM::SetSolidAngleSpdc(double value) {
+		solidAngleSpdc = value;
+	}
+
+	void SecondOrderNLTMM::SetDeltaThetaSpdc(double value) {
+		deltaThetaSpdc = value;
 	}
 
 	void SecondOrderNLTMM::AddLayer(double d_, Material *material_)
@@ -160,6 +190,7 @@ namespace TMM {
 
 	void SecondOrderNLTMM::Solve()
 	{
+		CheckPrerequisites();
 		UpdateGenParams();
 		SolveFundamentalFields();
 		SolveGeneratedField();
@@ -183,6 +214,18 @@ namespace TMM {
 
 	NonlinearTMM * SecondOrderNLTMM::GetGen() {
 		return &tmmGen;
+	}
+
+	double SecondOrderNLTMM::GetDeltaWlSpdc() {
+		return deltaWlSpdc;
+	}
+
+	double SecondOrderNLTMM::GetSolidAngleSpdc() {
+		return solidAngleSpdc;
+	}
+
+	double SecondOrderNLTMM::GetDeltaThetaSpdc() {
+		return deltaThetaSpdc;
 	}
 
 	SweepResultSecondOrderNLTMM * SecondOrderNLTMM::Sweep(TMMParam param, const Eigen::Map<ArrayXd>& valuesP1, const Eigen::Map<ArrayXd>& valuesP2, int outmask, int paramLayer, int layerNr, double layerZ) {
@@ -226,6 +269,7 @@ namespace TMM {
 
 	FieldsZX * SecondOrderNLTMM::WaveGetFields2D(const Eigen::Map<ArrayXd> &zs, const Eigen::Map<ArrayXd> &xs, WaveDirection dir) {
 		// Do checking
+		CheckPrerequisites();
 		tmmP1.CheckPrerequisites(PARAM_BETA);
 		tmmP2.CheckPrerequisites(PARAM_BETA);
 		tmmGen.CheckPrerequisites(PARAM_BETA);
@@ -286,6 +330,7 @@ namespace TMM {
 	}
 
 	pairdd SecondOrderNLTMM::WaveGetPowerFlows(int layerNr, double x0, double x1, double z) {
+		CheckPrerequisites();
 		// Do checking
 		if (layerNr < 0 || layerNr > tmmP1.LayersCount()) {
 			throw std::invalid_argument("Invalid layer index.");
@@ -397,6 +442,7 @@ namespace TMM {
 			throw std::invalid_argument("Value arrays must have the same size.");
 		}
 
+		CheckPrerequisites();
 		tmmP1.CheckPrerequisites(param);
 		tmmP2.CheckPrerequisites(param);
 		tmmGen.CheckPrerequisites(param);
@@ -404,13 +450,13 @@ namespace TMM {
 		// Alloc memory for result (dealloc is responsibility of the user)
 		WaveSweepResultSecondOrderNLTMM *res = new WaveSweepResultSecondOrderNLTMM(valuesP1.size(), outmask, layerNr, layerZ);
 
-#pragma omp parallel
+		#pragma omp parallel
 		{
 			// Make a copy
 			SecondOrderNLTMM nlTMMCopy = *this;
 
 			// Sweep
-#pragma omp for
+			#pragma omp for
 			for (int i = 0; i < valuesP1.size(); i++) {
 				//Set sweep param
 				nlTMMCopy.GetP1()->SetParam(param, valuesP1(i), paramLayer);
