@@ -38,6 +38,7 @@ namespace TMM {
 	const dcomplex constI = dcomplex(0.0, 1.0);
 	const double INF = std::numeric_limits<double>::infinity();
 	const double constNAN = std::numeric_limits<double>::quiet_NaN();
+	const double constHbar = 1.054571800e-34;
 
 	//---------------------------------------------------------------
 	// ENUMs

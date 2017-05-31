@@ -139,17 +139,27 @@ namespace TMM {
 	}
 
 	void SecondOrderNLTMM::SolveFundamentalFields() {
+		// Solve pump 1
+		tmmP1.Solve();
+		
+		// In case of SPDC pump2 represents vacuum fluctuations
 		if (process == TMM::SPDC) {
+			double omegaP1 = WlToOmega(tmmP1.GetWl());
+			double omegaP2 = WlToOmega(tmmP2.GetWl());
+			double omegaGen = WlToOmega(tmmGen.GetWl());
+
 			// Calc vacuum fluctuations stength
-			double EVac = 1.0; // TODO
+			double ESqr = (deltaWlSpdc * solidAngleSpdc / deltaThetaSpdc) *
+				(constHbar / (8.0 * constEps0 * std::pow(PI, 4))) *
+				(std::pow(omegaGen, 3) * std::pow(omegaP2, 2) / (pow(constC, 4))) *
+				(constC / omegaP2);
+			double EVac = std::sqrt(ESqr);
 
 			// Set value of vacuum fluctuations
 			tmmP2.SetOverrideE0(true);
 			tmmP2.SetE0(EVac);
 		}
 
-
-		tmmP1.Solve();
 		tmmP2.Solve();
 	}
 	void SecondOrderNLTMM::SolveGeneratedField() {		
