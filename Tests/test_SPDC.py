@@ -70,7 +70,7 @@ def n2(request):
 @pytest.fixture()
 def tmmParams(crystalD, pwrP1, n1, n2):
     # Define params
-    wlP1 = 400e-9
+    wlP1 = 450e-9
     wlP2 = 800e-9
     polP1 = "s"
     polP2 = "s"
@@ -82,7 +82,7 @@ def tmmParams(crystalD, pwrP1, n1, n2):
     chi2 = 1.4761823412e-12
     
     # Define materials
-    wlsCrystal = np.array([400e-9, 800.0001e-9])
+    wlsCrystal = np.array([100e-9, 1200.0001e-9])
     nsCrystal = np.array([n1, n2], dtype = complex)
     prism = Material(wlsCrystal, nsCrystal)
     crystal = Material(wlsCrystal, nsCrystal)
