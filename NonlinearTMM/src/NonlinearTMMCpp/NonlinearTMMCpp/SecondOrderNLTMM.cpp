@@ -100,6 +100,20 @@ namespace TMM {
 		return constNAN;
 	}
 
+	double SecondOrderNLTMM::CalcVacFuctuationsE0() {
+		double omegaP1 = WlToOmega(tmmP1.GetWl());
+		double omegaP2 = WlToOmega(tmmP2.GetWl());
+		double omegaGen = WlToOmega(tmmGen.GetWl());
+
+		// Calc vacuum fluctuations stength
+		double ESqr = (deltaWlSpdc * solidAngleSpdc / deltaThetaSpdc) *
+			(constHbar / (8.0 * constEps0 * std::pow(PI, 4))) *
+			(std::pow(omegaGen, 3) * std::pow(omegaP2, 2) / (pow(constC, 4))) *
+			(constC / omegaP2);
+		double EVac = std::sqrt(ESqr);
+		return EVac;
+	}
+
 	void SecondOrderNLTMM::CalcInhomogeneosWaveParams(int layerNr, Material *material, InhomogeneosWaveParams * kpS, InhomogeneosWaveParams * kpA)
 	{
 		dcomplex kzFP1 = tmmP1.GetLayer(layerNr)->GetHw()->GetKz()(F);
@@ -170,18 +184,7 @@ namespace TMM {
 		
 		// In case of SPDC pump2 represents vacuum fluctuations
 		if (process == TMM::SPDC) {
-			double omegaP1 = WlToOmega(tmmP1.GetWl());
-			double omegaP2 = WlToOmega(tmmP2.GetWl());
-			double omegaGen = WlToOmega(tmmGen.GetWl());
-
-			// Calc vacuum fluctuations stength
-			double ESqr = (deltaWlSpdc * solidAngleSpdc / deltaThetaSpdc) *
-				(constHbar / (8.0 * constEps0 * std::pow(PI, 4))) *
-				(std::pow(omegaGen, 3) * std::pow(omegaP2, 2) / (pow(constC, 4))) *
-				(constC / omegaP2);
-			double EVac = std::sqrt(ESqr);
-
-			// Set value of vacuum fluctuations
+			double EVac = CalcVacFuctuationsE0();
 			tmmP2.SetOverrideE0(true);
 			tmmP2.SetE0(EVac);
 		}
@@ -406,6 +409,10 @@ namespace TMM {
 
 		// Solve wave P2
 		Wave *waveP2 = tmmP2.GetWave();
+		if (waveP2->GetWaveType() == SPDCWAVE) {
+			waveP2->SetOverrideE0(true);
+			waveP2->SetE0(CalcVacFuctuationsE0());
+		}
 		double deltaKxSpdc = CalcDeltaKxSpdc();
 		waveP2->Solve(tmmP2.GetWl(), tmmP2.GetBeta(), matLayer0, matLayerThis, deltaKxSpdc);
 		double LyP2 = waveP2->GetLy();

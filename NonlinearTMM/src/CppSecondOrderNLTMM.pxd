@@ -237,6 +237,7 @@ cdef extern from "SecondOrderNLTMM.h" namespace "TMM":
         double GetDeltaThetaSpdc() except +
         void UpdateGenParams() except +
         double CalcDeltaKxSpdc() except +
+        double CalcVacFuctuationsE0() except +
         
         void Solve() except +
         SecondOrderNLIntensitiesCpp GetIntensities() except +

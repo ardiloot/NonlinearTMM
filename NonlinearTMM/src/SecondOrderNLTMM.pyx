@@ -1728,6 +1728,9 @@ cdef class SecondOrderNLTMM:
         
     def CalcDeltaKxSpdc(self):
         return self._thisptr.CalcDeltaKxSpdc()
+    
+    def CalcVacFuctuationsE0(self):
+        return self._thisptr.CalcVacFuctuationsE0()
         
     def GetIntensities(self):
         cdef SecondOrderNLIntensitiesCpp resCpp;
