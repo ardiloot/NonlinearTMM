@@ -13,6 +13,7 @@ namespace TMM {
 		PLANEWAVE,
 		GAUSSIANWAVE,
 		TUKEYWAVE,
+		SPDCWAVE,
 	};
 
 	//---------------------------------------------------------------
@@ -42,6 +43,7 @@ namespace TMM {
 		double dynamicMaxXCoef;
 		double maxXThis;
 		double maxPhi;
+		double deltaKxSpdc; // SPDC
 		bool solved;
 
 		double wl;
@@ -58,6 +60,7 @@ namespace TMM {
 
 		void SolvePlaneWave();
 		void SolveFFTWave();
+		void SolveSpdcWave();
 
 	public:
 
@@ -79,7 +82,7 @@ namespace TMM {
 		void SetParam(TMMParam param, double value);
 
 		// Solve
-		void Solve(double wl_, double beta_, Material *materialLayer0_, Material *materialLayerThis_);
+		void Solve(double wl_, double beta_, Material *materialLayer0_, Material *materialLayerThis_, double deltaKxSpdc_ = constNAN);
 
 		// Getters
 		double GetPwr();

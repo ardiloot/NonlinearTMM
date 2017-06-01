@@ -48,6 +48,8 @@ cdef WaveTypeCpp WaveTypeFromStr(str waveTypeStr):
         return GAUSSIANWAVE
     if waveTypeStr == "tukey":
         return TUKEYWAVE
+    if waveTypeStr == "spdc":
+        return SPDCWAVE;
     else:
         raise NotImplementedError()
 

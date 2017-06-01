@@ -77,7 +77,8 @@ cdef extern from "Waves.h" namespace "TMM":
     cdef enum WaveTypeCpp "TMM::WaveType":
         PLANEWAVE,
         GAUSSIANWAVE,
-        TUKEYWAVE
+        TUKEYWAVE,
+        SPDCWAVE
 
     cdef cppclass WaveCpp "TMM::Wave":
         void SetWaveType(WaveTypeCpp waveType_) except +

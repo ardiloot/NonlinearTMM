@@ -99,6 +99,27 @@ namespace TMM {
 		expansionCoefsKx = fieldProfileSpectrum / std::cos(thLayer0);
 	}
 
+	void Wave::SolveSpdcWave() {
+		// Checks
+		if (std::isnan(deltaKxSpdc)) {
+			std::cerr << "SPDC wave can only be used through SecondOrderNLTMM" << std::endl;
+			throw std::runtime_error("SPDC wave can only be used through SecondOrderNLTMM");
+		}
+
+		maxXThis = (0.5 * w0 / std::cos(thLayer0));
+
+		// Init arrays
+		phis = ArrayXd(1);
+		fieldProfileXs = ArrayXd(0);
+		fieldProfile = ArrayXd(0);
+
+		double kxMid = k * std::sin(thLayer0);
+		kxs = ArrayXd::LinSpaced(nPointsInteg, kxMid - deltaKxSpdc, kxMid + deltaKxSpdc);
+		kzs = (k * k - kxs.pow(2)).sqrt();
+		expansionCoefsKx = ArrayXcd::Ones(nPointsInteg) * E0OverrideValue;
+		phis(0) = 0.0; // Currently not calculated (not needed)
+	}
+
 	Wave::Wave() : phis(0), kxs(0), kzs(0), expansionCoefsKx(0), fieldProfileXs(0), fieldProfile(0) {
 		waveType = PLANEWAVE;
 		pwr = 1.0;
@@ -116,6 +137,7 @@ namespace TMM {
 		maxXThis = 0.0;
 		solved = false;
 		maxPhi = 0.17;
+		deltaKxSpdc = constNAN;
 
 		wl = 0.0;
 		beta = 0.0;
@@ -186,13 +208,14 @@ namespace TMM {
 		}
 	}
 
-	void Wave::Solve(double wl_, double beta_, Material *materialLayer0_, Material *materialLayerThis_) {
+	void Wave::Solve(double wl_, double beta_, Material *materialLayer0_, Material *materialLayerThis_, double deltaKxSpdc_) {
 		wl = wl_;
 		beta = beta_;
 		materialLayer0 = materialLayer0_;
 		materialLayerThis = materialLayerThis_;
+		deltaKxSpdc = deltaKxSpdc_;
 		maxXThis = maxX;
-
+		
 		// Calc E0
 		if (!overrideE0) {
 			double I0 = pwr / (Ly * w0);
@@ -213,8 +236,15 @@ namespace TMM {
 		if (waveType == PLANEWAVE) {
 			SolvePlaneWave();
 		}
-		else {
+		else if (waveType == GAUSSIANWAVE || waveType == TUKEYWAVE) {
 			SolveFFTWave();
+		}
+		else if (waveType == SPDCWAVE) {
+			SolveSpdcWave();
+		}
+		else {
+			std::cerr << "Unknown wave type." << std::endl;
+			throw std::invalid_argument("Unknown wave type.");
 		}
 		solved = true;
 	}
