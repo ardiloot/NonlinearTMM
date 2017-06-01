@@ -249,6 +249,13 @@ namespace TMM {
 		solved = true;
 	}
 
+
+	// Getters
+
+	WaveType Wave::GetWaveType() {
+		return waveType;
+	}
+
 	double Wave::GetPwr() {
 		return pwr;
 	}

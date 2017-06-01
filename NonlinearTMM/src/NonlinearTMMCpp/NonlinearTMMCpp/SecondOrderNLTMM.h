@@ -73,6 +73,7 @@ namespace TMM {
 
 		void CheckPrerequisites();
 		void UpdateGenParams();
+		double CalcDeltaKxSpdc();
 		
 		// Planewaves
 		void Solve();

@@ -74,6 +74,32 @@ namespace TMM {
 		tmmGen.SetBeta(betaGen);
 	}
 
+	double SecondOrderNLTMM::CalcDeltaKxSpdc() {
+		// It is assumed, that only P2 can represent vacuum fluctuations for SPDC
+		if (tmmP1.GetWave()->GetWaveType() == SPDCWAVE) {
+			std::cerr << "Only P2 can be SPDC wave." << std::endl;
+			throw std::invalid_argument("Only P2 can be SPDC wave.");
+		}
+
+		// Calc deltaKx
+		if (tmmP2.GetWave()->GetWaveType() == SPDCWAVE) {
+			// Check and update gen params
+			tmmP1.CheckPrerequisites();
+			tmmP2.CheckPrerequisites();
+			UpdateGenParams();
+			tmmGen.CheckPrerequisites();
+
+			Material *matLayer0 = tmmP1.GetLayer(0)->GetMaterial();
+			double n0 = real(matLayer0->GetN(wlGen));
+			double kz0 = 2.0 * PI / wlGen * std::sqrt(n0 * n0 - betaGen * betaGen);
+			double res = kz0 / (2.0 * n0) * deltaThetaSpdc;
+			return res;
+		}
+
+		// No SPDC wave involved, return NAN
+		return constNAN;
+	}
+
 	void SecondOrderNLTMM::CalcInhomogeneosWaveParams(int layerNr, Material *material, InhomogeneosWaveParams * kpS, InhomogeneosWaveParams * kpA)
 	{
 		dcomplex kzFP1 = tmmP1.GetLayer(layerNr)->GetHw()->GetKz()(F);
@@ -358,8 +384,13 @@ namespace TMM {
 
 	pairdd SecondOrderNLTMM::WaveGetPowerFlows(int layerNr, double x0, double x1, double z) {
 		CheckPrerequisites();
+		tmmP1.CheckPrerequisites();
+		tmmP2.CheckPrerequisites();
+		tmmGen.CheckPrerequisites();
+
 		// Do checking
 		if (layerNr < 0 || layerNr > tmmP1.LayersCount()) {
+			std::cerr << "Invalid layer index." << std::endl;
 			throw std::invalid_argument("Invalid layer index.");
 		}
 
@@ -375,7 +406,8 @@ namespace TMM {
 
 		// Solve wave P2
 		Wave *waveP2 = tmmP2.GetWave();
-		waveP2->Solve(tmmP2.GetWl(), tmmP2.GetBeta(), matLayer0, matLayerThis);
+		double deltaKxSpdc = CalcDeltaKxSpdc();
+		waveP2->Solve(tmmP2.GetWl(), tmmP2.GetBeta(), matLayer0, matLayerThis, deltaKxSpdc);
 		double LyP2 = waveP2->GetLy();
 		ArrayXd betasP2 = waveP2->GetBetas();
 		ArrayXcd E0sP2 = waveP2->GetExpansionCoefsKx();

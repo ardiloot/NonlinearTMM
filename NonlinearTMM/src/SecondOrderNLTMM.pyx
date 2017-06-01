@@ -1726,6 +1726,9 @@ cdef class SecondOrderNLTMM:
     def UpdateGenParams(self):
         self._thisptr.UpdateGenParams()
         
+    def CalcDeltaKxSpdc(self):
+        return self._thisptr.CalcDeltaKxSpdc()
+        
     def GetIntensities(self):
         cdef SecondOrderNLIntensitiesCpp resCpp;
         resCpp = self._thisptr.GetIntensities();

@@ -236,6 +236,7 @@ cdef extern from "SecondOrderNLTMM.h" namespace "TMM":
         double GetSolidAngleSpdc() except +
         double GetDeltaThetaSpdc() except +
         void UpdateGenParams() except +
+        double CalcDeltaKxSpdc() except +
         
         void Solve() except +
         SecondOrderNLIntensitiesCpp GetIntensities() except +

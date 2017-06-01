@@ -85,6 +85,7 @@ namespace TMM {
 		void Solve(double wl_, double beta_, Material *materialLayer0_, Material *materialLayerThis_, double deltaKxSpdc_ = constNAN);
 
 		// Getters
+		WaveType GetWaveType();
 		double GetPwr();
 		bool GetOverrideE0();
 		double GetE0();
