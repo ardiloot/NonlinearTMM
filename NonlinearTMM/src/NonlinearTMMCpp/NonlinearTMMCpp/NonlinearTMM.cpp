@@ -404,6 +404,14 @@ namespace TMM {
 		}
 	}
 
+	void NonlinearTMM::SolveWave(ArrayXd * betas, ArrayXcd * E0s) {
+		Material *matLayerF = layers[0].GetMaterial();
+		Material *matLayerL = NULL;
+		wave.Solve(wl, beta, matLayerF, matLayerL);
+		*betas = wave.GetBetas();
+		*E0s = wave.GetExpansionCoefsKx();
+	}
+
 	NonlinearTMM::NonlinearTMM() {
 		wl = constNAN;
 		beta = constNAN;
@@ -595,14 +603,15 @@ namespace TMM {
 		}
 
 		// Solve wave
-		Material *matLayerF = layers[0].GetMaterial();
-		Material *matLayerL = layers[layers.size() - 1].GetMaterial();
-		wave.Solve(wl, beta, matLayerF, matLayerL);
-		double Ly = wave.GetLy();
-		ArrayXd betas = wave.GetBetas();
-		ArrayXcd E0s = wave.GetExpansionCoefsKx();
-
+		ArrayXd betas;
+		ArrayXcd E0s;
+		SolveWave(&betas, &E0s);
 		ArrayXd kxs = betas * 2.0 * PI / wl;
+
+		if (!wave.IsCoherent()) {
+			std::cerr << "Currently waves must be coherent." << std::endl;
+			throw std::invalid_argument("Currently waves must be coherent.");
+		}
 
 		// Allocate space (deletion is the responsibility of the caller!)
 		FieldsZX *res = new FieldsZX(zs.size(), xs.size(), pol);
@@ -726,13 +735,11 @@ namespace TMM {
 		}
 
 		// Solve wave
-		Material *matLayer0 = layers[0].GetMaterial();
-		Material *matLayerThis = layers[layerNr].GetMaterial();
-		wave.Solve(wl, beta, matLayer0, matLayerThis);
+		ArrayXd betas;
+		ArrayXcd E0s;
+		SolveWave(&betas, &E0s);
 		double Ly = wave.GetLy();
-		ArrayXd betas = wave.GetBetas();
-		ArrayXcd E0s = wave.GetExpansionCoefsKx();
-
+		
 		// Adjust range
 		pairdd xrange = wave.GetXRange();
 		if (isnan(x0)) {
@@ -765,7 +772,7 @@ namespace TMM {
 		ArrayXd kxs(betas.size());
 		kxs = betas * layers[0].k0;
 		dcomplex epsLayer = layers[layerNr].eps;
-		pairdd res = IntegrateWavePower(layerNr, pol, wl, epsLayer, Us, kxs, kzs, x0, x1, z, Ly);
+		pairdd res = IntegrateWavePower(layerNr, pol, wl, epsLayer, Us, kxs, kzs, x0, x1, z, Ly, wave.IsCoherent());
 		return res;
 	}
 	

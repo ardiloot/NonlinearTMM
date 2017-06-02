@@ -128,6 +128,7 @@ namespace TMM {
 		void SolveAllTransferMatrices();
 		void SolveSystemMatrix();
 		void SolveIncReflTrans();
+		void SolveWave(ArrayXd *betas, ArrayXcd *E0s);
 
 	public:
 		NonlinearTMM();

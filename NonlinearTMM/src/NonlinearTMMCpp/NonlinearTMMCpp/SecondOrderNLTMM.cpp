@@ -367,7 +367,8 @@ namespace TMM {
 		SolveWaves(&betasP1, &E0sP1, &betasP2, &E0sP2, &coherent);
 
 		if (!coherent) {
-			throw std::invalid_argument("waves must be coherent");
+			std::cerr << "Currently waves must be coherent." << std::endl;
+			throw std::invalid_argument("Currently waves must be coherent.");
 		}
 
 		// kxs
