@@ -79,7 +79,7 @@ namespace TMM {
 		tmmGen.SetBeta(betaGen);
 	}
 
-	double SecondOrderNLTMM::CalcDeltaKxSpdc() {
+	double SecondOrderNLTMM::CalcDeltaKxSpdc(bool checkRequirements) {
 		// It is assumed, that only P2 can represent vacuum fluctuations for SPDC
 		if (tmmP1.GetWave()->GetWaveType() == SPDCWAVE) {
 			std::cerr << "Only P2 can be SPDC wave." << std::endl;
@@ -89,8 +89,10 @@ namespace TMM {
 		// Calc deltaKx
 		if (tmmP2.GetWave()->GetWaveType() == SPDCWAVE) {
 			// Check and update gen params
-			UpdateGenParams();
-			CheckPrerequisites();
+			if (checkRequirements) {
+				UpdateGenParams();
+				CheckPrerequisites();
+			}
 
 			Material *matLayer0 = tmmP1.GetLayer(0)->GetMaterial();
 			double n0 = real(matLayer0->GetN(wlGen));
@@ -103,9 +105,11 @@ namespace TMM {
 		return constNAN;
 	}
 
-	double SecondOrderNLTMM::CalcVacFuctuationsE0() {
-		UpdateGenParams();
-		CheckPrerequisites(PARAM_BETA);
+	double SecondOrderNLTMM::CalcVacFuctuationsE0(bool checkRequirements) {
+		if (checkRequirements) {
+			UpdateGenParams();
+			CheckPrerequisites(PARAM_BETA);
+		}
 
 		double omegaP1 = WlToOmega(tmmP1.GetWl());
 		double omegaP2 = WlToOmega(tmmP2.GetWl());
@@ -189,7 +193,7 @@ namespace TMM {
 		
 		// In case of SPDC pump2 represents vacuum fluctuations
 		if (process == TMM::SPDC) {
-			double EVac = CalcVacFuctuationsE0();
+			double EVac = CalcVacFuctuationsE0(false);
 			tmmP2.SetOverrideE0(true);
 			tmmP2.SetE0(EVac);
 		}
@@ -386,14 +390,13 @@ namespace TMM {
 	}
 
 	pairdd SecondOrderNLTMM::WaveGetPowerFlows(int layerNr, double x0, double x1, double z) {
-		UpdateGenParams();
-		CheckPrerequisites();
-
 		// Do checking
 		if (layerNr < 0 || layerNr > tmmP1.LayersCount()) {
 			std::cerr << "Invalid layer index." << std::endl;
 			throw std::invalid_argument("Invalid layer index.");
 		}
+		UpdateGenParams();
+		CheckPrerequisites();
 
 		Material *matLayer0 = tmmP1.GetLayer(0)->GetMaterial();
 		Material *matLayerThis = tmmP1.GetLayer(layerNr)->GetMaterial();
@@ -409,12 +412,12 @@ namespace TMM {
 		Wave *waveP2 = tmmP2.GetWave();
 		bool coherent = true;
 		if (waveP2->GetWaveType() == SPDCWAVE) {
-			double EVac = CalcVacFuctuationsE0();
+			double EVac = CalcVacFuctuationsE0(false);
 			waveP2->SetOverrideE0(true);
 			waveP2->SetE0(EVac);
 			coherent = false;
 		}
-		double deltaKxSpdc = CalcDeltaKxSpdc();
+		double deltaKxSpdc = CalcDeltaKxSpdc(false);
 		waveP2->Solve(tmmP2.GetWl(), tmmP2.GetBeta(), matLayer0, matLayerThis, deltaKxSpdc);
 		double LyP2 = waveP2->GetLy();
 		ArrayXd betasP2 = waveP2->GetBetas();

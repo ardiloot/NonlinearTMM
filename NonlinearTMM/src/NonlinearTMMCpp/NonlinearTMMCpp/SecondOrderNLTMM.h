@@ -73,8 +73,8 @@ namespace TMM {
 
 		void CheckPrerequisites(TMMParam toIgnore = PARAM_NOT_DEFINED);
 		void UpdateGenParams();
-		double CalcDeltaKxSpdc();
-		double CalcVacFuctuationsE0();
+		double CalcDeltaKxSpdc(bool checkRequirements = false);
+		double CalcVacFuctuationsE0(bool checkRequirements = false);
 		
 		// Planewaves
 		void Solve();
