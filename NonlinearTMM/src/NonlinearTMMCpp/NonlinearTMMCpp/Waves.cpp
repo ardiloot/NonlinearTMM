@@ -377,4 +377,11 @@ namespace TMM {
 		return beamArea;
 	}
 
+	bool Wave::IsCoherent() {
+		if (waveType == SPDCWAVE) {
+			return false;
+		}
+		return true;
+	}
+
 }

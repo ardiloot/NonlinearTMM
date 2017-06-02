@@ -107,6 +107,7 @@ namespace TMM {
 		ArrayXd GetFieldProfile();
 		ArrayXcd GetExpansionCoefsKx();
 		double GetBeamArea();
+		bool IsCoherent();
 	};
 
 
