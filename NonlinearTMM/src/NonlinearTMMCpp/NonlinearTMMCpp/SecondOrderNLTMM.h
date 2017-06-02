@@ -71,7 +71,7 @@ namespace TMM {
 		double GetSolidAngleSpdc();
 		double GetDeltaThetaSpdc();
 
-		void CheckPrerequisites();
+		void CheckPrerequisites(TMMParam toIgnore = PARAM_NOT_DEFINED);
 		void UpdateGenParams();
 		double CalcDeltaKxSpdc();
 		double CalcVacFuctuationsE0();

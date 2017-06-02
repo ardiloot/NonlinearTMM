@@ -26,7 +26,7 @@ namespace TMM {
 		}
 	}
 
-	void SecondOrderNLTMM::CheckPrerequisites() {
+	void SecondOrderNLTMM::CheckPrerequisites(TMMParam toIgnore) {
 		// Check SPDC specific values
 		if (process == TMM::SPDC) {
 			if (isnan(deltaWlSpdc)) {
@@ -39,6 +39,11 @@ namespace TMM {
 				throw std::invalid_argument("deltaThetaSpdc is not set.");
 			}
 		}
+
+		// Sub TMMs
+		tmmP1.CheckPrerequisites(toIgnore);
+		tmmP2.CheckPrerequisites(toIgnore);
+		tmmGen.CheckPrerequisites(toIgnore);
 	}
 
 	void SecondOrderNLTMM::UpdateGenParams()
@@ -84,10 +89,8 @@ namespace TMM {
 		// Calc deltaKx
 		if (tmmP2.GetWave()->GetWaveType() == SPDCWAVE) {
 			// Check and update gen params
-			tmmP1.CheckPrerequisites();
-			tmmP2.CheckPrerequisites();
 			UpdateGenParams();
-			tmmGen.CheckPrerequisites();
+			CheckPrerequisites();
 
 			Material *matLayer0 = tmmP1.GetLayer(0)->GetMaterial();
 			double n0 = real(matLayer0->GetN(wlGen));
@@ -101,10 +104,12 @@ namespace TMM {
 	}
 
 	double SecondOrderNLTMM::CalcVacFuctuationsE0() {
+		UpdateGenParams();
+		CheckPrerequisites(PARAM_BETA);
+
 		double omegaP1 = WlToOmega(tmmP1.GetWl());
 		double omegaP2 = WlToOmega(tmmP2.GetWl());
 		double omegaGen = WlToOmega(tmmGen.GetWl());
-
 		// Calc vacuum fluctuations stength
 		double ESqr = (deltaWlSpdc * solidAngleSpdc / deltaThetaSpdc) *
 			(constHbar / (8.0 * constEps0 * std::pow(PI, 4))) *
@@ -245,8 +250,8 @@ namespace TMM {
 
 	void SecondOrderNLTMM::Solve()
 	{
-		CheckPrerequisites();
 		UpdateGenParams();
+		CheckPrerequisites();
 		SolveFundamentalFields();
 		SolveGeneratedField();
 	}
@@ -288,10 +293,7 @@ namespace TMM {
 			throw std::invalid_argument("Value arrays must have the same size.");
 		}
 
-		CheckPrerequisites();
-		tmmP1.CheckPrerequisites(param);
-		tmmP2.CheckPrerequisites(param);
-		tmmGen.CheckPrerequisites(param);
+		CheckPrerequisites(param); // Maybe not needed, checks done later in Solve
 
 		// Alloc memory for result (dealloc is responsibility of the user)
 		SweepResultSecondOrderNLTMM *res = new SweepResultSecondOrderNLTMM(valuesP1.size(), outmask, layerNr, layerZ);
@@ -325,10 +327,8 @@ namespace TMM {
 
 	FieldsZX * SecondOrderNLTMM::WaveGetFields2D(const Eigen::Map<ArrayXd> &zs, const Eigen::Map<ArrayXd> &xs, WaveDirection dir) {
 		// Do checking
-		CheckPrerequisites();
-		tmmP1.CheckPrerequisites(PARAM_BETA);
-		tmmP2.CheckPrerequisites(PARAM_BETA);
-		tmmGen.CheckPrerequisites(PARAM_BETA);
+		UpdateGenParams();
+		CheckPrerequisites(PARAM_BETA);
 
 		// Solve wave P1
 		Material *matLayerF = tmmP1.GetLayer(0)->GetMaterial();
@@ -386,10 +386,8 @@ namespace TMM {
 	}
 
 	pairdd SecondOrderNLTMM::WaveGetPowerFlows(int layerNr, double x0, double x1, double z) {
+		UpdateGenParams();
 		CheckPrerequisites();
-		tmmP1.CheckPrerequisites();
-		tmmP2.CheckPrerequisites();
-		tmmGen.CheckPrerequisites();
 
 		// Do checking
 		if (layerNr < 0 || layerNr > tmmP1.LayersCount()) {
@@ -410,8 +408,9 @@ namespace TMM {
 		// Solve wave P2
 		Wave *waveP2 = tmmP2.GetWave();
 		if (waveP2->GetWaveType() == SPDCWAVE) {
+			double EVac = CalcVacFuctuationsE0();
 			waveP2->SetOverrideE0(true);
-			waveP2->SetE0(CalcVacFuctuationsE0());
+			waveP2->SetE0(EVac);
 		}
 		double deltaKxSpdc = CalcDeltaKxSpdc();
 		waveP2->Solve(tmmP2.GetWl(), tmmP2.GetBeta(), matLayer0, matLayerThis, deltaKxSpdc);
@@ -508,10 +507,7 @@ namespace TMM {
 			throw std::invalid_argument("Value arrays must have the same size.");
 		}
 
-		CheckPrerequisites();
-		tmmP1.CheckPrerequisites(param);
-		tmmP2.CheckPrerequisites(param);
-		tmmGen.CheckPrerequisites(param);
+		CheckPrerequisites(param);
 
 		// Alloc memory for result (dealloc is responsibility of the user)
 		WaveSweepResultSecondOrderNLTMM *res = new WaveSweepResultSecondOrderNLTMM(valuesP1.size(), outmask, layerNr, layerZ);

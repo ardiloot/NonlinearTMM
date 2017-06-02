@@ -105,7 +105,6 @@ namespace TMM {
 			std::cerr << "SPDC wave can only be used through SecondOrderNLTMM" << std::endl;
 			throw std::runtime_error("SPDC wave can only be used through SecondOrderNLTMM");
 		}
-
 		maxXThis = (0.5 * w0 / std::cos(thLayer0));
 
 		// Init arrays
