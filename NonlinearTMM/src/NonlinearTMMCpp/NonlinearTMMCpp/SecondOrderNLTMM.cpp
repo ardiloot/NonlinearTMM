@@ -217,6 +217,32 @@ namespace TMM {
 		// Solve generated fields
 		tmmGen.Solve();
 	}
+	
+	void SecondOrderNLTMM::SolveWaves(ArrayXd * betasP1, ArrayXcd * E0sP1, ArrayXd * betasP2, ArrayXcd * E0sP2, bool * coherent) {
+		Material *matLayer0 = tmmP1.GetLayer(0)->GetMaterial();
+		Material *matLayerThis = NULL;
+
+		// Solve wave P1
+		Wave *waveP1 = tmmP1.GetWave();
+		waveP1->Solve(tmmP1.GetWl(), tmmP1.GetBeta(), matLayer0, matLayerThis);
+		*betasP1 = waveP1->GetBetas();
+		*E0sP1 = waveP1->GetExpansionCoefsKx();
+
+		// Solve wave P2
+		Wave *waveP2 = tmmP2.GetWave();
+		if (waveP2->GetWaveType() == SPDCWAVE) {
+			double EVac = CalcVacFuctuationsE0(false);
+			waveP2->SetOverrideE0(true);
+			waveP2->SetE0(EVac);
+		}
+		double deltaKxSpdc = CalcDeltaKxSpdc(false);
+		waveP2->Solve(tmmP2.GetWl(), tmmP2.GetBeta(), matLayer0, matLayerThis, deltaKxSpdc);
+		*betasP2 = waveP2->GetBetas();
+		*E0sP2 = waveP2->GetExpansionCoefsKx();
+
+		// Coherence
+		*coherent = waveP1->IsCoherent() && waveP2->IsCoherent();
+	}
 	SecondOrderNLTMM::SecondOrderNLTMM()
 	{
 		SetProcess(SFG);
@@ -334,22 +360,15 @@ namespace TMM {
 		UpdateGenParams();
 		CheckPrerequisites(PARAM_BETA);
 
-		// Solve wave P1
-		Material *matLayerF = tmmP1.GetLayer(0)->GetMaterial();
-		Material *matLayerL = tmmP1.GetLayer(tmmP1.LayersCount() - 1)->GetMaterial();
+		// Solve waves
+		ArrayXd betasP1, betasP2;
+		ArrayXcd E0sP1, E0sP2;
+		bool coherent;
+		SolveWaves(&betasP1, &E0sP1, &betasP2, &E0sP2, &coherent);
 
-		Wave *waveP1 = tmmP1.GetWave();
-		waveP1->Solve(tmmP1.GetWl(), tmmP1.GetBeta(), matLayerF, matLayerL);
-		double LyP1 = waveP1->GetLy();
-		ArrayXd betasP1 = waveP1->GetBetas();
-		ArrayXcd E0sP1 = waveP1->GetExpansionCoefsKx();
-
-		// Solve wave P2
-		Wave *waveP2 = tmmP2.GetWave();
-		waveP2->Solve(tmmP2.GetWl(), tmmP2.GetBeta(), matLayerF, matLayerL);
-		double LyP2 = waveP2->GetLy();
-		ArrayXd betasP2 = waveP2->GetBetas();
-		ArrayXcd E0sP2 = waveP2->GetExpansionCoefsKx();
+		if (!coherent) {
+			throw std::invalid_argument("waves must be coherent");
+		}
 
 		// kxs
 		ArrayXd kxsP1 = betasP1 * 2.0 * PI / tmmP1.GetWl();
@@ -398,31 +417,16 @@ namespace TMM {
 		UpdateGenParams();
 		CheckPrerequisites();
 
-		Material *matLayer0 = tmmP1.GetLayer(0)->GetMaterial();
-		Material *matLayerThis = tmmP1.GetLayer(layerNr)->GetMaterial();
-
-		// Solve wave P1
+		//Solve waves
+		ArrayXd betasP1, betasP2;
+		ArrayXcd E0sP1, E0sP2;
+		bool coherent;
+		SolveWaves(&betasP1, &E0sP1, &betasP2, &E0sP2, &coherent);
 		Wave *waveP1 = tmmP1.GetWave();
-		waveP1->Solve(tmmP1.GetWl(), tmmP1.GetBeta(), matLayer0, matLayerThis);
-		double LyP1 = waveP1->GetLy();
-		ArrayXd betasP1 = waveP1->GetBetas();
-		ArrayXcd E0sP1 = waveP1->GetExpansionCoefsKx();
-
-		// Solve wave P2
 		Wave *waveP2 = tmmP2.GetWave();
-		bool coherent = true;
-		if (waveP2->GetWaveType() == SPDCWAVE) {
-			double EVac = CalcVacFuctuationsE0(false);
-			waveP2->SetOverrideE0(true);
-			waveP2->SetE0(EVac);
-			coherent = false;
-		}
-		double deltaKxSpdc = CalcDeltaKxSpdc(false);
-		waveP2->Solve(tmmP2.GetWl(), tmmP2.GetBeta(), matLayer0, matLayerThis, deltaKxSpdc);
+		double LyP1 = tmmP1.GetWave()->GetLy();
 		double LyP2 = waveP2->GetLy();
-		ArrayXd betasP2 = waveP2->GetBetas();
-		ArrayXcd E0sP2 = waveP2->GetExpansionCoefsKx();
-
+		
 		// TODO
 		if (waveP1->GetW0() > waveP2->GetW0()) {
 			std::cerr << "Currently P2 must be at least as wide as P1." << std::endl;

@@ -56,6 +56,7 @@ namespace TMM {
 		void CalcInhomogeneosWaveParams(int layerNr, Material *material, InhomogeneosWaveParams *kpS, InhomogeneosWaveParams *kpA);
 		void SolveFundamentalFields();
 		void SolveGeneratedField();
+		void SolveWaves(ArrayXd *betasP1, ArrayXcd *E0sP1, ArrayXd *betasP2, ArrayXcd *E0sP2, bool *coherent);
 
 	public:
 		SecondOrderNLTMM();
@@ -73,8 +74,8 @@ namespace TMM {
 
 		void CheckPrerequisites(TMMParam toIgnore = PARAM_NOT_DEFINED);
 		void UpdateGenParams();
-		double CalcDeltaKxSpdc(bool checkRequirements = false);
-		double CalcVacFuctuationsE0(bool checkRequirements = false);
+		double CalcDeltaKxSpdc(bool checkRequirements = true);
+		double CalcVacFuctuationsE0(bool checkRequirements = true);
 		
 		// Planewaves
 		void Solve();
