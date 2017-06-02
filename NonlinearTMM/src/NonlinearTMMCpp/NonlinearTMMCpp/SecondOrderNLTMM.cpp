@@ -407,10 +407,12 @@ namespace TMM {
 
 		// Solve wave P2
 		Wave *waveP2 = tmmP2.GetWave();
+		bool coherent = true;
 		if (waveP2->GetWaveType() == SPDCWAVE) {
 			double EVac = CalcVacFuctuationsE0();
 			waveP2->SetOverrideE0(true);
 			waveP2->SetE0(EVac);
+			coherent = false;
 		}
 		double deltaKxSpdc = CalcDeltaKxSpdc();
 		waveP2->Solve(tmmP2.GetWl(), tmmP2.GetBeta(), matLayer0, matLayerThis, deltaKxSpdc);
@@ -498,7 +500,7 @@ namespace TMM {
 		Polarization polGen = tmmGen.GetPolarization();
 		dcomplex epsLayer = tmmGen.GetLayer(layerNr)->eps;
 
-		pairdd res = IntegrateWavePower(layerNr, polGen, wlGen, epsLayer, Us, kxs, kzs, x0, x1, z, Ly);
+		pairdd res = IntegrateWavePower(layerNr, polGen, wlGen, epsLayer, Us, kxs, kzs, x0, x1, z, Ly, coherent);
 		return res;
 	}
 
