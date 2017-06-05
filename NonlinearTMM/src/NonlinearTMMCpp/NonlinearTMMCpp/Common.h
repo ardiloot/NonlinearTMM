@@ -122,7 +122,7 @@ namespace TMM {
 	double GetDifferential(const ArrayXd &intVar, int nr);
 	pairdd const IntegrateWavePower(int layerNr, Polarization pol, double wl, dcomplex epsLayer, const Eigen::MatrixX2cd &Us,
 		const ArrayXd &kxs, const Eigen::MatrixX2cd &kzs,
-		double x0, double x1, double z, double Ly, bool coherent = true);
+		double x0, double x1, double z, double Ly);
 	WaveDirection GetWaveDirection(dcomplex kzF, dcomplex eps, Polarization pol);
 	ArrayXcd FFTShift(ArrayXcd data);
 	ArrayXd IFFTShift(ArrayXd data);

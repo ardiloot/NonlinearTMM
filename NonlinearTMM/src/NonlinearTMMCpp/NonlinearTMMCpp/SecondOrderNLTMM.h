@@ -56,7 +56,7 @@ namespace TMM {
 		void CalcInhomogeneosWaveParams(int layerNr, Material *material, InhomogeneosWaveParams *kpS, InhomogeneosWaveParams *kpA);
 		void SolveFundamentalFields();
 		void SolveGeneratedField();
-		void SolveWaves(ArrayXd *betasP1, ArrayXcd *E0sP1, ArrayXd *betasP2, ArrayXcd *E0sP2, bool *coherent);
+		void SolveWaves(ArrayXd *betasP1, ArrayXcd *E0sP1, ArrayXd *betasP2, ArrayXcd *E0sP2);
 
 	public:
 		SecondOrderNLTMM();

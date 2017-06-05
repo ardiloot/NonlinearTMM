@@ -275,7 +275,7 @@ namespace TMM {
 	}
 	*/
 
-	pairdd const IntegrateWavePower(int layerNr, Polarization pol, double wl, dcomplex epsLayer, const Eigen::MatrixX2cd & Us, const ArrayXd & kxs, const Eigen::MatrixX2cd & kzs, double x0, double x1, double z, double Ly, bool coherent) {
+	pairdd const IntegrateWavePower(int layerNr, Polarization pol, double wl, dcomplex epsLayer, const Eigen::MatrixX2cd & Us, const ArrayXd & kxs, const Eigen::MatrixX2cd & kzs, double x0, double x1, double z, double Ly) {
 
 		if (x0 != -x1 || z != 0) {
 			std::cerr << "Currently only x0 = -x1, z = 0 supported." << std::endl;
@@ -298,76 +298,67 @@ namespace TMM {
 			dcomplex UB = Us(i, B);
 			dcomplex kzB = kzs(i, B);
 			double kx = kxs(i);
-			double dkx = dkxs(i);
-			if (coherent) {
-				integValue2dF += dkx * dkx * UF * std::conj(UF) * kzF * (x1 - x0);
-				integValue2dB += dkx * dkx * UB * std::conj(UB) * kzB * (x1 - x0);
-			}
-			else {
-				integValue2dF += dkx * UF * std::conj(UF) * kzF * (x1 - x0);
-				integValue2dB += dkx * UB * std::conj(UB) * kzB * (x1 - x0);
-			}
+			double dkx = dkxs(i);			
+			integValue2dF += dkx * dkx * UF * std::conj(UF) * kzF * (x1 - x0);
+			integValue2dB += dkx * dkx * UB * std::conj(UB) * kzB * (x1 - x0);
 		}
 
 		// Polarization spetcific
 		double omega = WlToOmega(wl);
 		double resF, resB;
 		if (pol == P_POL) {
-			if (coherent) {
-				for (int i = 0; i < m; i++) {
-					double kx = kxs(i);
-					dcomplex kzF = kzs(i, F);
-					dcomplex UF = Us(i, F);
-					dcomplex kzB = kzs(i, B);
-					dcomplex UB = Us(i, B);
-					dcomplex integValue1dF = 0.0, integValue1dB = 0.0;
-					for (int j = i + 1; j < m; j++) {
-						double kxP = kxs(j);
-						dcomplex kzPF = kzs(j, F);
-						dcomplex UPF = Us(j, F);
-						dcomplex kzPB = kzs(j, B);
-						dcomplex UPB = Us(j, B);
-						double dkxP = dkxs(j);
-						double dk = kx - kxP;
+			for (int i = 0; i < m; i++) {
+				double kx = kxs(i);
+				dcomplex kzF = kzs(i, F);
+				dcomplex UF = Us(i, F);
+				dcomplex kzB = kzs(i, B);
+				dcomplex UB = Us(i, B);
+				dcomplex integValue1dF = 0.0, integValue1dB = 0.0;
+				for (int j = i + 1; j < m; j++) {
+					double kxP = kxs(j);
+					dcomplex kzPF = kzs(j, F);
+					dcomplex UPF = Us(j, F);
+					dcomplex kzPB = kzs(j, B);
+					dcomplex UPB = Us(j, B);
+					double dkxP = dkxs(j);
+					double dk = kx - kxP;
 
-						double cc = (std::sin(x0 * dk) * dkxP / dk);
-						integValue1dF += cc * (UF * std::conj(UPF) * kzF + std::conj(UF) * UPF * kzPF);
-						integValue1dB += cc * (UB * std::conj(UPB) * kzB + std::conj(UB) * UPB * kzPB);
-					}
-					double dkx = dkxs(i);
-					integValue2dF -= (2.0 * dkx) * integValue1dF;
-					integValue2dB -= (2.0 * dkx) * integValue1dB;
+					double cc = (std::sin(x0 * dk) * dkxP / dk);
+					integValue1dF += cc * (UF * std::conj(UPF) * kzF + std::conj(UF) * UPF * kzPF);
+					integValue1dB += cc * (UB * std::conj(UPB) * kzB + std::conj(UB) * UPB * kzPB);
 				}
+				double dkx = dkxs(i);
+				integValue2dF -= (2.0 * dkx) * integValue1dF;
+				integValue2dB -= (2.0 * dkx) * integValue1dB;
 			}
 			resF = Ly / (2.0 * omega * constEps0) * std::real(integValue2dF / epsLayer);
 			resB = -Ly / (2.0 * omega * constEps0) * std::real(integValue2dB / epsLayer);
 		} else if (pol == S_POL) {
 			// Almost identical to p-polarization, copy for performance
-			if (coherent) {
-				for (int i = 0; i < m; i++) {
-					double kx = kxs(i);
-					dcomplex kzF = kzs(i, F);
-					dcomplex UF = Us(i, F);
-					dcomplex kzB = kzs(i, B);
-					dcomplex UB = Us(i, B);
-					dcomplex integValue1dF = 0.0, integValue1dB = 0.0;
-					for (int j = i + 1; j < m; j++) {
-						double kxP = kxs(j);
-						dcomplex kzPF = kzs(j, F);
-						dcomplex UPF = Us(j, F);
-						dcomplex kzPB = kzs(j, B);
-						dcomplex UPB = Us(j, B);
-						double dkxP = dkxs(j);
-						double dk = kx - kxP;
+			for (int i = 0; i < m; i++) {
+				double kx = kxs(i);
+				dcomplex kzF = kzs(i, F);
+				dcomplex UF = Us(i, F);
+				dcomplex kzB = kzs(i, B);
+				dcomplex UB = Us(i, B);
+				dcomplex integValue1dF = 0.0, integValue1dB = 0.0;
+				for (int j = i + 1; j < m; j++) {
+					double kxP = kxs(j);
+					dcomplex kzPF = kzs(j, F);
+					dcomplex UPF = Us(j, F);
+					dcomplex kzPB = kzs(j, B);
+					dcomplex UPB = Us(j, B);
+					double dkxP = dkxs(j);
+					double dk = kx - kxP;
 
-						double cc = (std::sin(x0 * dk) * dkxP / dk);
-						integValue1dF += cc * (UF * std::conj(UPF) * kzPF + std::conj(UF) * UPF * kzF);
-						integValue1dB += cc * (UB * std::conj(UPB) * kzPB + std::conj(UB) * UPB * kzB);
-					}
-					double dkx = dkxs(i);
-					integValue2dF -= (2.0 * dkx) * integValue1dF;
-					integValue2dB -= (2.0 * dkx) * integValue1dB;
+					double cc = (std::sin(x0 * dk) * dkxP / dk);
+					integValue1dF += cc * (UF * std::conj(UPF) * kzPF + std::conj(UF) * UPF * kzF);
+					integValue1dB += cc * (UB * std::conj(UPB) * kzPB + std::conj(UB) * UPB * kzB);
 				}
+				double dkx = dkxs(i);
+				integValue2dF -= (2.0 * dkx) * integValue1dF;
+				integValue2dB -= (2.0 * dkx) * integValue1dB;
+
 			}
 			resF = Ly / (2.0 * omega * constMu0) * real(integValue2dF);
 			resB = -Ly / (2.0 * omega * constMu0) * real(integValue2dB);

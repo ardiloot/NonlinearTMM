@@ -218,7 +218,7 @@ namespace TMM {
 		tmmGen.Solve();
 	}
 	
-	void SecondOrderNLTMM::SolveWaves(ArrayXd * betasP1, ArrayXcd * E0sP1, ArrayXd * betasP2, ArrayXcd * E0sP2, bool * coherent) {
+	void SecondOrderNLTMM::SolveWaves(ArrayXd * betasP1, ArrayXcd * E0sP1, ArrayXd * betasP2, ArrayXcd * E0sP2) {
 		Material *matLayer0 = tmmP1.GetLayer(0)->GetMaterial();
 		Material *matLayerThis = NULL;
 
@@ -239,9 +239,6 @@ namespace TMM {
 		waveP2->Solve(tmmP2.GetWl(), tmmP2.GetBeta(), matLayer0, matLayerThis, deltaKxSpdc);
 		*betasP2 = waveP2->GetBetas();
 		*E0sP2 = waveP2->GetExpansionCoefsKx();
-
-		// Coherence
-		*coherent = waveP1->IsCoherent() && waveP2->IsCoherent();
 	}
 	SecondOrderNLTMM::SecondOrderNLTMM()
 	{
@@ -364,9 +361,9 @@ namespace TMM {
 		ArrayXd betasP1, betasP2;
 		ArrayXcd E0sP1, E0sP2;
 		bool coherent;
-		SolveWaves(&betasP1, &E0sP1, &betasP2, &E0sP2, &coherent);
+		SolveWaves(&betasP1, &E0sP1, &betasP2, &E0sP2);
 
-		if (!coherent) {
+		if (!tmmP1.GetWave()->IsCoherent() || !tmmP2.GetWave()->IsCoherent()) {
 			std::cerr << "Currently waves must be coherent." << std::endl;
 			throw std::invalid_argument("Currently waves must be coherent.");
 		}
@@ -421,8 +418,7 @@ namespace TMM {
 		//Solve waves
 		ArrayXd betasP1, betasP2;
 		ArrayXcd E0sP1, E0sP2;
-		bool coherent;
-		SolveWaves(&betasP1, &E0sP1, &betasP2, &E0sP2, &coherent);
+		SolveWaves(&betasP1, &E0sP1, &betasP2, &E0sP2);
 		Wave *waveP1 = tmmP1.GetWave();
 		Wave *waveP2 = tmmP2.GetWave();
 		double LyP1 = tmmP1.GetWave()->GetLy();
@@ -448,8 +444,7 @@ namespace TMM {
 			std::cerr << "Both pump waves must have the same Ly." << std::endl;
 			throw std::invalid_argument("Both pump waves must have the same Ly.");
 		}
-		double Ly = LyP1;
-		//std::cout << x0 << " " << x1 << " " << Ly << std::endl;
+
 		// Init memory
 		int nTot = betasP1.size() * betasP2.size();
 		Eigen::MatrixX2cd UsUnsorted(nTot, 2);
@@ -482,33 +477,67 @@ namespace TMM {
 		tmmP1.SetBeta(oldBetaP1);
 		tmmP2.SetBeta(oldBetaP2);
 
-		// Sort values by kxs
-		Eigen::ArrayXi indices(nTot);
-		for (int i = 0; i < nTot; i++) {
-			indices(i) = i;
-		}
 
-		std::sort(indices.data(), indices.data() + nTot, [&kxsUnsorted](const int a, int b) -> bool
-		{
-			return kxsUnsorted(a) < kxsUnsorted(b);
-		});
-
-		Eigen::MatrixX2cd Us(nTot, 2);
-		Eigen::MatrixX2cd kzs(nTot, 2);
-		ArrayXd kxs(nTot);
-
-		for (int i = 0; i < nTot; i++) {
-			Us.row(i) = UsUnsorted.row(indices(i));
-			kzs.row(i) = kzsUnsorted.row(indices(i));
-			kxs(i) = kxsUnsorted(indices(i));
-		}
-
-		// Integrate powers
+		double Ly = LyP1;
 		double wlGen = tmmGen.GetWl();
 		Polarization polGen = tmmGen.GetPolarization();
 		dcomplex epsLayer = tmmGen.GetLayer(layerNr)->eps;
+		
+		pairdd res(0.0, 0.0);
+		if (waveP1->IsCoherent() && waveP2->IsCoherent()) {
+			// Sort values by kxs
+			Eigen::ArrayXi indices(nTot);
+			for (int i = 0; i < nTot; i++) {
+				indices(i) = i;
+			}
 
-		pairdd res = IntegrateWavePower(layerNr, polGen, wlGen, epsLayer, Us, kxs, kzs, x0, x1, z, Ly, coherent);
+			std::sort(indices.data(), indices.data() + nTot, [&kxsUnsorted](const int a, int b) -> bool
+			{
+				return kxsUnsorted(a) < kxsUnsorted(b);
+			});
+
+			Eigen::MatrixX2cd Us(nTot, 2);
+			Eigen::MatrixX2cd kzs(nTot, 2);
+			ArrayXd kxs(nTot);
+
+			for (int i = 0; i < nTot; i++) {
+				Us.row(i) = UsUnsorted.row(indices(i));
+				kzs.row(i) = kzsUnsorted.row(indices(i));
+				kxs(i) = kxsUnsorted(indices(i));
+			}
+
+			// Integrate powers
+			res = IntegrateWavePower(layerNr, polGen, wlGen, epsLayer, Us, kxs, kzs, x0, x1, z, Ly);
+
+		} else if (waveP1->IsCoherent() && !waveP2->IsCoherent()) {
+			ArrayXd kxsP2 = betasP2 * (2.0 * PI / tmmP2.GetWl());
+			for (int j = 0; j < betasP2.size(); j++) {
+				// Init
+				Eigen::MatrixX2cd Us(betasP1.size(), 2);
+				Eigen::MatrixX2cd kzs(betasP1.size(), 2);
+				ArrayXd kxs(betasP1.size());
+
+				// Collect amplitutes
+				for (int i = 0; i < betasP1.size(); i++) {
+					int index = i * betasP2.size() + j;
+					Us.row(i) = UsUnsorted.row(index);
+					kzs.row(i) = kzsUnsorted.row(index);
+					kxs.row(i) = kxsUnsorted.row(index);
+				}
+
+				// Sum powers
+				double dkxP2 = GetDifferential(kxsP2, j);
+				pairdd r = IntegrateWavePower(layerNr, polGen, wlGen, epsLayer, Us, kxs, kzs, x0, x1, z, Ly);
+				res.first += r.first * dkxP2;
+				res.second += r.second * dkxP2;
+			}
+		}
+		else {
+			std::cerr << "Only P2 is allowed to be incoherent." << std::endl;
+			throw std::invalid_argument("Only P2 is allowed to be incoherent.");
+		}
+
+		
 		return res;
 	}
 

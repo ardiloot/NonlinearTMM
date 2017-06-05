@@ -609,7 +609,7 @@ namespace TMM {
 		ArrayXd kxs = betas * 2.0 * PI / wl;
 
 		if (!wave.IsCoherent()) {
-			std::cerr << "Currently waves must be coherent." << std::endl;
+			std::cerr << "Currently wave must be coherent." << std::endl;
 			throw std::invalid_argument("Currently waves must be coherent.");
 		}
 
@@ -734,6 +734,11 @@ namespace TMM {
 			throw std::invalid_argument("Invalid layer index.");
 		}
 
+		if (!wave.IsCoherent()) {
+			std::cerr << "Currently only coherent waves supported." << std::endl;
+			throw std::invalid_argument("Currently only coherent waves supported.");
+		}
+
 		// Solve wave
 		ArrayXd betas;
 		ArrayXcd E0s;
@@ -772,7 +777,7 @@ namespace TMM {
 		ArrayXd kxs(betas.size());
 		kxs = betas * layers[0].k0;
 		dcomplex epsLayer = layers[layerNr].eps;
-		pairdd res = IntegrateWavePower(layerNr, pol, wl, epsLayer, Us, kxs, kzs, x0, x1, z, Ly, wave.IsCoherent());
+		pairdd res = IntegrateWavePower(layerNr, pol, wl, epsLayer, Us, kxs, kzs, x0, x1, z, Ly);
 		return res;
 	}
 	
