@@ -213,6 +213,46 @@ namespace TMM {
 		SetFields(f, phaseX, true);
 	}
 
+	void FieldsZX::AddSquaredFields(FieldsZX * toAdd) {
+		switch (pol)
+		{
+		case TMM::P_POL:
+			Ex += toAdd->Ex.cwiseAbs2();
+			Ez += toAdd->Ez.cwiseAbs2();
+			Hy += toAdd->Hy.cwiseAbs2();
+			// S-pol fields stay undefined because of performance
+			break;
+		case TMM::S_POL:
+			Ey += toAdd->Ey.cwiseAbs2();
+			Hx += toAdd->Hx.cwiseAbs2();
+			Hz += toAdd->Hz.cwiseAbs2();
+			// P-pol fields stay undefined because of performance
+			break;
+		default:
+			throw std::invalid_argument("Unknown polarization.");
+			break;
+		}
+	}
+
+	void FieldsZX::TakeSqrt() {
+		switch (pol)
+		{
+		case TMM::P_POL:
+			Ex = Ex.cwiseSqrt();
+			Ez = Ez.cwiseSqrt();
+			Hy = Hy.cwiseSqrt();
+			break;
+		case TMM::S_POL:
+			Ey = Ey.cwiseSqrt();
+			Hx = Hx.cwiseSqrt();
+			Hz = Hz.cwiseSqrt();
+			break;
+		default:
+			throw std::invalid_argument("Unknown polarization.");
+			break;
+		}
+	}
+
 	MatrixXd FieldsZX::GetENorm() {
 		MatrixXd res;
 		switch (pol)

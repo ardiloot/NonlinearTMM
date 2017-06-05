@@ -97,6 +97,8 @@ namespace TMM {
 		Polarization GetPol();
 		void SetFields(const FieldsZ &f, const ArrayXcd &phaseX, bool add = false);
 		void AddFields(const FieldsZ &f, const ArrayXcd &phaseX);
+		void AddSquaredFields(FieldsZX *toAdd);
+		void TakeSqrt();
 		MatrixXd GetENorm();
 
 	};
