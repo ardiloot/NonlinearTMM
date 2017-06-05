@@ -75,6 +75,11 @@ namespace TMM {
 			break;
 		}
 
+		if (wlGen <= 0.0) {
+			std::cerr << "Wavelength cannot be negative." << std::endl;
+			throw std::runtime_error("Wavelength cannot be negative.");
+		}
+
 		tmmGen.SetWl(wlGen);
 		tmmGen.SetBeta(betaGen);
 	}
@@ -231,6 +236,10 @@ namespace TMM {
 		// Solve wave P2
 		Wave *waveP2 = tmmP2.GetWave();
 		if (waveP2->GetWaveType() == SPDCWAVE) {
+			if (process != SPDC) {
+				std::cerr << "SecondOrderNLTMM must be in SPDC mode to use SPDC wave." << std::endl;
+				throw std::invalid_argument("SecondOrderNLTMM must be in SPDC mode to use SPDC wave.");
+			}
 			double EVac = CalcVacFuctuationsE0(false);
 			waveP2->SetOverrideE0(true);
 			waveP2->SetE0(EVac);
@@ -355,7 +364,7 @@ namespace TMM {
 	FieldsZX * SecondOrderNLTMM::WaveGetFields2D(const Eigen::Map<ArrayXd> &zs, const Eigen::Map<ArrayXd> &xs, WaveDirection dir) {
 		// Do checking
 		UpdateGenParams();
-		CheckPrerequisites(PARAM_BETA);
+		CheckPrerequisites();
 
 		// Solve waves
 		ArrayXd betasP1, betasP2;
