@@ -113,6 +113,7 @@ cdef extern from "Waves.h" namespace "TMM":
         ArrayXd GetKzs() except +
         ArrayXd GetFieldProfileXs() except +
         ArrayXd GetFieldProfile() except +
+        double GetBeamArea() except +
         ArrayXcd GetExpansionCoefsKx() except +
         
 #===============================================================================

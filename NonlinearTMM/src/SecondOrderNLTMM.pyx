@@ -476,6 +476,11 @@ cdef class _Wave:
     def expansionCoefsKx(self):
         return ndarray_copy(self._thisptr.GetExpansionCoefsKx()).squeeze()
 
+    @property
+    def beamArea(self):
+        return self._thisptr.GetBeamArea()
+
+
     # Setters
     #---------------------------------------------------------------------------
 
