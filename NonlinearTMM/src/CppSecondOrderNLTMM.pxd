@@ -18,6 +18,7 @@ cdef extern from "Common.h" namespace "TMM":
         
     cdef enum NonlinearTmmModeCpp "TMM::NonlinearTmmMode":
         MODE_INCIDENT,
+        MODE_VACUUM_FLUCTUATIONS,
         MODE_NONLINEAR
         
     cdef enum TMMParamCpp "TMM::TMMParam":

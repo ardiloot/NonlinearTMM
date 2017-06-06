@@ -404,8 +404,8 @@ namespace TMM {
 		double omega = WlToOmega(wl);
 		NonlinearLayer &l0 = layers[0];
 		NonlinearLayer &lL = layers[layers.size() - 1];
-		if (mode == MODE_INCIDENT) {
-			if (!overrideE0) {
+		if (mode == MODE_INCIDENT || mode == MODE_VACUUM_FLUCTUATIONS) {
+			if (mode == MODE_INCIDENT && !overrideE0) {
 				// Intensity given by I0 (intensity at normal incidence), I = I0 * cos(th0)				
 				double cosTh0 = real(l0.hw.GetKzF()) / real(l0.k);
 				if (pol == P_POL) {
@@ -420,11 +420,16 @@ namespace TMM {
 			}
 			else {
 				// Pump wave E0 is given in vacuum
+				dcomplex E0This = E0;
+				if (mode == MODE_VACUUM_FLUCTUATIONS) {
+					E0This = CalcVacFuctuationsE0();
+				}
+
 				if (pol == P_POL) {
-					inc = E0 * std::sqrt(real(l0.n)) * constEps0 * constC;
+					inc = E0This * std::sqrt(real(l0.n)) * constEps0 * constC;
 				}
 				else if (pol == S_POL) {
-					inc = E0 / std::sqrt(real(l0.n));
+					inc = E0This / std::sqrt(real(l0.n));
 				}
 				else {
 					throw std::runtime_error("Unknown polarization");
@@ -445,11 +450,54 @@ namespace TMM {
 	}
 
 	void NonlinearTMM::SolveWave(ArrayXd * betas, ArrayXcd * E0s) {
+		if (wave.GetWaveType() == SPDCWAVE) {
+			if (mode != MODE_VACUUM_FLUCTUATIONS) {
+				std::cerr << "NonlinearTMM must be in MODE_VACUUM_FLUCTUATIONS mode to use SPDC wave." << std::endl;
+				throw std::invalid_argument("NonlinearTMM must be in MODE_VACUUM_FLUCTUATIONS mode to use SPDC wave.");
+				wave.SetOverrideE0(true);
+				wave.SetE0(1.0); // Correct value set in Solve()
+			}
+		}
+
 		Material *matLayerF = layers[0].GetMaterial();
 		Material *matLayerL = NULL;
-		wave.Solve(wl, beta, matLayerF, matLayerL);
+		double deltaKxSpdc = CalcDeltaKxSpdc();
+		wave.Solve(wl, beta, matLayerF, matLayerL, deltaKxSpdc);
 		*betas = wave.GetBetas();
 		*E0s = wave.GetExpansionCoefsKx();
+	}
+
+	double NonlinearTMM::CalcVacFuctuationsE0() {
+		double wlP2 = wl;
+		double wlGen = OmegaToWl(WlToOmega(wlP1Spdc) - WlToOmega(wlP2));
+		double omegaP1 = WlToOmega(wlP1Spdc);
+		double omegaP2 = WlToOmega(wlP2);
+		double omegaGen = WlToOmega(wlGen);
+		// Calc vacuum fluctuations stength
+		double ESqr = (deltaWlSpdc * solidAngleSpdc / deltaThetaSpdc) *
+			(constHbar / (8.0 * constEps0 * std::pow(PI, 4))) *
+			(std::pow(omegaGen, 3) * std::pow(omegaP2, 2) / (pow(constC, 4))) *
+			(constC / omegaP2);
+		double EVac = std::sqrt(ESqr);
+		return EVac;
+	}
+
+	double NonlinearTMM::CalcDeltaKxSpdc() {
+		// Calc deltaKx
+		if (wave.GetWaveType() == SPDCWAVE) {
+			double wlP2 = wl;
+			double betaP2 = beta;
+			double wlGen = OmegaToWl(WlToOmega(wlP1Spdc) - WlToOmega(wlP2));
+			double betaGen = wlGen * (betaP1Spdc / wlP1Spdc - betaP2 / wlP2);
+			Material *matLayer0 = GetLayer(0)->GetMaterial();
+			double n0 = real(matLayer0->GetN(wlGen));
+			double kz0 = 2.0 * PI / wlGen * std::sqrt(n0 * n0 - betaGen * betaGen);
+			double res = kz0 / (2.0 * n0) * deltaThetaSpdc;
+			return res;
+		}
+
+		// No SPDC wave involved, return NAN
+		return constNAN;
 	}
 
 	NonlinearTMM::NonlinearTMM() {
@@ -469,6 +517,11 @@ namespace TMM {
 		r = 0.0;
 		t = 0.0;
 		solved = false;
+		deltaWlSpdc = constNAN;
+		solidAngleSpdc = constNAN;
+		deltaThetaSpdc = constNAN;
+		wlP1Spdc = constNAN;
+		betaP1Spdc = constNAN;
 	}
 
 	void NonlinearTMM::AddLayer(double d_, Material *material_) {
@@ -878,6 +931,14 @@ namespace TMM {
 			throw std::invalid_argument("Param not in list.");
 			break;
 		}
+	}
+
+	void NonlinearTMM::UpdateSPDCParams(double deltaWlSpdc_, double solidAngleSpdc_, double deltaThetaSpdc_, double wlP1Spdc_, double betaP1Spdc_) {
+		deltaWlSpdc = deltaWlSpdc_;
+		solidAngleSpdc = solidAngleSpdc_;
+		deltaThetaSpdc = deltaThetaSpdc_;
+		wlP1Spdc = wlP1Spdc_;
+		betaP1Spdc = betaP1Spdc_;
 	}
 
 	// Getters

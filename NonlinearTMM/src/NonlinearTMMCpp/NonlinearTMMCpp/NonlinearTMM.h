@@ -108,6 +108,7 @@ namespace TMM {
 	//---------------------------------------------------------------
 
 	class NonlinearTMM {
+
 	private:
 		double wl;
 		double beta;
@@ -124,6 +125,7 @@ namespace TMM {
 		dcomplex inc, r, t;
 		bool solved;
 		Wave wave;
+		double deltaWlSpdc, solidAngleSpdc, deltaThetaSpdc, wlP1Spdc, betaP1Spdc;
 
 		Array2cd CalcTransferMatrixNL(int interfaceNr, const InhomogeneousWave &w1, const InhomogeneousWave &w2);
 		void SolveInterfaceTransferMatrix(int interfaceNr);
@@ -149,6 +151,7 @@ namespace TMM {
 		void SetMode(NonlinearTmmMode mode_);
 		void SetParam(TMMParam param, double value, int paramLayer = -1);
 		void SetParam(TMMParam param, dcomplex value, int paramLayer = -1);
+		void UpdateSPDCParams(double deltaWlSpdc_, double solidAngleSpdc_, double deltaThetaSpdc_, double wlP1Spdc_, double betaP1Spdc_);
 
 		// Getters
 		double GetWl();
@@ -176,6 +179,10 @@ namespace TMM {
 		double WaveGetEnhancement(int layerNr, double z);
 		WaveSweepResultNonlinearTMM * WaveSweep(TMMParam param, const Eigen::Map<ArrayXd> &values, int outmask = SWEEP_PWRFLOWS, int paramLayer = -1, int layerNr = 0, double layerZ = 0);
 		FieldsZX* WaveGetFields2D(const Eigen::Map<ArrayXd> &zs, const Eigen::Map<ArrayXd> &xs, WaveDirection dir = TOT);
+
+		// SPDC
+		double CalcVacFuctuationsE0();
+		double CalcDeltaKxSpdc();
 	};
 
 }

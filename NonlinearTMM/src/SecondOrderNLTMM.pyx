@@ -28,6 +28,8 @@ cdef NonlinearTmmModeCpp NonlinearTmmModeFromStr(str modeStr):
         return MODE_INCIDENT
     elif modeStr == "nonlinear":
         return MODE_NONLINEAR
+    elif modeStr == "vacuum":
+        return MODE_VACUUM_FLUCTUATIONS
     else:
         raise ValueError()
     

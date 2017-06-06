@@ -67,6 +67,7 @@ namespace TMM {
 	enum NonlinearTmmMode {
 		MODE_INCIDENT,
 		MODE_NONLINEAR,
+		MODE_VACUUM_FLUCTUATIONS,
 		MODE_NOT_DEFINED,
 	};
 
