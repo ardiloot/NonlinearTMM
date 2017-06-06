@@ -291,6 +291,33 @@ namespace TMM {
 		if (layers.size() < 2) {
 			throw std::invalid_argument("TMM must have at least 2 layers.");
 		}
+
+		if (mode == MODE_VACUUM_FLUCTUATIONS) {
+			if (isnan(deltaWlSpdc)) {
+				std::cerr << "No value for deltaWlSpdc" << std::endl;
+				throw std::invalid_argument("No value for deltaWlSpdc");
+			}
+
+			if (isnan(solidAngleSpdc)) {
+				std::cerr << "No value for solidAngleSpdc" << std::endl;
+				throw std::invalid_argument("No value for solidAngleSpdc");
+			}
+
+			if (isnan(deltaThetaSpdc)) {
+				std::cerr << "No value for deltaThetaSpdc" << std::endl;
+				throw std::invalid_argument("No value for deltaThetaSpdc");
+			}
+
+			if (isnan(wlP1Spdc)) {
+				std::cerr << "No value for wlP1Spdc" << std::endl;
+				throw std::invalid_argument("No value for wlP1Spdc");
+			}
+
+			if (isnan(betaP1Spdc)) {
+				std::cerr << "No value for betaP1Spdc" << std::endl;
+				throw std::invalid_argument("No value for betaP1Spdc");
+			}
+		}
 	}
 
 	// Setters
@@ -450,13 +477,9 @@ namespace TMM {
 	}
 
 	void NonlinearTMM::SolveWave(ArrayXd * betas, ArrayXcd * E0s) {
-		if (wave.GetWaveType() == SPDCWAVE) {
-			if (mode != MODE_VACUUM_FLUCTUATIONS) {
-				std::cerr << "NonlinearTMM must be in MODE_VACUUM_FLUCTUATIONS mode to use SPDC wave." << std::endl;
-				throw std::invalid_argument("NonlinearTMM must be in MODE_VACUUM_FLUCTUATIONS mode to use SPDC wave.");
-				wave.SetOverrideE0(true);
-				wave.SetE0(1.0); // Correct value set in Solve()
-			}
+		if (wave.GetWaveType() == SPDCWAVE && mode != MODE_VACUUM_FLUCTUATIONS) {
+			std::cerr << "NonlinearTMM must be in MODE_VACUUM_FLUCTUATIONS mode to use SPDC wave." << std::endl;
+			throw std::invalid_argument("NonlinearTMM must be in MODE_VACUUM_FLUCTUATIONS mode to use SPDC wave.");
 		}
 
 		Material *matLayerF = layers[0].GetMaterial();
@@ -483,6 +506,8 @@ namespace TMM {
 	}
 
 	double NonlinearTMM::CalcDeltaKxSpdc() {
+		// TODO: restrict ublic usage
+
 		// Calc deltaKx
 		if (wave.GetWaveType() == SPDCWAVE) {
 			double wlP2 = wl;

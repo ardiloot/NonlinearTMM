@@ -27,19 +27,6 @@ namespace TMM {
 	}
 
 	void SecondOrderNLTMM::CheckPrerequisites(TMMParam toIgnore) {
-		// Check SPDC specific values
-		if (process == TMM::SPDC) {
-			if (isnan(deltaWlSpdc)) {
-				throw std::invalid_argument("deltaWlSpdc is not set.");
-			}
-			if (isnan(solidAngleSpdc)) {
-				throw std::invalid_argument("solidAngleSpdc is not set.");
-			}
-			if (isnan(deltaThetaSpdc)) {
-				throw std::invalid_argument("deltaThetaSpdc is not set.");
-			}
-		}
-
 		// Sub TMMs
 		tmmP1.CheckPrerequisites(toIgnore);
 		tmmP2.CheckPrerequisites(toIgnore);
@@ -83,40 +70,6 @@ namespace TMM {
 
 		tmmGen.SetWl(wlGen);
 		tmmGen.SetBeta(betaGen);
-	}
-
-	double SecondOrderNLTMM::CalcDeltaKxSpdc(bool checkRequirements) {
-		// It is assumed, that only P2 can represent vacuum fluctuations for SPDC
-		if (tmmP1.GetWave()->GetWaveType() == SPDCWAVE) {
-			std::cerr << "Only P2 can be SPDC wave." << std::endl;
-			throw std::invalid_argument("Only P2 can be SPDC wave.");
-		}
-
-		// Calc deltaKx
-		if (tmmP2.GetWave()->GetWaveType() == SPDCWAVE) {
-			// Check and update gen params
-			if (checkRequirements) {
-				UpdateGenParams();
-				CheckPrerequisites();
-			}
-
-			double res = tmmP2.CalcDeltaKxSpdc();
-			return res;
-		}
-
-		// No SPDC wave involved, return NAN
-		return constNAN;
-	}
-
-	double SecondOrderNLTMM::CalcVacFuctuationsE0(bool checkRequirements) {
-		if (checkRequirements) {
-			UpdateGenParams();
-			CheckPrerequisites(PARAM_BETA);
-		}
-
-		UpdateGenParams();
-		double res = tmmP2.CalcVacFuctuationsE0();
-		return res;
 	}
 
 	void SecondOrderNLTMM::CalcInhomogeneosWaveParams(int layerNr, Material *material, InhomogeneosWaveParams * kpS, InhomogeneosWaveParams * kpA)
@@ -218,17 +171,11 @@ namespace TMM {
 
 		// Solve wave P2
 		Wave *waveP2 = tmmP2.GetWave();
-		if (waveP2->GetWaveType() == SPDCWAVE) {
-			if (process != SPDC) {
-				std::cerr << "SecondOrderNLTMM must be in SPDC mode to use SPDC wave." << std::endl;
-				throw std::invalid_argument("SecondOrderNLTMM must be in SPDC mode to use SPDC wave.");
-			}
-			//double EVac = CalcVacFuctuationsE0(false);
-			waveP2->SetOverrideE0(true);
-			waveP2->SetE0(1.0);
-			// Correct E0 is set automatically in NonlinearTMM
+		if (waveP2->GetWaveType() == SPDCWAVE && process != SPDC) {
+			std::cerr << "SecondOrderNLTMM must be in SPDC mode to use SPDC wave." << std::endl;
+			throw std::invalid_argument("SecondOrderNLTMM must be in SPDC mode to use SPDC wave.");
 		}
-		double deltaKxSpdc = CalcDeltaKxSpdc(false);
+		double deltaKxSpdc = tmmP2.CalcDeltaKxSpdc();
 		waveP2->Solve(tmmP2.GetWl(), tmmP2.GetBeta(), matLayer0, matLayerThis, deltaKxSpdc);
 		*betasP2 = waveP2->GetBetas();
 		*E0sP2 = waveP2->GetExpansionCoefsKx();
@@ -256,17 +203,14 @@ namespace TMM {
 
 	void SecondOrderNLTMM::SetDeltaWlSpdc(double value) {
 		deltaWlSpdc = value;
-		tmmP2.UpdateSPDCParams(deltaWlSpdc, solidAngleSpdc, deltaThetaSpdc, constNAN, constNAN);
 	}
 
 	void SecondOrderNLTMM::SetSolidAngleSpdc(double value) {
 		solidAngleSpdc = value;
-		tmmP2.UpdateSPDCParams(deltaWlSpdc, solidAngleSpdc, deltaThetaSpdc, constNAN, constNAN);
 	}
 
 	void SecondOrderNLTMM::SetDeltaThetaSpdc(double value) {
 		deltaThetaSpdc = value;
-		tmmP2.UpdateSPDCParams(deltaWlSpdc, solidAngleSpdc, deltaThetaSpdc, constNAN, constNAN);
 	}
 
 	void SecondOrderNLTMM::AddLayer(double d_, Material *material_)
@@ -320,8 +264,6 @@ namespace TMM {
 		if (valuesP1.size() != valuesP2.size()) {
 			throw std::invalid_argument("Value arrays must have the same size.");
 		}
-
-		CheckPrerequisites(param); // Maybe not needed, checks done later in Solve
 
 		// Alloc memory for result (dealloc is responsibility of the user)
 		SweepResultSecondOrderNLTMM *res = new SweepResultSecondOrderNLTMM(valuesP1.size(), outmask, layerNr, layerZ);

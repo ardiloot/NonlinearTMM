@@ -115,7 +115,7 @@ namespace TMM {
 		double kxMid = k * std::sin(thLayer0);
 		kxs = ArrayXd::LinSpaced(nPointsInteg, kxMid - deltaKxSpdc, kxMid + deltaKxSpdc);
 		kzs = (k * k - kxs.pow(2)).sqrt();
-		expansionCoefsKx = ArrayXcd::Ones(nPointsInteg) * E0OverrideValue;
+		expansionCoefsKx = ArrayXcd::Ones(nPointsInteg);
 		phis(0) = 0.0; // Currently not calculated (not needed)
 	}
 

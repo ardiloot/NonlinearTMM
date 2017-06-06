@@ -18,7 +18,6 @@ cdef extern from "Common.h" namespace "TMM":
         
     cdef enum NonlinearTmmModeCpp "TMM::NonlinearTmmMode":
         MODE_INCIDENT,
-        MODE_VACUUM_FLUCTUATIONS,
         MODE_NONLINEAR
         
     cdef enum TMMParamCpp "TMM::TMMParam":
@@ -238,8 +237,6 @@ cdef extern from "SecondOrderNLTMM.h" namespace "TMM":
         double GetSolidAngleSpdc() except +
         double GetDeltaThetaSpdc() except +
         void UpdateGenParams() except +
-        double CalcDeltaKxSpdc() except +
-        double CalcVacFuctuationsE0() except +
         
         void Solve() except +
         SecondOrderNLIntensitiesCpp GetIntensities() except +

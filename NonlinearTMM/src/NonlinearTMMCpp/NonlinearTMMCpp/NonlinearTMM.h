@@ -133,6 +133,7 @@ namespace TMM {
 		void SolveSystemMatrix();
 		void SolveIncReflTrans();
 		void SolveWave(ArrayXd *betas, ArrayXcd *E0s);
+		double CalcVacFuctuationsE0();
 
 	public:
 		NonlinearTMM();
@@ -151,7 +152,6 @@ namespace TMM {
 		void SetMode(NonlinearTmmMode mode_);
 		void SetParam(TMMParam param, double value, int paramLayer = -1);
 		void SetParam(TMMParam param, dcomplex value, int paramLayer = -1);
-		void UpdateSPDCParams(double deltaWlSpdc_, double solidAngleSpdc_, double deltaThetaSpdc_, double wlP1Spdc_, double betaP1Spdc_);
 
 		// Getters
 		double GetWl();
@@ -180,8 +180,8 @@ namespace TMM {
 		WaveSweepResultNonlinearTMM * WaveSweep(TMMParam param, const Eigen::Map<ArrayXd> &values, int outmask = SWEEP_PWRFLOWS, int paramLayer = -1, int layerNr = 0, double layerZ = 0);
 		FieldsZX* WaveGetFields2D(const Eigen::Map<ArrayXd> &zs, const Eigen::Map<ArrayXd> &xs, WaveDirection dir = TOT);
 
-		// SPDC
-		double CalcVacFuctuationsE0();
+		// SPDC (used internally by SecondOrderNLTMM)
+		void UpdateSPDCParams(double deltaWlSpdc_, double solidAngleSpdc_, double deltaThetaSpdc_, double wlP1Spdc_, double betaP1Spdc_);
 		double CalcDeltaKxSpdc();
 	};
 
