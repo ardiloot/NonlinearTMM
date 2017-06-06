@@ -774,11 +774,6 @@ namespace TMM {
 			throw std::invalid_argument("Invalid layer index.");
 		}
 
-		if (!wave.IsCoherent()) {
-			std::cerr << "Currently only coherent waves supported." << std::endl;
-			throw std::invalid_argument("Currently only coherent waves supported.");
-		}
-
 		// Solve wave
 		ArrayXd betas;
 		ArrayXcd E0s;
@@ -814,10 +809,23 @@ namespace TMM {
 		SetBeta(oldBeta);
 
 		// Integrate powers
-		ArrayXd kxs(betas.size());
-		kxs = betas * layers[0].k0;
+
+		ArrayXd kxs = betas * layers[0].k0;
 		dcomplex epsLayer = layers[layerNr].eps;
-		pairdd res = IntegrateWavePower(layerNr, pol, wl, epsLayer, Us, kxs, kzs, x0, x1, z, Ly);
+		pairdd res(0.0, 0.0);
+		if (wave.IsCoherent()) {
+			// Coherent
+			res = IntegrateWavePower(layerNr, pol, wl, epsLayer, Us, kxs, kzs, x0, x1, z, Ly);
+		}
+		else {
+			// Incoherent
+			for (int i = 0; i < betas.size(); i++) {
+				pairdd r = IntegrateWavePower(layerNr, pol, wl, epsLayer, Us.row(i), kxs.row(i), kzs.row(i), x0, x1, z, Ly);
+				double dkx = GetDifferential(kxs, i);
+				res.first += r.first * dkx;
+				res.second += r.second * dkx;
+			}
+		}
 		return res;
 	}
 	
