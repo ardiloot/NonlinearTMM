@@ -726,35 +726,63 @@ namespace TMM {
 		SolveWave(&betas, &E0s);
 		ArrayXd kxs = betas * 2.0 * PI / wl;
 
-		if (!wave.IsCoherent()) {
-			std::cerr << "Currently wave must be coherent." << std::endl;
-			throw std::invalid_argument("Currently waves must be coherent.");
-		}
-
 		// Allocate space (deletion is the responsibility of the caller!)
 		FieldsZX *res = new FieldsZX(zs.size(), xs.size(), pol);
 		res->SetZero(); // We are summing up
 
-		#pragma omp parallel
-		{
-			NonlinearTMM tmmThread = *this;
-			tmmThread.SetOverrideE0(true);
-			#pragma omp for
-			for (int i = 0; i < betas.size(); i++) {
-				
-				// Solve TMM
-				tmmThread.SetBeta(betas(i));
-				tmmThread.SetE0(E0s(i));
-				tmmThread.Solve();
+		if (wave.IsCoherent()) {
+			// Coherent
+			#pragma omp parallel
+			{
+				NonlinearTMM tmmThread = *this;
+				tmmThread.SetOverrideE0(true);
+				#pragma omp for
+				for (int i = 0; i < betas.size(); i++) {
 
-				// Integrate fields
-				double dkx = GetDifferential(kxs, i);
-				FieldsZ *f = tmmThread.GetFields(zs, dir);
-				ArrayXcd phaseX = (constI * kxs(i) * xs).exp() * dkx;
-				res->AddFields(*f, phaseX);
-				delete f;
+					// Solve TMM
+					tmmThread.SetBeta(betas(i));
+					tmmThread.SetE0(E0s(i));
+					tmmThread.Solve();
+
+					// Integrate fields
+					double dkx = GetDifferential(kxs, i);
+					FieldsZ *f = tmmThread.GetFields(zs, dir);
+					ArrayXcd phaseX = (constI * kxs(i) * xs).exp() * dkx;
+					res->AddFields(*f, phaseX);
+					delete f;
+				}
 			}
 		}
+		else {
+			// Incoherent
+			#pragma omp parallel
+			{
+				NonlinearTMM tmmThread = *this;
+				tmmThread.SetOverrideE0(true);
+				#pragma omp for
+				for (int i = 0; i < betas.size(); i++) {
+
+					// Solve TMM
+					tmmThread.SetBeta(betas(i));
+					tmmThread.SetE0(E0s(i));
+					tmmThread.Solve();
+
+					// Integrate fields
+					double dkx = GetDifferential(kxs, i);
+					
+					FieldsZ *f = tmmThread.GetFields(zs, dir);
+					ArrayXcd phaseX = (constI * kxs(i) * xs).exp() * dkx;
+					FieldsZX *coherentFields = new FieldsZX(zs.size(), xs.size(), pol);
+					coherentFields->SetZero();
+					coherentFields->AddFields(*f, phaseX);
+					res->AddSquaredFields(coherentFields);
+					delete coherentFields;
+					delete f;
+				}
+			}
+			res->TakeSqrt();
+		}
+
 		return res;
 	}
 
