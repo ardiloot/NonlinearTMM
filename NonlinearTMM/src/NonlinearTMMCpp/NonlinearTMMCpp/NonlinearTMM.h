@@ -16,6 +16,7 @@ namespace TMM {
 	void OuterProductSSEEigenComplexAdd(const ArrayXcd& X, const ArrayXcd& Y, MatrixXcd& R);
 	void OuterProductGoodEigenComplex(const ArrayXcd& X, const ArrayXcd& Y, MatrixXcd& R);
 	void OuterProductGoodEigenComplexAdd(const ArrayXcd& X, const ArrayXcd& Y, MatrixXcd& R);
+	void ThreadSafeMatrixAddNorm(MatrixXcd &mat, const MatrixXcd &toAdd);
 
 	//---------------------------------------------------------------
 	// Intensities

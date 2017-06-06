@@ -90,6 +90,23 @@ namespace TMM {
 		}
 	}
 
+	void ThreadSafeMatrixAddNorm(MatrixXcd & mat, const MatrixXcd & toAdd) {
+		if (mat.rows() != toAdd.rows() || mat.cols() != toAdd.cols()) {
+			std::cerr << "mat and toAdd must be the same size." << std::endl;
+			throw std::invalid_argument("mat and toAdd must be the same size.");
+		}
+
+		double* ptrMat = (double *)&mat(0, 0);
+		dcomplex* ptrToAdd = (dcomplex *)&toAdd(0, 0);
+		int n = mat.cols() * mat.rows();
+
+		for (int i = 0; i < n; i++) {
+			double norm = std::norm(ptrToAdd[i]);
+			#pragma omp atomic	
+			ptrMat[2 * i] += norm;
+		}
+	}
+
 	Intensities::Intensities(dcomplex inc_, dcomplex r_, dcomplex t_, double I_, double R_, double T_) {
 		inc = inc_;
 		r = r_;
@@ -217,15 +234,21 @@ namespace TMM {
 		switch (pol)
 		{
 		case TMM::P_POL:
-			Ex += toAdd->Ex.cwiseAbs2();
-			Ez += toAdd->Ez.cwiseAbs2();
-			Hy += toAdd->Hy.cwiseAbs2();
+			ThreadSafeMatrixAddNorm(Ex, toAdd->Ex);
+			ThreadSafeMatrixAddNorm(Ez, toAdd->Ez);
+			ThreadSafeMatrixAddNorm(Hy, toAdd->Hy);
+			//Ex += toAdd->Ex.cwiseAbs2();
+			//Ez += toAdd->Ez.cwiseAbs2();
+			//Hy += toAdd->Hy.cwiseAbs2();
 			// S-pol fields stay undefined because of performance
 			break;
 		case TMM::S_POL:
-			Ey += toAdd->Ey.cwiseAbs2();
-			Hx += toAdd->Hx.cwiseAbs2();
-			Hz += toAdd->Hz.cwiseAbs2();
+			ThreadSafeMatrixAddNorm(Ey, toAdd->Ey);
+			ThreadSafeMatrixAddNorm(Hx, toAdd->Hx);
+			ThreadSafeMatrixAddNorm(Hz, toAdd->Hz);
+			//Ey += toAdd->Ey.cwiseAbs2();
+			//Hx += toAdd->Hx.cwiseAbs2();
+			//Hz += toAdd->Hz.cwiseAbs2();
 			// P-pol fields stay undefined because of performance
 			break;
 		default:
