@@ -77,6 +77,7 @@ cdef waveParamsSet = set(["waveType",
                 "maxX",
                 "dynamicMaxX",
                 "dynamicMaxXCoef",
+                "dynamicMaxXAddition",
                 "maxPhi"])
 
     
@@ -334,6 +335,9 @@ cdef class _Wave:
     dynamicMaxXCoef : float
         Dynamic maxX equals to the beam width (corrected to the angle of
         incidence) times :any:`dynamicMaxXCoef`. Default is 2.0.
+    dynamicMaxXAddition : float
+        Constant factor that is added to maxX if :any:`dynamicMaxX` is true.
+        Default is 0.0.
     maxPhi : float
         Determines the maximum angle of deviation form the direction of
         propagation of the participating fields. Increases the range of x-span
@@ -442,6 +446,10 @@ cdef class _Wave:
         return self._thisptr.GetDynamicMaxXCoef()
 
     @property
+    def dynamicMaxXAddition(self):
+        return self._thisptr.GetDynamicMaxXAddition()
+
+    @property
     def maxPhi(self):
         return self._thisptr.GetMaxPhi()
 
@@ -528,6 +536,10 @@ cdef class _Wave:
     def dynamicMaxXCoef(self, double value): # @DuplicatedSignature
         self._thisptr.SetDynamicMaxXCoef(value)    
     
+    @dynamicMaxXAddition.setter
+    def dynamicMaxXAddition(self, double value): # @DuplicatedSignature
+        self._thisptr.SetDynamicMaxXAddition(value)    
+
     @maxPhi.setter
     def maxPhi(self, double value): # @DuplicatedSignature
         self._thisptr.SetMaxPhi(value)    

@@ -50,7 +50,7 @@ namespace TMM {
 		double maxXByPhi = (nPointsInteg / 2) * PI / (std::sin(maxPhi) * k);
 		// Calc maxX
 		if (dynamicMaxX) {
-			maxXThis = dynamicMaxXCoef * (0.5 * w0 / std::cos(thLayer0));
+			maxXThis = dynamicMaxXCoef * (0.5 * w0 / std::cos(thLayer0)) + dynamicMaxXAddition;
 		}
 		else {
 			maxXThis = maxX;
@@ -133,6 +133,7 @@ namespace TMM {
 		maxX = 1e-3;
 		dynamicMaxX = true;
 		dynamicMaxXCoef = 2.0;
+		dynamicMaxXAddition = 0.0;
 		maxXThis = 0.0;
 		solved = false;
 		maxPhi = 0.17;
@@ -189,6 +190,10 @@ namespace TMM {
 
 	void Wave::SetDynamicMaxXCoef(double dynamicMaxXCoef_) {
 		dynamicMaxXCoef = dynamicMaxXCoef_;
+	}
+
+	void Wave::SetDynamicMaxXAddition(double dynamicMaxXAddition_) {
+		dynamicMaxXAddition = dynamicMaxXAddition_;
 	}
 
 	void Wave::SetMaxPhi(double maxPhi_) {
@@ -293,6 +298,10 @@ namespace TMM {
 
 	double Wave::GetDynamicMaxXCoef() {
 		return dynamicMaxXCoef;
+	}
+
+	double Wave::GetDynamicMaxXAddition() {
+		return dynamicMaxXAddition;
 	}
 
 	double Wave::GetMaxPhi() {

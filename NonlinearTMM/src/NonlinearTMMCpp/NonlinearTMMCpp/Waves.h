@@ -41,6 +41,7 @@ namespace TMM {
 		double maxX;
 		bool dynamicMaxX;
 		double dynamicMaxXCoef;
+		double dynamicMaxXAddition;
 		double maxXThis;
 		double maxPhi;
 		double deltaKxSpdc; // SPDC
@@ -78,6 +79,7 @@ namespace TMM {
 		void SetMaxX(double maxX_);
 		void EnableDynamicMaxX(bool dynamicMaxX_);
 		void SetDynamicMaxXCoef(double dynamicMaxXCoef_);
+		void SetDynamicMaxXAddition(double dynamicMaxXAddition_);
 		void SetMaxPhi(double maxPhi_);
 		void SetParam(TMMParam param, double value);
 
@@ -96,6 +98,7 @@ namespace TMM {
 		double GetMaxX();
 		bool IsDynamicMaxXEnabled();
 		double GetDynamicMaxXCoef();
+		double GetDynamicMaxXAddition();
 		double GetMaxPhi();
 		double GetDouble(TMMParam param);
 		pairdd GetXRange();
