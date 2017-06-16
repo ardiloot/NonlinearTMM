@@ -93,6 +93,7 @@ cdef extern from "Waves.h" namespace "TMM":
         void SetMaxX(double maxX_) except +
         void EnableDynamicMaxX(bool dynamicMaxX_) except +
         void SetDynamicMaxXCoef(double dynamicMaxXCoef_) except +
+        void SetDynamicMaxXAddition(double) except +
         void SetMaxPhi(double maxPhi_) except +
         
         double GetPwr() except +
@@ -105,6 +106,7 @@ cdef extern from "Waves.h" namespace "TMM":
         double GetMaxX() except +
         bool IsDynamicMaxXEnabled() except +
         double GetDynamicMaxXCoef() except +
+        double GetDynamicMaxXAddition() except +
         double GetMaxPhi() except +
         pair[double, double] GetXRange() except +
         ArrayXd GetBetas() except +

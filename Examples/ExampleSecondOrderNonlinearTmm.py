@@ -38,8 +38,8 @@ if __name__ == "__main__":
     
     # Plot generated reflection and transmission
     plt.title("SHG generation from crystal (d = %.0f $\mu m$)" % (1e6 * crystalD))
-    plt.plot(betas, sr.Gen.R, label = "R")
-    plt.plot(betas, sr.Gen.T, label = "T")
+    plt.plot(betas, sr.Gen.Ir, label = "R")
+    plt.plot(betas, sr.Gen.It, label = "T")
     plt.legend()
     plt.xlabel(r"$\beta$")
     plt.ylabel(r"($W / m^{2}$)")

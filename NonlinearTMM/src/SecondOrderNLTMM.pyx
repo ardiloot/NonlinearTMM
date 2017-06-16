@@ -305,6 +305,8 @@ cdef class _Wave:
         'tukey':
             Rectangular wave with cosine tapered edges (Tukey window). The width
             is given by :any:`w0` and the tapered region is determined by :any:`a`.
+        'spdc':
+            Wave used to represent vacuum fluctuations in case of SPDC calculation.
         Default is 'planewave'.
     pwr : float
         Power of the wave (in watts). Default 1.0. The area of the beam is
@@ -1512,13 +1514,13 @@ cdef class _SecondOrderNLIntensities:
     
     Attributes
     ----------
-    P1 : `_Intensities`
+    P1 : :any:`_Intensities`
         Instance of `_Intensities` class and holds the intensities of second
         inuput wave.
-    P2 : `_Intensities`
+    P2 : :any:`_Intensities`
         Instance of `_Intensities` class and holds the intensities of first
         inuput wave.
-    Gen : `_Intensities`
+    Gen : :any:`_Intensities`
         Instance of `_Intensities` class and holds the intensities of generated
         wave.
         
@@ -1552,11 +1554,11 @@ cdef class _SweepResultSecondOrderNLTMM:
     
     Attributes
     ----------
-    P1 : `_SweepResultNonlinearTMM`
+    P1 : :any:`_SweepResultNonlinearTMM`
         Sweep results for the first input wave.
-    P2 : `_SweepResultNonlinearTMM`
+    P2 : :any:`_SweepResultNonlinearTMM`
         Sweep results for the second input wave.
-    Gen : `_SweepResultNonlinearTMM`
+    Gen : :any:`_SweepResultNonlinearTMM`
         Sweep results for the generated wave.
     wlsGen : ndarray of floats
         Stores the wavelength of the generated wave.
@@ -1604,11 +1606,11 @@ cdef class _WaveSweepResultSecondOrderNLTMM:
     
     Attributes
     ----------
-    P1 : `_WaveSweepResultNonlinearTMM`
+    P1 : :any:`_WaveSweepResultNonlinearTMM`
         The sweep result of the first input beam. 
-    P1 : `_WaveSweepResultNonlinearTMM`
+    P1 : :any:`_WaveSweepResultNonlinearTMM`
         The sweep result of the second input beam.
-    Gen : `_WaveSweepResultNonlinearTMM`
+    Gen : :any:`_WaveSweepResultNonlinearTMM`
         The sweep result of the generated beam.
     wlsGen : ndarray of floats
         Stores the wavelength of the generated wave.
@@ -1653,16 +1655,22 @@ cdef class _WaveSweepResultSecondOrderNLTMM:
 cdef class SecondOrderNLTMM:
     """SecondOrderNLTMM(mode)
     
-    This class calculates second-order nonliner processes (e.g. sum-frequency
-    and difference frequency generation) in layered structures. Relies on the
+    This class calculates second-order nonliner processes (e.g. sum-frequency,
+    difference frequency generation and SPDC) in layered structures. Relies on the
     functionality of `NonlinearTMM` class.
     
     Parameters
     ----------
-    mode : str {'sfg', 'dfg'}
+    mode : str {'sfg', 'dfg', 'spdc'}
     
     Attributes
     ----------
+    P1 : :any:`NonlinearTMM`
+        The inctance of the first pump wave TMM.
+    P2 : :any:`NonlinearTMM`
+        The inctance of the second pump wave TMM.
+    Gen : :any:`NonlinearTMM`
+        The inctance of the generated wave TMM.
     deltaWlSpdc : float
         The spectral collection window (in nanometers) of the SPDC signal. 
         Only used if :any:`mode` is set to :any:`SPDC`
@@ -1729,6 +1737,19 @@ cdef class SecondOrderNLTMM:
             setattr(self, name, value)
         
     def AddLayer(self, double d, Material material):
+        """AddLayer(d, material)
+        
+        Adds layer to SecondOrderNLTMM. Equivalent of adding layer to P1, P2
+        and Gen.
+        
+        Parameters
+        ----------
+        d : float
+            layer thickness (m)
+        material : :any:`Material`
+            The class containing the material parameters.
+            
+        """
         # No copy of material is made
         self.P1.AddLayer(d, material)
         self.P2.AddLayer(d, material)
@@ -1738,12 +1759,33 @@ cdef class SecondOrderNLTMM:
         self.materialsCache.append(material)
         
     def Solve(self):
+        """Solve()
+        
+        Solves the structure.
+            
+        """
         self._thisptr.Solve()
         
     def UpdateGenParams(self):
+        """UpdateGenParams()
+        
+        Forces the update of the wavelength and beta of the generated beam :any:`Gen`.
+
+        """
         self._thisptr.UpdateGenParams()
         
     def GetIntensities(self):
+        """GetIntensities()
+        
+        Returns the intensities and amplitutes of incident, reflected and
+        transmitted wave for :any:`P1`, :any:`P2` and :any:`Gen`.
+        The structure must be solved first.
+        
+        Returns
+        -------
+        :any:`_SecondOrderNLIntensities`
+            Helper class to hold intensity data.
+        """
         cdef SecondOrderNLIntensitiesCpp resCpp;
         resCpp = self._thisptr.GetIntensities();
         
@@ -1751,7 +1793,52 @@ cdef class SecondOrderNLTMM:
         res._Init(&resCpp)
         return res
         
-    def Sweep(self, str paramStr, np.ndarray[double, ndim = 1] valuesP1, np.ndarray[double, ndim = 1] valuesP2, int layerNr = 0, double layerZ = 0.0, bool outPwr = True, bool outAbs = False, outEnh = False, outP1 = True, outP2 = True, outGen = True):
+    def Sweep(self, str paramStr, np.ndarray[double, ndim = 1] valuesP1, np.ndarray[double, ndim = 1] valuesP2, int layerNr = 0, double layerZ = 0.0, bool outPwr = True, bool outAbs = False, bool outEnh = False, bool outP1 = True, bool outP2 = True, bool outGen = True):
+        """Sweep(paramStr, valuesP1, valuesP2, layerNr = 0, layerZ = 0.0, outPwr = True, outAbs = False, outEnh = False, outP1 = True, outP2 = True, outGen = True)
+        
+        Solves the structure for series of :any:`valuesP1` and :any:`valuesP2`
+        of param :any:`paramStr`. Using this function is more confortable and
+        faster than just changing params and solving the structure (parallelized
+        with OpenMP).
+        
+        Parameters
+        ----------
+        paramStr : str
+            'wl':
+                Wavelength in meters
+            'beta':
+                normalized tangential wavevector
+            'I0':
+                intensity of the wave
+            'd_i': thikness of layer i (0..N-1)
+        valuesP1 : ndarray of floats
+            Correspondig values of param :any:`paramStr` for :any:`P1`.
+        valuesP2 : ndarray of floats
+            Correspondig values of param :any:`paramStr` for :any:`P2`.
+        layerNr : int
+            Specifies layer, where electrical field enhancment is calculated.
+        layerZ : double
+            Specifies z-coordinate of enchncment calculation inside :any:`layerNr`.
+        outPwr : bool
+            Turns calculation of intensities on/off.
+        outAbs : bool
+            Turns calculation of absoprtiopn in the entire structure on/off.
+        outEnh : bool
+            Turns calculation of enhancment in layer :any:`layerNr` at distance
+            :any:`layerZ` on/off.values
+        outP1 : bool
+            Turns calculation of the :any:`P1` on/off.
+        outP2 : bool
+            Turns calculation of the :any:`P2` on/off.
+        outGen : bool
+            Turns calculation of the :any:`Gen` on/off.
+        
+        Returns
+        -------
+        :any:`_SweepResultSecondOrderNLTMM`
+            Helper class to store the result.
+            
+        """
         cdef SweepResultSecondOrderNLTMMCpp *resCpp;
         cdef int outmask = 0
         if outP1:
@@ -1781,6 +1868,36 @@ cdef class SecondOrderNLTMM:
         return res
     
     def WaveGetPowerFlows(self, int layerNr, double x0 = float("nan"), double x1 = float("nan"), double z = 0.0):
+        """WaveGetPowerFlows(layerNr, x0 = float("nan"), x1 = float("nan"), z = 0.0)
+        
+        Analogous to the :any:`GetIntensities`, but calculates the powers of the
+        beams instead of the intensities of the plane-waves. Only for the
+        calculation of the power of generated beam. For pump beams use the
+        same method of :any:`NonlinearTMM`.
+        
+        Parameters
+        ----------
+        layerNr : int
+            Specifies layer number where to calculate the power of the beam.
+        x0 : float
+            Specifies the starting point of the integration of the power in the
+            x-direction. By default this parameter is selected by the :any:`_Wave`
+            class.
+        x1 : float
+            Specifies the end point of the integration of the power in the
+            x-direction. By default this parameter is selected by the :any:`_Wave`
+            class.
+        z : float
+            Specifies the z-position of the line through which the integration
+            of the power of the beam is done.
+            
+        Returns
+        -------
+        tuple of floats (PB, PF)
+            PB is the power propageted into netagtive infinity and PF denotes
+            the power propagation to the positive direction of z-axis.
+            
+        """
         cdef pair[double, double] res;
         res = self._thisptr.WaveGetPowerFlows(layerNr, x0, x1, z)
         return (res.first, res.second)
@@ -1788,7 +1905,57 @@ cdef class SecondOrderNLTMM:
     def WaveSweep(self, str paramStr, np.ndarray[double, ndim = 1] valuesP1, \
             np.ndarray[double, ndim = 1] valuesP2,
             int layerNr = 0, double layerZ = 0.0, bool outPwr = True, \
-            outR = False, outT = False, outEnh = False, outP1 = True, outP2 = True, outGen = True):
+            bool outR = False, bool outT = False, bool outEnh = False, \
+            bool outP1 = True, bool outP2 = True, bool outGen = True):
+        """WaveSweep(paramStr, valuesP1, valuesP2, layerNr = 0, layerZ = 0.0, outPwr = True, outR = False, outT = False, outEnh = False, outP1 = True, outP2 = True, outGen = True)
+        
+        Solves the structure for waves for series of :any:`valuesP1` and :any:`valuesP2` of param
+        :any:`paramStr`. Using this function is more confortable and faster than just
+        changing the params and solving the structure. Analogous to :any:`Sweep`.
+        
+        Parameters
+        ----------
+        paramStr : str
+            'wl':
+                Wavelength in meters
+            'beta':
+                normalized tangential wavevector
+            'I0':
+                intensity of the wave
+            'd_i':
+                thikness of layer i (0..N-1)
+            'w0':
+                waist size of the input beam
+        valuesP1 : ndarray of floats
+            Correspondig values of param :any:`paramStr` for :any:`P1`.
+        valuesP2 : ndarray of floats
+            Correspondig values of param :any:`paramStr` for :any:`P2`.
+        layerNr : int
+            Specifies layer, where electrical field enhancment is calculated.
+        layerZ : double
+            Specifies z-coordinate of enchncment calculation inside :any:`layerNr`.
+        outPwr : bool
+            Turns calculation of all powers on/off.
+        outR : bool
+            Turns calculation of reflected power on/off.
+        outT : bool
+            Turns calculation of transmitted power on/off.
+        outEnh : bool
+            Turns calculation of enhancment in layer layerNr at distance
+            :any:`layerZ` on/off.
+        outP1 : bool
+            Turns calculation of the :any:`P1` on/off.
+        outP2 : bool
+            Turns calculation of the :any:`P2` on/off.
+        outGen : bool
+            Turns calculation of the :any:`Gen` on/off.
+        
+        Returns
+        -------
+        :any:`_WaveSweepResultSecondOrderNLTMM`
+            Helper class to store the result.
+            
+        """
         
         cdef WaveSweepResultSecondOrderNLTMMCpp *resCpp;
         cdef int outmask = 0
@@ -1820,7 +1987,32 @@ cdef class SecondOrderNLTMM:
         res._Init(resCpp);
         return res
     
-    def WaveGetFields2D(self, np.ndarray[double, ndim = 1] zs, np.ndarray[double, ndim = 1] xs, str dirStr = "total"):
+    def WaveGetFields2D(self, np.ndarray[double, ndim = 1] zs, \
+                        np.ndarray[double, ndim = 1] xs, str dirStr = "total"):
+        """WaveGetFields2D(zs, xs, dirStr = "total")
+        
+        Calculates 2D electric and magnetic fields of beam propagating in the
+        structure. Analogous to the :any:`GetFields2D` of plane waves. Only for the
+        calculation of the power of generated beam. For pump beams use the
+        same method of :any:`NonlinearTMM`.
+        
+        Parameters
+        ----------
+        zs : ndarray of floats
+            Points on z-axis where to calculate the fields. The beginning of the
+            first layer is at z = 0.
+        xs : ndarray of floats
+            Points on x-axis where to calculate the fields.
+        dir : {'total', 'forward', 'backward'}
+            Specifies the components of the output fields.
+            
+        Returns
+        -------
+        :any:`_FieldsZX`
+            Helper class to store electric and magnetic fields in regular grid.
+        
+        """
+        
         cdef FieldsZXCpp *resCpp;
         cdef WaveDirectionCpp direction = WaveDirectionFromStr(dirStr)
         resCpp = self._thisptr.WaveGetFields2D(Map[ArrayXd](zs), Map[ArrayXd](xs), direction)

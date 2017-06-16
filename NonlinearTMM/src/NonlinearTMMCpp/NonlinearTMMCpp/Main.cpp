@@ -72,8 +72,8 @@ void TestNonlinearTmm() {
 }
 
 void TestSecondOrderNLTMM() {
-	double wlP1 = 1064e-9;
-	double wlP2 = 1064e-9;
+	double wlP1 = 400e-9;
+	double wlP2 = 800e-9;
 	TMM::Polarization polP1 = TMM::S_POL;
 	TMM::Polarization polP2 = TMM::S_POL;
 	TMM::Polarization polGen = TMM::S_POL;
@@ -83,6 +83,10 @@ void TestSecondOrderNLTMM() {
 	TMM::dcomplex overrideE0P2 = 1.0;
 
 	TMM::SecondOrderNLTMM tmm;
+	tmm.SetProcess(TMM::SPDC);
+	tmm.SetDeltaThetaSpdc(0.00872665);
+	tmm.SetDeltaWlSpdc(2.5e-9);
+	tmm.SetSolidAngleSpdc(7.61543549467e-05);
 
 	TMM::NonlinearTMM *tmmP1 = tmm.GetP1();
 	TMM::NonlinearTMM *tmmP2 = tmm.GetP2();
@@ -90,17 +94,25 @@ void TestSecondOrderNLTMM() {
 
 	tmmP1->SetParam(TMM::PARAM_WL, wlP1);
 	tmmP1->SetParam(TMM::PARAM_BETA, betaP1);
-	tmmP1->SetParam(TMM::PARAM_POL, polP1);
-	tmmP1->SetParam(TMM::PARAM_OVERRIDE_E0, true);
+	tmmP1->SetPolarization(polP1);
+	tmmP1->SetOverrideE0(true);
 	tmmP1->SetParam(TMM::PARAM_E0, overrideE0P1);
 
 	tmmP2->SetParam(TMM::PARAM_WL, wlP2);
 	tmmP2->SetParam(TMM::PARAM_BETA, betaP2);
-	tmmP2->SetParam(TMM::PARAM_POL, polP2);
-	tmmP2->SetParam(TMM::PARAM_OVERRIDE_E0, true);
+	tmmP2->SetPolarization(polP2);
+	tmmP2->SetOverrideE0(true);
 	tmmP2->SetParam(TMM::PARAM_E0, overrideE0P2);
 
-	tmmGen->SetParam(TMM::PARAM_POL, polGen);
+	tmmGen->SetPolarization(polGen);
+
+
+	//  Waves
+	tmmP1->GetWave()->SetWaveType(TMM::GAUSSIANWAVE);
+	tmmP2->GetWave()->SetWaveType(TMM::SPDCWAVE);
+
+	tmmP1->GetWave()->SetNPointsInteg(500);
+	tmmP2->GetWave()->SetNPointsInteg(500);
 
 
 	Eigen::Array4d wls;
@@ -147,11 +159,16 @@ void TestSecondOrderNLTMM() {
 	Eigen::ArrayXd zs = Eigen::ArrayXd::LinSpaced(200, -200e-9, 200e-9);
 	Eigen::Map<Eigen::ArrayXd> zsMap(&zs(0), zs.size());
 
+	/*
 	for (int i = 0; i < 10000; i++) {
 	tmm.Solve();
 	TMM::FieldsZX *ptr = tmm.GetGen()->GetFields2D(xsMap, zsMap);
 	delete ptr;
 	}
+	*/
+
+	TMM::FieldsZX *ptr = tmm.WaveGetFields2D(xsMap, zsMap);
+	delete ptr;
 }
 
 int main() {
@@ -160,6 +177,6 @@ int main() {
 	
 	std::cout << double(clock()) / CLOCKS_PER_SEC << std::endl;
 	std::cout << "Done" << std::endl;
-	std::getchar();
+	//std::getchar();
 	return 0;
 }
