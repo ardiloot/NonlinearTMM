@@ -1,4 +1,7 @@
-from distutils.core import setup, Extension
+#from distutils.core import setup, Extension
+#from distutils.core import setup, Extension
+from setuptools import setup
+from setuptools.extension import Extension
 from Cython.Distutils import build_ext
 import numpy
 import glob

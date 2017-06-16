@@ -22,3 +22,6 @@ NonlinearTMM/src/SecondOrderNLTMM.cpp
 /cloc.txt
 /MANIFEST
 /dist/
+/prepare_to_publish.bat
+/publish.bat
+/NonlinearTMM.egg-info/
