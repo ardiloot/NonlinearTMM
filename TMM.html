@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>TMM &#8212; NonlinearTMM 1.2.4 documentation</title>
+    <title>TMM &#8212; NonlinearTMM 1.3.3 documentation</title>
     
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.2.4',
+        VERSION:     '1.3.3',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -34,7 +34,7 @@
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
-        <li class="nav-item nav-item-0"><a href="index.html">NonlinearTMM 1.2.4 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">NonlinearTMM 1.3.3 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="Reference.html" accesskey="U">API reference</a> &#187;</li> 
       </ul>
     </div>  
@@ -931,12 +931,12 @@ nonlinear.</p>
 <p class="rubric">Attributes</p>
 <table border="1" class="docutils">
 <colgroup>
-<col width="6%" />
-<col width="94%" />
+<col width="5%" />
+<col width="95%" />
 </colgroup>
 <tbody valign="top">
 <tr class="row-odd"><td>waveType</td>
-<td>(str) &#8216;planewave&#8217;: Usual plane wave &#8216;gaussian&#8217;: Standard Gaussian beam with waist size w0 &#8216;tukey&#8217;: Rectangular wave with cosine tapered edges (Tukey window). The width is given by <code class="xref any docutils literal"><span class="pre">w0</span></code> and the tapered region is determined by <code class="xref any docutils literal"><span class="pre">a</span></code>. Default is &#8216;planewave&#8217;.</td>
+<td>(str) &#8216;planewave&#8217;: Usual plane wave &#8216;gaussian&#8217;: Standard Gaussian beam with waist size w0 &#8216;tukey&#8217;: Rectangular wave with cosine tapered edges (Tukey window). The width is given by <code class="xref any docutils literal"><span class="pre">w0</span></code> and the tapered region is determined by <code class="xref any docutils literal"><span class="pre">a</span></code>. &#8216;spdc&#8217;: Wave used to represent vacuum fluctuations in case of SPDC calculation. Default is &#8216;planewave&#8217;.</td>
 </tr>
 <tr class="row-even"><td>pwr</td>
 <td>(float) Power of the wave (in watts). Default 1.0. The area of the beam is calculated as w0 * Ly.</td>
@@ -968,28 +968,31 @@ nonlinear.</p>
 <tr class="row-odd"><td>dynamicMaxXCoef</td>
 <td>(float) Dynamic maxX equals to the beam width (corrected to the angle of incidence) times <code class="xref any docutils literal"><span class="pre">dynamicMaxXCoef</span></code>. Default is 2.0.</td>
 </tr>
-<tr class="row-even"><td>maxPhi</td>
+<tr class="row-even"><td>dynamicMaxXAddition</td>
+<td>(float) Constant factor that is added to maxX if <code class="xref any docutils literal"><span class="pre">dynamicMaxX</span></code> is true. Default is 0.0.</td>
+</tr>
+<tr class="row-odd"><td>maxPhi</td>
 <td>(float) Determines the maximum angle of deviation form the direction of propagation of the participating fields. Increases the range of x-span (i.e <code class="xref any docutils literal"><span class="pre">maxX</span></code>) if it is neccesary to limit the angular distribution of the participating plane waves. Default is 0.17 rad.</td>
 </tr>
-<tr class="row-odd"><td>xRange</td>
+<tr class="row-even"><td>xRange</td>
 <td>(tuple of floats (xMin, xMax)) Current x-span calculated from <code class="xref any docutils literal"><span class="pre">maxX</span></code>, <code class="xref any docutils literal"><span class="pre">dynamicMaxXCoef</span></code> and <code class="xref any docutils literal"><span class="pre">maxPhi</span></code>. The wave must be solved to access this quantity.</td>
 </tr>
-<tr class="row-even"><td>betas</td>
+<tr class="row-odd"><td>betas</td>
 <td>(ndarray of floats) Normalized tangential wave vectors of plane wave expansion. The wave must be solved to access this quantity.</td>
 </tr>
-<tr class="row-odd"><td>phis</td>
+<tr class="row-even"><td>phis</td>
 <td>(ndarray of floats) Same information as in betas, but converted to angles in respect to the direction of the propagation. The wave must be solved to access this quantity.</td>
 </tr>
-<tr class="row-even"><td>kxs</td>
+<tr class="row-odd"><td>kxs</td>
 <td>(ndarray of floats) Same information as in betas, but converted to the x-component of the wave vector. The wave must be solved to access this quantity.</td>
 </tr>
-<tr class="row-odd"><td>kzs</td>
+<tr class="row-even"><td>kzs</td>
 <td>(ndarray of floats) Same information as in betas, but converted to the z-component of the wave vector. The wave must be solved to access this quantity.</td>
 </tr>
-<tr class="row-even"><td>fieldProfile</td>
+<tr class="row-odd"><td>fieldProfile</td>
 <td>(tuple(2,) of ndarray of floats (xs, fiedProfile)) The field profile of the input wave sample by <code class="xref any docutils literal"><span class="pre">nPointsInteg</span></code> points. The wave must be solved to access this quantity.</td>
 </tr>
-<tr class="row-odd"><td>expansionCoefsKx</td>
+<tr class="row-even"><td>expansionCoefsKx</td>
 <td>(ndarray of complex) Array of plane wave expansion coefs.</td>
 </tr>
 </tbody>
@@ -1069,7 +1072,7 @@ nonlinear.</p>
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              >index</a></li>
-        <li class="nav-item nav-item-0"><a href="index.html">NonlinearTMM 1.2.4 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">NonlinearTMM 1.3.3 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="Reference.html" >API reference</a> &#187;</li> 
       </ul>
     </div>
