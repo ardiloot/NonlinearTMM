@@ -1185,7 +1185,7 @@ cdef class NonlinearTMM:
         else:
             param = TmmParamFromStr(paramStr)
         
-        resCpp = self._thisptr.Sweep(TmmParamFromStr(paramStr), Map[ArrayXd](values), outmask, paramLayer, layerNr, layerZ)
+        resCpp = self._thisptr.Sweep(param, Map[ArrayXd](values), outmask, paramLayer, layerNr, layerZ)
         res = _SweepResultNonlinearTMM()
         res._Init(resCpp);
         return res
@@ -1405,7 +1405,7 @@ cdef class NonlinearTMM:
         else:
             param = TmmParamFromStr(paramStr)
             
-        resCpp = self._thisptr.WaveSweep(TmmParamFromStr(paramStr), Map[ArrayXd](values), outmask, paramLayer, layerNr, layerZ)
+        resCpp = self._thisptr.WaveSweep(param, Map[ArrayXd](values), outmask, paramLayer, layerNr, layerZ)
         res = _WaveSweepResultNonlinearTMM()
         res._Init(resCpp);
         return res
@@ -1862,7 +1862,7 @@ cdef class SecondOrderNLTMM:
         else:
             param = TmmParamFromStr(paramStr)
         
-        resCpp = self._thisptr.Sweep(TmmParamFromStr(paramStr), Map[ArrayXd](valuesP1), Map[ArrayXd](valuesP2), outmask, paramLayer, layerNr, layerZ)
+        resCpp = self._thisptr.Sweep(param, Map[ArrayXd](valuesP1), Map[ArrayXd](valuesP2), outmask, paramLayer, layerNr, layerZ)
         res = _SweepResultSecondOrderNLTMM()
         res._Init(resCpp);
         return res
@@ -1982,7 +1982,7 @@ cdef class SecondOrderNLTMM:
         else:
             param = TmmParamFromStr(paramStr)
             
-        resCpp = self._thisptr.WaveSweep(TmmParamFromStr(paramStr), Map[ArrayXd](valuesP1), Map[ArrayXd](valuesP2), outmask, paramLayer, layerNr, layerZ)
+        resCpp = self._thisptr.WaveSweep(param, Map[ArrayXd](valuesP1), Map[ArrayXd](valuesP2), outmask, paramLayer, layerNr, layerZ)
         res = _WaveSweepResultSecondOrderNLTMM()
         res._Init(resCpp);
         return res
