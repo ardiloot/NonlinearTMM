@@ -13,7 +13,7 @@ def RemoveMain(listoffiles):
 copt = {
     "msvc": ["/openmp", "/O2", "/Ot", "/MP"],
     "mingw32" : ["-O3", "-fopenmp"],
-    "unix": ["-std=c++11", "-O3", "-fopenmp"]
+    "unix": ["-std=c++11", "-O3", "-fopenmp", "-msse3"]
     }
 
 lopt = {"mingw32" : ["-fopenmp"] }
