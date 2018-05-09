@@ -24,6 +24,7 @@ environment:
 #    APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
 
 install:
+  - ps: $ErrorActionPreference = "silentlyContinue"
   - ps: $env:PATH += "$env:MINICONDA;$env:MINICONDA/Scripts"
   - ps: conda config --set always_yes yes --set changeps1 no
   - ps: conda update -q conda
