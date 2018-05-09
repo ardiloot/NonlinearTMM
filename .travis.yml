@@ -1,0 +1,38 @@
+language: python
+python:
+  - 3.6.5
+notifications:
+  email: false
+
+install:
+  - sudo apt-get update
+  - if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
+      wget https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh -O miniconda.sh;
+    else
+      wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
+    fi
+  - bash miniconda.sh -b -p $HOME/miniconda
+  - export PATH="$HOME/miniconda/bin:$PATH"
+  - hash -r
+  - conda config --set always_yes yes --set changeps1 no
+  - conda update -q conda
+  # Useful for debugging any issues with conda
+  - conda info -a
+  - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION numpy scipy Cython
+  - source activate test-environment
+  - pip install -r requirements.txt
+  - pip install pytest
+  - python setup.py install
+
+script:
+  - pytest tests
+  
+deploy:
+  provider: pypi
+  user: ardiloot
+  distributions: sdist
+  password:
+    secure: p7q/IEoY2wZ70drhcfJXR9pIYHm1DwCSQG9Oxy8Rloeq/HfHWbSJW6kU9bhbWoWyA65dUga6ukxkwjZIsNTgEzVoHnrwjSo0vsE8VKrMucPIq5Z4HBXryV0LI0ZjqtLbrvz728N0L5vqx7F+aneBg0eEYtma+xl4YI55KfKMrGnVdnc8sdnLTM8rkGC/pSrTsZkrEeFmICwhDr0bv2MlgW3il6llJYeaT0m3nGsvZXZ1tldYjX46hXk1zPbQcsF3vzOvorZ+6QdpLSKRZWX+A3VH+vmDbrXQrh2LicqcbVaOquC83rnbVkVnf5Lhb7MVruSnBC6c5CBJ8GTIbmeianUwZi6+EzNgRADqg5DGxsXoDIVSMm62PReSRvdmIHfYCTXasUL76HvI3toH2P+Y1FA0KURgPfuaY2ZMhezHyZOO46aU7RDUAWTCs2YoomW/3cTCFCOWC1nXqjTNJhnpwE27MOKuPjV6JpUXM983yHOQiNmLmaYRmD2U5vCE2o5PTAaMug2dr2FyhmJ8XrKotPSqXQBRxEfjUaHsASfS2xhmEwsMZmI1IxqKkn6S6x6rghFd/69rffKJrVFey0Yz0AcjBO8Y3FguE7OoE0GxvKYogEdSu8ET6K5Cakv/Fx/JW2V7jovd+1oWJBJOM4g1maYGozb6ZE5pjTPiPuO27FM=
+  on:
+    tags: true
+    branch: master
