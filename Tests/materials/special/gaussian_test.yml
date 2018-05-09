@@ -1,0 +1,14 @@
+BOOK: Thorlabs UVFS
+BOOK LONG: Thorlabs UVFS
+PAGE: Thorlabs
+PAGE LONG: Thorlabs
+REFERENCES: 
+COMMENTS: 
+DATA:
+    type: n
+    data: |
+        0.2 1.54
+        0.8 1.54
+        0.81 1.53
+        2.00 1.53
+

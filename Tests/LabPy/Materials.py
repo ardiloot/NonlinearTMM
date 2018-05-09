@@ -7,7 +7,7 @@ import bisect
 import os
 from LabPy import Core  # @UnresolvedImport
 
-materialsDir = r"../materials"
+materialsDir = path.join(path.dirname(path.realpath(__file__)), r"../materials") 
 if not path.isdir(materialsDir):
     materialsDir = os.environ["PYLAB_MATERIALS_DIR"]
 
