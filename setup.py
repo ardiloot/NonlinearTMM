@@ -1,5 +1,3 @@
-#from distutils.core import setup, Extension
-#from distutils.core import setup, Extension
 from setuptools import setup
 from setuptools.extension import Extension
 from Cython.Distutils import build_ext
@@ -12,8 +10,12 @@ def RemoveMain(listoffiles):
     return [fn for fn in listoffiles if "Main.cpp" not in fn]
 
 # Optimization flags
-copt = {"msvc": ["/openmp", "/arch:SSE2", "/O2", "/Ot", "/MP"],
-         "mingw32" : ["-O3", "-fopenmp"]}
+copt = {
+    "msvc": ["/openmp", "/O2", "/Ot", "/MP"],
+    "mingw32" : ["-O3", "-fopenmp"],
+    "unix": ["-std=c++11", "-O3", "-fopenmp"]
+    }
+
 lopt = {"mingw32" : ["-fopenmp"] }
 
 class build_ext_subclass(build_ext):

@@ -30,7 +30,8 @@ install:
   - cmd: activate test-environment
   - ps: pip install -r requirements.txt
   - ps: pip install twine
-  - ps: pip install nose  
+  - ps: pip install pytest
+  - ps: pip install pyyaml  
 
 build_script:
   - ps: python setup.py build install
