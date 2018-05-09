@@ -22,25 +22,30 @@ environment:
 #    MINICONDA: C:\Miniconda35-x64
 
 install:
-  - cmd: set PATH=%MINICONDA%;%MINICONDA%\\Scripts;%PATH%
-  - cmd: conda config --set always_yes yes --set changeps1 no
-  - cmd: conda update -q conda
-  - cmd: conda info -a
-  - cmd: conda create -q -n test-environment python=%PYTHON_VERSION% numpy scipy Cython
-  - cmd: activate test-environment
-  - cmd: pip install -r requirements.txt
-  - cmd: pip install twine
-  - cmd: pip install nose  
+  - ps: $env:PATH += "$env:MINICONDA;$env:MINICONDA/Scripts"
+  - ps: conda config --set always_yes yes --set changeps1 no
+  - ps: conda update -q conda
+  - ps: conda info -a
+  - ps: conda create -q -n test-environment python=%PYTHON_VERSION% numpy scipy Cython
+  - ps: activate test-environment
+  - ps: pip install -r requirements.txt
+  - ps: pip install twine
+  - ps: pip install nose  
 
 build_script:
-  - cmd: python setup.py build install
+  - ps: python setup.py build install
 
 test_script:
-  - cmd: pytest Tests/
-  - cmd: python setup.py sdist bdist_wheel
+  - ps: pytest Tests/
+  - ps: python setup.py sdist bdist_wheel
 
 artifacts:
   - path: dist/*
 
 deploy_script:
-  - cmd: if "%APPVEYOR_REPO_TAG%"=="true" ( twine upload --skip-existing dist/* ) else ( echo "Not deplaying because not a tagged commit.")
+  - ps: >-
+      if ($env:APPVEYOR_REPO_TAG -eq "true"){
+        twine upload --skip-existing dist/*
+      } else {
+        echo "Not deplaying because not a tagged commit."
+      }
