@@ -303,7 +303,6 @@ namespace TMM {
 		// Solve waves
 		ArrayXd betasP1, betasP2;
 		ArrayXcd E0sP1, E0sP2;
-		bool coherent;
 		SolveWaves(&betasP1, &E0sP1, &betasP2, &E0sP2);
 
 		// kxs

@@ -430,7 +430,7 @@ namespace TMM{
 			std::cerr << "NonlinearLayer must be solved first." << std::endl;
 		}
 
-		if (abs(imag(eps)) < 1e-14) {
+		if (std::abs(imag(eps)) < 1e-14) {
 			//Layer not absorbing
 			return 0.0;
 		}

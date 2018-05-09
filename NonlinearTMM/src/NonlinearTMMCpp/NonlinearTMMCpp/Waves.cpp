@@ -55,7 +55,7 @@ namespace TMM {
 		else {
 			maxXThis = maxX;
 		}
-		maxXThis = max(maxXThis, maxXByPhi);
+		maxXThis = std::max(maxXThis, maxXByPhi);
 		
 		// Init xs
 		ArrayXd xs(nPointsInteg);

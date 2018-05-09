@@ -297,7 +297,7 @@ namespace TMM {
 			dcomplex kzF = kzs(i, F);
 			dcomplex UB = Us(i, B);
 			dcomplex kzB = kzs(i, B);
-			double kx = kxs(i);
+			//double kx = kxs(i);
 			double dkx = dkxs(i);			
 			integValue2dF += dkx * dkx * UF * std::conj(UF) * kzF * (x1 - x0);
 			integValue2dB += dkx * dkx * UB * std::conj(UB) * kzB * (x1 - x0);
