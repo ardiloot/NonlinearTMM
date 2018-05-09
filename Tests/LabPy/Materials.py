@@ -5,10 +5,11 @@ import fnmatch
 import yaml
 import bisect
 import os
-import pkg_resources
 from LabPy import Core  # @UnresolvedImport
 
-materialsDir = path.join(pkg_resources.resource_filename("NonlinearTMM", ""), "../Tests/materials")
+materialsDir = path.join(path.dirname(path.realpath(__file__)), r"../materials") 
+if not path.isdir(materialsDir):
+    materialsDir = os.environ["PYLAB_MATERIALS_DIR"]
 
 #===============================================================================
 # Methods
