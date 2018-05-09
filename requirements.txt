@@ -2,4 +2,4 @@ numpy
 Cython
 eigency
 pytest
-yaml
+pyyaml
