@@ -19,7 +19,7 @@ install:
   - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION numpy scipy Cython
   - source activate test-environment
   - pip install -r requirements.txt
-  - pip install pytest
+  - pip install pytest pyyaml
   - python setup.py install
 
 script:
