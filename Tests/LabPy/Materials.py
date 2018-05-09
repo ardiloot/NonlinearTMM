@@ -131,7 +131,7 @@ class Material(Core.ParamsBaseClass):
             complex: complex refractive index
         
         """
-        res = self.nFunc(wl) + 1.0j * self.kFunc(wl) + 1.0j * self.kAdditional
+        res = self.nFunc(wl) + 1.0j * self.kFunc(wl) + 1.0j * self.kAdditional + 1.0
         return res
   
     def GetN(self, wlFr = -float("inf"), wlTo = -float("inf")):
