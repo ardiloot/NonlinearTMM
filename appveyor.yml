@@ -36,7 +36,7 @@ build_script:
   - cmd: python setup.py build install
 
 test_script:
-  - cmd: nosetests -v -w tests
+  - cmd: pytest Tests/
   - cmd: python setup.py sdist bdist_wheel
 
 artifacts:
