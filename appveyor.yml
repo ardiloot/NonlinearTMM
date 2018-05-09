@@ -16,15 +16,12 @@ environment:
   TWINE_PASSWORD:
     secure: LpIfAMfey8cEO3mNGXR4h9cUXBNNVCRAWBpCVmn2vq8=
   matrix:
-#  - PYTHON_VERSION: 3.6.5
-#    MINICONDA: C:\Miniconda36-x64
-#    APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
-#  - PYTHON_VERSION: 3.6.5
-#    MINICONDA: C:\Miniconda36-x64
-#    APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
   - PYTHON_VERSION: 3.6.5
     MINICONDA: C:\Miniconda36-x64
-    APPVEYOR_BUILD_WORKER_IMAGE: ubuntu
+    APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
+  - PYTHON_VERSION: 3.6.5
+    MINICONDA: C:\Miniconda36-x64
+    APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
     
 install:
   - cmd: $env:PATH += "$env:MINICONDA;$env:MINICONDA/Scripts"
