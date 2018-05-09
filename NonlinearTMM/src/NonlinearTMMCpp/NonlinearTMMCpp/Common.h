@@ -133,7 +133,7 @@ namespace TMM {
 	// Inline SSE
 	//---------------------------------------------------------------
 
-	__forceinline dcomplex FastExp(dcomplex z) {
+	inline dcomplex FastExp(dcomplex z) {
 		/*
 		double y = imag(z);
 		__m128d c2 = _mm_set1_pd(std::exp(real(z)));
@@ -149,7 +149,7 @@ namespace TMM {
 		return res;
 	}
 
-	__forceinline dcomplex multSSE(dcomplex aa, dcomplex bb) {
+	inline dcomplex multSSE(dcomplex aa, dcomplex bb) {
 		const __m128d mask = _mm_set_pd(-0.0, 0.0);
 
 		// Load to registers
