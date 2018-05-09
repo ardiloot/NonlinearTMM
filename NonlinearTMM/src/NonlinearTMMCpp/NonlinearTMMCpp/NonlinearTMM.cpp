@@ -298,11 +298,11 @@ namespace TMM {
 	void NonlinearTMM::CheckPrerequisites(TMMParam toIgnore) {
 		// Check params
 		if (mode != MODE_NONLINEAR) {
-			if (toIgnore != PARAM_WL && isnan(wl)) {
+			if (toIgnore != PARAM_WL && std::isnan(wl)) {
 				throw std::invalid_argument("Wavelength is not set.");
 			}
 
-			if (toIgnore != PARAM_BETA && isnan(beta)) {
+			if (toIgnore != PARAM_BETA && std::isnan(beta)) {
 				throw std::invalid_argument("Beta is not set.");
 			}
 		}
@@ -316,27 +316,27 @@ namespace TMM {
 		}
 
 		if (mode == MODE_VACUUM_FLUCTUATIONS) {
-			if (isnan(deltaWlSpdc)) {
+			if (std::isnan(deltaWlSpdc)) {
 				std::cerr << "No value for deltaWlSpdc" << std::endl;
 				throw std::invalid_argument("No value for deltaWlSpdc");
 			}
 
-			if (isnan(solidAngleSpdc)) {
+			if (std::isnan(solidAngleSpdc)) {
 				std::cerr << "No value for solidAngleSpdc" << std::endl;
 				throw std::invalid_argument("No value for solidAngleSpdc");
 			}
 
-			if (isnan(deltaThetaSpdc)) {
+			if (std::isnan(deltaThetaSpdc)) {
 				std::cerr << "No value for deltaThetaSpdc" << std::endl;
 				throw std::invalid_argument("No value for deltaThetaSpdc");
 			}
 
-			if (isnan(wlP1Spdc)) {
+			if (std::isnan(wlP1Spdc)) {
 				std::cerr << "No value for wlP1Spdc" << std::endl;
 				throw std::invalid_argument("No value for wlP1Spdc");
 			}
 
-			if (isnan(betaP1Spdc)) {
+			if (std::isnan(betaP1Spdc)) {
 				std::cerr << "No value for betaP1Spdc" << std::endl;
 				throw std::invalid_argument("No value for betaP1Spdc");
 			}
@@ -911,11 +911,11 @@ namespace TMM {
 		
 		// Adjust range
 		pairdd xrange = wave.GetXRange();
-		if (isnan(x0)) {
+		if (std::isnan(x0)) {
 			x0 = xrange.first;
 		}
 
-		if (isnan(x1)) {
+		if (std::isnan(x1)) {
 			x1 = xrange.second;
 		}
 

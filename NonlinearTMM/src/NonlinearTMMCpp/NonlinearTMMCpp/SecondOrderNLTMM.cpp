@@ -413,10 +413,10 @@ namespace TMM {
 
 		// X-range (TODO)
 		pairdd xrangeP1 = waveP1->GetXRange();
-		if (isnan(x0)) {
+		if (std::isnan(x0)) {
 			x0 = xrangeP1.first;
 		}
-		if (isnan(x1)) {
+		if (std::isnan(x1)) {
 			x1 = xrangeP1.second;
 		}
 
