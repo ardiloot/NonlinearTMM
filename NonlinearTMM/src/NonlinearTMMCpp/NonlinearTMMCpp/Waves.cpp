@@ -81,7 +81,7 @@ namespace TMM {
 		// FFT spectrum
 		ArrayXd shiftedFieldProfile = IFFTShift(fieldProfile);
 		ArrayXcd fieldProfileSpectrum(fieldProfile.size());
-		fft.fwd(fieldProfileSpectrum.matrix(), shiftedFieldProfile.matrix());
+		fft.fwd(&fieldProfileSpectrum(0), &shiftedFieldProfile(0), fieldProfile.size());
 		fieldProfileSpectrum = FFTShift(fieldProfileSpectrum);
 		fieldProfileSpectrum *= dx / (2.0 * PI);
 		ArrayXd kxPs = 2.0 * PI * FFTFreq(fieldProfile.size(), dx);
