@@ -28,13 +28,15 @@ install:
   - ps: conda info -a
   - ps: conda create -q -n test-environment python=$env:PYTHON_VERSION numpy scipy Cython
   - cmd: activate test-environment
+  - sh: source activate test-environment
   - ps: pip install -r requirements.txt
   - ps: pip install twine
   - ps: pip install pytest
   - ps: pip install pyyaml  
 
 build_script:
-  - ps: python setup.py build install
+  - ps: python setup.py build
+  - ps: python setup.py install
 
 test_script:
   - ps: pytest Tests/

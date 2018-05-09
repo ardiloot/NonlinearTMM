@@ -53,4 +53,5 @@ setup(name = "NonlinearTMM",
       author_email = "ardi.loot@outlook.com",
       packages = ["NonlinearTMM"],
       cmdclass = {"build_ext": build_ext_subclass},
-      ext_modules = [ext],)
+      ext_modules = [ext],
+      zip_safe = False)
