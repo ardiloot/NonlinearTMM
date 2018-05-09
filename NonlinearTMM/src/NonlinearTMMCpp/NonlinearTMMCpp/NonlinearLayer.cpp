@@ -102,7 +102,7 @@ namespace TMM{
 		}
 
 		// Propagation matrix
-		if (isinf(layer->d)) {
+		if (std::isinf(layer->d)) {
 			propMatrix = Matrix2cd::Identity();
 		}
 		else {
@@ -201,7 +201,7 @@ namespace TMM{
 		// NL Propagation Matrix
 		propMatrixNL = Array2cd::Zero();
 		if (layer->IsNonlinear()) {
-			if (isinf(layer->d)) {
+			if (std::isinf(layer->d)) {
 				throw std::runtime_error("First and last medium must be nonlinear.");
 			}
 			else {

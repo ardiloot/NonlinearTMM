@@ -573,7 +573,7 @@ namespace TMM {
 	}
 
 	void NonlinearTMM::AddLayer(double d_, Material *material_) {
-		if (layers.size() == 0 && !isinf(d_)) {
+		if (layers.size() == 0 && !std::isinf(d_)) {
 			throw std::invalid_argument("First layer must have infinite thickness.");
 		}
 
