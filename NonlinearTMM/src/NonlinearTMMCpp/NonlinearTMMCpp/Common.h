@@ -1,12 +1,12 @@
 #pragma once
 #define EIGEN_DONT_PARALLELIZE
+#define NOMINMAX
 #include <iostream>
 #include <complex>
 #include <algorithm>
 #include <vector>
 #include <Eigen/Dense>
 #include <unsupported/Eigen/CXX11/Tensor>
-//#include <omp.h>
 
 namespace TMM {
 	using Eigen::Array2cd;
