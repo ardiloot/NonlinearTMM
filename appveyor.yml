@@ -42,7 +42,8 @@ build_script:
 
 test_script:
   - ps: pytest Tests/
-  - ps: python setup.py sdist bdist_wheel
+  - ps: python setup.py sdist
+  - ps: python setup.py bdist_wheel
 
 artifacts:
   - path: dist/*
