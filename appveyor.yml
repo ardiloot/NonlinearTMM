@@ -1,0 +1,46 @@
+version: 1.0.{build}
+
+init:
+  - ps: >-
+      if ($env:APPVEYOR_REPO_TAG -eq "true")
+      {
+          Update-AppveyorBuild -Version "$env:APPVEYOR_REPO_TAG_NAME"
+      }
+      else
+      {
+          Update-AppveyorBuild -Version "dev-$($env:APPVEYOR_REPO_COMMIT.substring(0,7))"
+      }
+
+environment:
+  TWINE_USERNAME: ardiloot
+  TWINE_PASSWORD:
+    secure: LpIfAMfey8cEO3mNGXR4h9cUXBNNVCRAWBpCVmn2vq8=
+  matrix:
+  - PYTHON_VERSION: 3.6.3
+    MINICONDA: C:\Miniconda36-x64
+#  - PYTHON_VERSION: 3.5.2
+#    MINICONDA: C:\Miniconda35-x64
+
+install:
+  - cmd: set PATH=%MINICONDA%;%MINICONDA%\\Scripts;%PATH%
+  - cmd: conda config --set always_yes yes --set changeps1 no
+  - cmd: conda update -q conda
+  - cmd: conda info -a
+  - cmd: conda create -q -n test-environment python=%PYTHON_VERSION% numpy scipy Cython
+  - cmd: activate test-environment
+  - cmd: pip install -r requirements.txt
+  - cmd: pip install twine
+  - cmd: pip install nose  
+
+build_script:
+  - cmd: python setup.py build install
+
+test_script:
+  - cmd: nosetests -v -w tests
+  - cmd: python setup.py sdist bdist_wheel
+
+artifacts:
+  - path: dist/*
+
+deploy_script:
+  - cmd: if "%APPVEYOR_REPO_TAG%"=="true" ( twine upload --skip-existing dist/* ) else ( echo "Not deplaying because not a tagged commit.")
