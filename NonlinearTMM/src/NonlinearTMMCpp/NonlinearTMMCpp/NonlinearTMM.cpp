@@ -1,4 +1,4 @@
-#include "NonlinearTmm.h"
+#include "NonlinearTMM.h"
 
 namespace TMM {
 
