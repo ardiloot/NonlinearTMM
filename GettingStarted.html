@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Getting started &#8212; NonlinearTMM 1.3.3 documentation</title>
+    <title>Getting started &#8212; NonlinearTMM 1.3.10 documentation</title>
     
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.3.3',
+        VERSION:     '1.3.10',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -42,7 +42,7 @@
         <li class="right" >
           <a href="Introduction.html" title="Introduction"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">NonlinearTMM 1.3.3 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">NonlinearTMM 1.3.10 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -90,33 +90,33 @@ code.</p>
 <h2>Package structure<a class="headerlink" href="#package-structure" title="Permalink to this headline">¶</a></h2>
 <p>The package has three main classes:</p>
 <ul class="simple">
-<li><a class="reference internal" href="Material.html#NonlinearTMM.Material" title="NonlinearTMM.Material"><code class="xref py py-class docutils literal"><span class="pre">Material</span></code></a></li>
-<li><a class="reference internal" href="TMM.html#NonlinearTMM.TMM" title="NonlinearTMM.TMM"><code class="xref py py-class docutils literal"><span class="pre">TMM</span></code></a></li>
-<li><a class="reference internal" href="SecondOrderNLTMM.html#NonlinearTMM.SecondOrderNLTMM" title="NonlinearTMM.SecondOrderNLTMM"><code class="xref py py-class docutils literal"><span class="pre">SecondOrderNLTMM</span></code></a></li>
+<li><code class="xref py py-class docutils literal"><span class="pre">Material</span></code></li>
+<li><code class="xref py py-class docutils literal"><span class="pre">TMM</span></code></li>
+<li><code class="xref py py-class docutils literal"><span class="pre">SecondOrderNLTMM</span></code></li>
 </ul>
-<p>Class <a class="reference internal" href="Material.html#NonlinearTMM.Material" title="NonlinearTMM.Material"><code class="xref py py-class docutils literal"><span class="pre">Material</span></code></a> is responsible to represent the properties of optical
+<p>Class <code class="xref py py-class docutils literal"><span class="pre">Material</span></code> is responsible to represent the properties of optical
 material. Mainly wavelength dependent refractive indices and second-order
 suceptibility tensor for nonlinear processes.</p>
-<p>Class <a class="reference internal" href="TMM.html#NonlinearTMM.TMM" title="NonlinearTMM.TMM"><code class="xref py py-class docutils literal"><span class="pre">TMM</span></code></a> (alias of <a class="reference internal" href="TMM.html#NonlinearTMM.NonlinearTMM" title="NonlinearTMM.NonlinearTMM"><code class="xref py py-class docutils literal"><span class="pre">NonlinearTMM</span></code></a>) is has all the standard TMM features:</p>
+<p>Class <code class="xref py py-class docutils literal"><span class="pre">TMM</span></code> (alias of <code class="xref py py-class docutils literal"><span class="pre">NonlinearTMM</span></code>) is has all the standard TMM features:</p>
 <ul class="simple">
 <li>Both p- and s-polarization</li>
 <li>Arbritarty angle of incidence</li>
-<li>Calculation of reflection, transmission and absorption of plane waves (<a class="reference internal" href="TMM.html#NonlinearTMM.NonlinearTMM.GetIntensities" title="NonlinearTMM.NonlinearTMM.GetIntensities"><code class="xref any py py-meth docutils literal"><span class="pre">GetIntensities</span></code></a> and <a class="reference internal" href="TMM.html#NonlinearTMM.NonlinearTMM.GetAbsorbedIntensity" title="NonlinearTMM.NonlinearTMM.GetAbsorbedIntensity"><code class="xref any py py-meth docutils literal"><span class="pre">GetAbsorbedIntensity</span></code></a>)</li>
-<li>Calculaion of electric and magnetic fields inside structure (<a class="reference internal" href="TMM.html#NonlinearTMM.NonlinearTMM.GetFields" title="NonlinearTMM.NonlinearTMM.GetFields"><code class="xref any py py-meth docutils literal"><span class="pre">GetFields</span></code></a> and <a class="reference internal" href="TMM.html#NonlinearTMM.NonlinearTMM.GetFields2D" title="NonlinearTMM.NonlinearTMM.GetFields2D"><code class="xref any py py-meth docutils literal"><span class="pre">GetFields2D</span></code></a>)</li>
-<li>Calculation of field enhancement (<a class="reference internal" href="TMM.html#NonlinearTMM.NonlinearTMM.GetEnhancement" title="NonlinearTMM.NonlinearTMM.GetEnhancement"><code class="xref any py py-meth docutils literal"><span class="pre">GetEnhancement</span></code></a>)</li>
-<li>Sweep over any parameter (<a class="reference internal" href="TMM.html#NonlinearTMM.NonlinearTMM.Sweep" title="NonlinearTMM.NonlinearTMM.Sweep"><code class="xref any py py-meth docutils literal"><span class="pre">Sweep</span></code></a>)</li>
+<li>Calculation of reflection, transmission and absorption of plane waves (<code class="xref any docutils literal"><span class="pre">GetIntensities</span></code> and <code class="xref any docutils literal"><span class="pre">GetAbsorbedIntensity</span></code>)</li>
+<li>Calculaion of electric and magnetic fields inside structure (<code class="xref any docutils literal"><span class="pre">GetFields</span></code> and <code class="xref any docutils literal"><span class="pre">GetFields2D</span></code>)</li>
+<li>Calculation of field enhancement (<code class="xref any docutils literal"><span class="pre">GetEnhancement</span></code>)</li>
+<li>Sweep over any parameter (<code class="xref any docutils literal"><span class="pre">Sweep</span></code>)</li>
 </ul>
 <p>In addition to those standard features, the class has similar functionality to
 work with waves with arbritarty profile (e.g. Gaussian beam). The configuration
-of the beam is done through attribute <code class="xref any docutils literal"><span class="pre">wave</span></code> (see class <a class="reference internal" href="TMM.html#NonlinearTMM._Wave" title="NonlinearTMM._Wave"><code class="xref any py py-class docutils literal"><span class="pre">_Wave</span></code></a>).
+of the beam is done through attribute <code class="xref any docutils literal"><span class="pre">wave</span></code> (see class <code class="xref any docutils literal"><span class="pre">_Wave</span></code>).
 The interface for the calculations with arbritarty beams is similar to standard TMM:</p>
 <ul class="simple">
-<li>Calculation of reflection, transmission and absorption of beams (<a class="reference internal" href="TMM.html#NonlinearTMM.NonlinearTMM.WaveGetPowerFlows" title="NonlinearTMM.NonlinearTMM.WaveGetPowerFlows"><code class="xref any py py-meth docutils literal"><span class="pre">WaveGetPowerFlows</span></code></a>)</li>
-<li>Calculaion of electric and magnetic fields inside structure (<a class="reference internal" href="TMM.html#NonlinearTMM.NonlinearTMM.WaveGetFields2D" title="NonlinearTMM.NonlinearTMM.WaveGetFields2D"><code class="xref any py py-meth docutils literal"><span class="pre">WaveGetFields2D</span></code></a>)</li>
-<li>Calculation of field enhancement (<a class="reference internal" href="TMM.html#NonlinearTMM.NonlinearTMM.WaveGetEnhancement" title="NonlinearTMM.NonlinearTMM.WaveGetEnhancement"><code class="xref any py py-meth docutils literal"><span class="pre">WaveGetEnhancement</span></code></a>)</li>
-<li>Sweep over any parameter (<a class="reference internal" href="TMM.html#NonlinearTMM.NonlinearTMM.WaveSweep" title="NonlinearTMM.NonlinearTMM.WaveSweep"><code class="xref any py py-meth docutils literal"><span class="pre">WaveSweep</span></code></a>)</li>
+<li>Calculation of reflection, transmission and absorption of beams (<code class="xref any docutils literal"><span class="pre">WaveGetPowerFlows</span></code>)</li>
+<li>Calculaion of electric and magnetic fields inside structure (<code class="xref any docutils literal"><span class="pre">WaveGetFields2D</span></code>)</li>
+<li>Calculation of field enhancement (<code class="xref any docutils literal"><span class="pre">WaveGetEnhancement</span></code>)</li>
+<li>Sweep over any parameter (<code class="xref any docutils literal"><span class="pre">WaveSweep</span></code>)</li>
 </ul>
-<p>Finally, <a class="reference internal" href="SecondOrderNLTMM.html#NonlinearTMM.SecondOrderNLTMM" title="NonlinearTMM.SecondOrderNLTMM"><code class="xref py py-class docutils literal"><span class="pre">SecondOrderNLTMM</span></code></a> class ic capable of calculating second-order
+<p>Finally, <code class="xref py py-class docutils literal"><span class="pre">SecondOrderNLTMM</span></code> class ic capable of calculating second-order
 nonlinear processes like second-harmonic generation, sum-frequency generation and
 difference frequency generation. This has similar interface as <a class="reference internal" href="TMM.html"><span class="doc">TMM</span></a> - it
 supports both the plane waves and beams.</p>
@@ -132,11 +132,11 @@ configuration. The example code is shown bellow and could be divided into
 following steps:</p>
 <ol class="arabic simple">
 <li>Specifying materials refractive indices.</li>
-<li>Initializing <a class="reference internal" href="TMM.html#NonlinearTMM.TMM" title="NonlinearTMM.TMM"><code class="xref py py-class docutils literal"><span class="pre">TMM</span></code></a>, setting params and adding layers.</li>
-<li>By using <a class="reference internal" href="TMM.html#NonlinearTMM.NonlinearTMM.Sweep" title="NonlinearTMM.NonlinearTMM.Sweep"><code class="xref any py py-meth docutils literal"><span class="pre">Sweep</span></code></a> calculate the dependence of reflection, transmission and enhancment factor on the angle of incidence.</li>
+<li>Initializing <code class="xref py py-class docutils literal"><span class="pre">TMM</span></code>, setting params and adding layers.</li>
+<li>By using <code class="xref any docutils literal"><span class="pre">Sweep</span></code> calculate the dependence of reflection, transmission and enhancment factor on the angle of incidence.</li>
 <li>Find the plasmonic resonance by maximum enhancment.</li>
-<li>Calculate 1D fields at plasmonic resonance by <a class="reference internal" href="TMM.html#NonlinearTMM.NonlinearTMM.GetFields" title="NonlinearTMM.NonlinearTMM.GetFields"><code class="xref any py py-meth docutils literal"><span class="pre">GetFields</span></code></a>.</li>
-<li>Calculate 2D fields at plasmonic resonance by <a class="reference internal" href="TMM.html#NonlinearTMM.NonlinearTMM.GetFields2D" title="NonlinearTMM.NonlinearTMM.GetFields2D"><code class="xref any py py-meth docutils literal"><span class="pre">GetFields2D</span></code></a>.</li>
+<li>Calculate 1D fields at plasmonic resonance by <code class="xref any docutils literal"><span class="pre">GetFields</span></code>.</li>
+<li>Calculate 2D fields at plasmonic resonance by <code class="xref any docutils literal"><span class="pre">GetFields2D</span></code>.</li>
 <li>Plot all results</li>
 </ol>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -241,7 +241,7 @@ fields for SPP is visible.</p>
 <h3>Gaussian wave example<a class="headerlink" href="#gaussian-wave-example" title="Permalink to this headline">¶</a></h3>
 <p>Previous example was entirely about standard TMM. Now, the calculations are
 extended to the beams, in this case Gaussian beam. The steps of the calculations
-remain the same, except <a class="reference internal" href="TMM.html#NonlinearTMM._Wave" title="NonlinearTMM._Wave"><code class="xref py py-class docutils literal"><span class="pre">_Wave</span></code></a> parameters must be set (<a class="reference internal" href="TMM.html#NonlinearTMM.TMM" title="NonlinearTMM.TMM"><code class="xref py py-class docutils literal"><span class="pre">TMM</span></code></a> has
+remain the same, except <code class="xref py py-class docutils literal"><span class="pre">_Wave</span></code> parameters must be set (<code class="xref py py-class docutils literal"><span class="pre">TMM</span></code> has
 attribute <code class="xref any docutils literal"><span class="pre">TMM.wave</span></code>). Gaussian beam power is set to 10 mW and waist size
 to 10 μm.</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -417,7 +417,7 @@ propagation.</p>
         <li class="right" >
           <a href="Introduction.html" title="Introduction"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">NonlinearTMM 1.3.3 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">NonlinearTMM 1.3.10 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
