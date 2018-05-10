@@ -137,7 +137,7 @@ def TestPowerFlows(tmms):
     print(T)
     print("Diff")
     print(T - sr.It)
-    print("Atol", 1e-6 * np.mean(inc))
+    print("Atol", 1e-9 * np.mean(I))
     
     # Comparison
     np.testing.assert_allclose(sr.inc, inc)
@@ -145,7 +145,7 @@ def TestPowerFlows(tmms):
     np.testing.assert_allclose(sr.t, t)
     np.testing.assert_allclose(sr.Ii, I)
     np.testing.assert_allclose(sr.Ir, R)    
-    np.testing.assert_allclose(sr.It, T, atol = 1e-6 * np.mean(inc))
+    np.testing.assert_allclose(sr.It, T, atol = 1e-9 * np.mean(I))
 
 
 
