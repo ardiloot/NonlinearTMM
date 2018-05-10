@@ -137,5 +137,10 @@ def TestPowerFlows(tmms):
     np.testing.assert_allclose(sr.t, t)
     np.testing.assert_allclose(sr.Ii, I)
     np.testing.assert_allclose(sr.Ir, R)    
-    np.testing.assert_allclose(sr.It, T, rtol = 1e-5)
+    np.testing.assert_allclose(sr.It, T, rtol = 1e-4)
+    print("C++")
+    print(sr.It)
+    print("Python")
+    print(T)
+
 
