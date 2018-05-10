@@ -36,3 +36,4 @@ deploy:
   on:
     tags: true
     branch: master
+    condition: $TRAVIS_OS_NAME = osx
