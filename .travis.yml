@@ -17,7 +17,7 @@ install:
   - conda config --set always_yes yes --set changeps1 no
   - conda update -q conda
   - conda info -a
-  - conda create -q -n test-environment python=3.6.5 numpy scipy Cython
+  - conda create -q -n test-environment python=3.6.5 numpy Cython
   - source activate test-environment
   - pip install -r requirements.txt
   - pip install pytest pyyaml

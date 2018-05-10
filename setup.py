@@ -1,6 +1,7 @@
 from setuptools import setup
 from setuptools.extension import Extension
 from Cython.Distutils import build_ext
+import platform
 import numpy
 import glob
 import re
@@ -15,6 +16,10 @@ copt = {
     "mingw32" : ["-O3", "-fopenmp"],
     "unix": ["-std=c++11", "-O3", "-fopenmp", "-msse3"]
     }
+
+# OpenMP not supported on OSX
+if platform.system() == "Darwin":
+    copt["unix"].remove("-fopenmp")
 
 lopt = {"mingw32" : ["-fopenmp"] }
 
