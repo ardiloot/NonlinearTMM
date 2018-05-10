@@ -640,6 +640,7 @@ namespace TMM {
 			I = c * std::real(l0.hw.kz(F) / l0.eps) * std::norm(inc);
 			R = c * std::real(l0.hw.kz(F) / l0.eps) * std::norm(r);
 			T = c * std::real(lL.hw.kz(F) / lL.eps) * std::norm(t);
+			std::cout << c << " " << t << " " << T << " " << lL.hw.kz(F) << " " << lL.eps << " " << I - R - T << std::endl;
 		}
 		else if (pol == S_POL) {
 			double c = 1.0 / (2.0 * omega * constMu0);
@@ -650,7 +651,6 @@ namespace TMM {
 		else {
 			throw std::runtime_error("Unknown polarization.");
 		}
-
 		Intensities res(inc, r, t, I, R, T);
 		return res;
 	}
