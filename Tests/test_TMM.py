@@ -144,7 +144,7 @@ def TestPowerFlows(tmms):
     np.testing.assert_allclose(sr.t, t)
     np.testing.assert_allclose(sr.Ii, I)
     np.testing.assert_allclose(sr.Ir, R)    
-    np.testing.assert_allclose(sr.It, T, atol = 1e-7 * inc)
+    np.testing.assert_allclose(sr.It, T, atol = 1e-7 * np.mean(inc))
 
 
 
