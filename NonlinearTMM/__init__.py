@@ -1,4 +1,4 @@
-__version__ = "1.3.8"
+__version__ = "1.3.9"
 
 from ._Material import *
 from ._NonlinearTMM import *
