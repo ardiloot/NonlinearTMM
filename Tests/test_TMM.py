@@ -131,14 +131,6 @@ def TestPowerFlows(tmms):
     sweepFunc = np.vectorize(lambda beta: tmmPy.Solve(beta = beta))
     inc, r, t, I, R, T, _ = sweepFunc(betas)
 
-    print("C++")
-    print(sr.It)
-    print("Python")
-    print(T)
-    print("Diff")
-    print(T - sr.It)
-    print("Atol", 1e-9 * np.mean(I))
-    
     # Comparison
     np.testing.assert_allclose(sr.inc, inc)
     np.testing.assert_allclose(sr.r, r)
