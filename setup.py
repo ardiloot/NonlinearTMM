@@ -14,12 +14,12 @@ def RemoveMain(listoffiles):
 copt = {
     "msvc": ["/openmp", "/O2", "/Ot", "/MP"],
     "mingw32" : ["-O3", "-fopenmp"],
-    "unix": ["-std=c++11", "-O3", "-msse3"]
+    "unix": ["-std=c++11", "-O3", "-fopenmp", "-msse3"]
     }
 
 # OpenMP not supported on OSX
 if platform.system() == "Darwin":
-    #copt["unix"].remove("-fopenmp")
+    copt["unix"].remove("-fopenmp")
     copt["unix"].append("-stdlib=libc++")
 
 lopt = {"mingw32" : ["-fopenmp"] }
