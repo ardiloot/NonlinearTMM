@@ -1,8 +1,10 @@
 name: Build and publish docs
 
 on:
-  release:
-    types: [created]
+  pull_request:
+  push:
+    branches:
+      - master
 
 jobs:
   build:
