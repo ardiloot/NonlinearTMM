@@ -35,10 +35,6 @@ class build_ext_subclass(build_ext):
                 e.extra_link_args = lopt[c]
         build_ext.build_extensions(self)
 
-# Parse version
-__version__ = re.search(r'__version__\s*=\s*[\'"]([^\'"]*)[\'"]',
-    open('NonlinearTMM/__init__.py').read()).group(1)
-
 sources = ["NonlinearTMM/src/SecondOrderNLTMM.pyx"] + \
     RemoveMain(glob.glob("NonlinearTMM/src/NonlinearTMMCpp/NonlinearTMMCpp/*.cpp"))
     
@@ -52,12 +48,24 @@ ext = Extension("NonlinearTMM._SecondOrderNLTMMCython",
     include_dirs = include_dirs,
     language = "c++")
 
-setup(name = "NonlinearTMM",
-      version = __version__,
-      author = "Ardi Loot",
-      url = "https://github.com/ardiloot/NonlinearTMM",
-      author_email = "ardi.loot@outlook.com",
-      packages = ["NonlinearTMM"],
-      cmdclass = {"build_ext": build_ext_subclass},
-      ext_modules = [ext],
-      zip_safe = False)
+long_description = open("README.md", encoding="utf-8").read()
+
+setup(
+    name = "NonlinearTMM",
+    description="Nonlinear transfer matrix method",
+    long_description=long_description,
+    long_description_content_type="text/markdown",
+    use_scm_version=True,
+    author = "Ardi Loot",
+    url = "https://github.com/ardiloot/NonlinearTMM",
+    author_email = "ardi.loot@outlook.com",
+    packages = ["NonlinearTMM"],
+    cmdclass = {"build_ext": build_ext_subclass},
+    ext_modules = [ext],
+    python_requires=">=3.5",
+    install_requires=[
+        "numpy",
+        "scipy",
+        "eigency>=2.0.0",
+    ],
+)
