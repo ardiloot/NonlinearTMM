@@ -11,8 +11,12 @@ def RemoveMain(listoffiles):
 
 
 extra_compile_args = []
+extra_link_args = []
 if sys.platform in ("linux", "darwin"):
-    extra_compile_args.append("-std=c++11")
+    extra_compile_args.extend(["-std=c++11", "-fopenmp", "-msse3"])
+    extra_link_args.extend(["-lgomp"])
+# else:
+#     extra_compile_args.extend(["/openmp"])
 
 sources = ["NonlinearTMM/src/SecondOrderNLTMM.pyx"] + \
     RemoveMain(glob.glob("NonlinearTMM/src/NonlinearTMMCpp/NonlinearTMMCpp/*.cpp"))
@@ -27,6 +31,7 @@ extensions = cythonize([
         ] + eigency.get_includes(include_eigen = False),
         language="c++",
         extra_compile_args=extra_compile_args,
+        extra_link_args=extra_link_args,
     ),
 ])
 
@@ -50,7 +55,7 @@ setup(
         "eigency>=2.0.0",
     ],
     extras_require={
-        "dev": ["pyyaml", "pytest", "flake8"],
+        "dev": ["pyyaml", "pytest", "flake8", "pip-tools"],
         "test": ["pyyaml", "pytest", "flake8"],
     },
 )
