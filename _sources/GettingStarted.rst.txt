@@ -11,15 +11,7 @@ code.
 
 Requirements:
 
-* `Python >3.0 <https://www.python.org/>`_
-* C++ compiler
-* `Cython <http://cython.org/>`_ for wrapping C++ code to Python
-* `Numpy <http://www.numpy.org/>`_ for general arrays
-* `Eigency <https://github.com/wouterboomsma/eigency>`_ for Eigen and Numpy array conversion
-* `Matplotlib <http://matplotlib.org/>`_ for plotting in examples
-* `Pytest <http://doc.pytest.org/>`_ for testing
-
-Tested with Python 3.6, Windows 10 x64, Visual studio C++ 2015.
+* `Python >= 3.6 <https://www.python.org/>`_
 
 Dependencies:
 
@@ -31,13 +23,7 @@ Installation through pip is done like:
 
 	pip install NonlinearTMM
 
-Alternatively, it is possible to install the package form the source code by commands
-
-.. code-block:: bash
-
-	python setup.py install
-
-or
+Alternatively, it is possible to install the package form the source code by
 
 .. code-block:: bash
 

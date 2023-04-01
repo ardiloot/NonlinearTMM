@@ -1,586 +1,124 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
+<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html lang="en">
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>Second-order NLTMM &#8212; NonlinearTMM 1.3.10 documentation</title>
-    
-    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '1.3.10',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>Second-order NLTMM &#8212; NonlinearTMM 0.1.dev1+g9a871fd documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" /> 
-  </head>
-  <body role="document">
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="nav-item nav-item-0"><a href="index.html">NonlinearTMM 1.3.10 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="Reference.html" accesskey="U">API reference</a> &#187;</li> 
-      </ul>
-    </div>  
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="TMM" href="TMM.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
+          
+
           <div class="body" role="main">
             
-  <div class="section" id="second-order-nltmm">
-<h1>Second-order NLTMM<a class="headerlink" href="#second-order-nltmm" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="main-class">
-<h2>Main class<a class="headerlink" href="#main-class" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="NonlinearTMM.SecondOrderNLTMM">
-<em class="property">class </em><code class="descclassname">NonlinearTMM.</code><code class="descname">SecondOrderNLTMM</code><span class="sig-paren">(</span><em>mode</em><span class="sig-paren">)</span><a class="headerlink" href="#NonlinearTMM.SecondOrderNLTMM" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
-<p>This class calculates second-order nonliner processes (e.g. sum-frequency,
-difference frequency generation and SPDC) in layered structures. Relies on the
-functionality of <cite>NonlinearTMM</cite> class.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mode</strong> : str {&#8216;sfg&#8217;, &#8216;dfg&#8217;, &#8216;spdc&#8217;}</td>
-</tr>
-</tbody>
-</table>
-<p class="rubric">Attributes</p>
-<table border="1" class="docutils">
-<colgroup>
-<col width="7%" />
-<col width="93%" />
-</colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td>P1</td>
-<td>(<a class="reference internal" href="TMM.html#NonlinearTMM.NonlinearTMM" title="NonlinearTMM.NonlinearTMM"><code class="xref any py py-class docutils literal"><span class="pre">NonlinearTMM</span></code></a>) The inctance of the first pump wave TMM.</td>
-</tr>
-<tr class="row-even"><td>P2</td>
-<td>(<a class="reference internal" href="TMM.html#NonlinearTMM.NonlinearTMM" title="NonlinearTMM.NonlinearTMM"><code class="xref any py py-class docutils literal"><span class="pre">NonlinearTMM</span></code></a>) The inctance of the second pump wave TMM.</td>
-</tr>
-<tr class="row-odd"><td>Gen</td>
-<td>(<a class="reference internal" href="TMM.html#NonlinearTMM.NonlinearTMM" title="NonlinearTMM.NonlinearTMM"><code class="xref any py py-class docutils literal"><span class="pre">NonlinearTMM</span></code></a>) The inctance of the generated wave TMM.</td>
-</tr>
-<tr class="row-even"><td>deltaWlSpdc</td>
-<td>(float) The spectral collection window (in nanometers) of the SPDC signal. Only used if <code class="xref any docutils literal"><span class="pre">mode</span></code> is set to <code class="xref any docutils literal"><span class="pre">SPDC</span></code> Default: NaN.</td>
-</tr>
-<tr class="row-odd"><td>solidAngleSpdc</td>
-<td>(float) The collection solid angle (srad) of the detector (given in vacuum). Only used if <code class="xref any docutils literal"><span class="pre">mode</span></code> is set to <code class="xref any docutils literal"><span class="pre">SPDC</span></code> Default: NaN.</td>
-</tr>
-<tr class="row-even"><td>deltaThetaSpdc</td>
-<td>(float) The horizontal collection window (rad) of the detector (given in vacuum). It is used to calculate the vertical span of the detector. Only used if <code class="xref any docutils literal"><span class="pre">mode</span></code> is set to <code class="xref any docutils literal"><span class="pre">SPDC</span></code> Default: NaN.</td>
-</tr>
-</tbody>
-</table>
-<p class="rubric">Methods</p>
-<table border="1" class="longtable docutils">
-<colgroup>
-<col width="10%" />
-<col width="90%" />
-</colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#NonlinearTMM.SecondOrderNLTMM.AddLayer" title="NonlinearTMM.SecondOrderNLTMM.AddLayer"><code class="xref py py-obj docutils literal"><span class="pre">AddLayer</span></code></a>(d,&nbsp;material)</td>
-<td>Adds layer to SecondOrderNLTMM.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#NonlinearTMM.SecondOrderNLTMM.GetIntensities" title="NonlinearTMM.SecondOrderNLTMM.GetIntensities"><code class="xref py py-obj docutils literal"><span class="pre">GetIntensities</span></code></a>()</td>
-<td>Returns the intensities and amplitutes of incident, reflected and transmitted wave for <code class="xref any docutils literal"><span class="pre">P1</span></code>, <code class="xref any docutils literal"><span class="pre">P2</span></code> and <code class="xref any docutils literal"><span class="pre">Gen</span></code>.</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#NonlinearTMM.SecondOrderNLTMM.SetParams" title="NonlinearTMM.SecondOrderNLTMM.SetParams"><code class="xref py py-obj docutils literal"><span class="pre">SetParams</span></code></a>(**kwargs)</td>
-<td>Helper method to set the values of all the attributes.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#NonlinearTMM.SecondOrderNLTMM.Solve" title="NonlinearTMM.SecondOrderNLTMM.Solve"><code class="xref py py-obj docutils literal"><span class="pre">Solve</span></code></a>()</td>
-<td>Solves the structure.</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#NonlinearTMM.SecondOrderNLTMM.Sweep" title="NonlinearTMM.SecondOrderNLTMM.Sweep"><code class="xref py py-obj docutils literal"><span class="pre">Sweep</span></code></a>(paramStr,&nbsp;valuesP1,&nbsp;valuesP2,&nbsp;...)</td>
-<td>Solves the structure for series of <code class="xref any docutils literal"><span class="pre">valuesP1</span></code> and <code class="xref any docutils literal"><span class="pre">valuesP2</span></code> of param <code class="xref any docutils literal"><span class="pre">paramStr</span></code>.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#NonlinearTMM.SecondOrderNLTMM.UpdateGenParams" title="NonlinearTMM.SecondOrderNLTMM.UpdateGenParams"><code class="xref py py-obj docutils literal"><span class="pre">UpdateGenParams</span></code></a>()</td>
-<td>Forces the update of the wavelength and beta of the generated beam <code class="xref any docutils literal"><span class="pre">Gen</span></code>.</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#NonlinearTMM.SecondOrderNLTMM.WaveGetFields2D" title="NonlinearTMM.SecondOrderNLTMM.WaveGetFields2D"><code class="xref py py-obj docutils literal"><span class="pre">WaveGetFields2D</span></code></a>(zs,&nbsp;xs,&nbsp;dirStr&nbsp;=&nbsp;&#8221;total&#8221;)</td>
-<td>Calculates 2D electric and magnetic fields of beam propagating in the structure.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#NonlinearTMM.SecondOrderNLTMM.WaveGetPowerFlows" title="NonlinearTMM.SecondOrderNLTMM.WaveGetPowerFlows"><code class="xref py py-obj docutils literal"><span class="pre">WaveGetPowerFlows</span></code></a>(layerNr,&nbsp;...)</td>
-<td>Analogous to the <a class="reference internal" href="#NonlinearTMM.SecondOrderNLTMM.GetIntensities" title="NonlinearTMM.SecondOrderNLTMM.GetIntensities"><code class="xref any py py-meth docutils literal"><span class="pre">GetIntensities</span></code></a>, but calculates the powers of the beams instead of the intensities of the plane-waves.</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#NonlinearTMM.SecondOrderNLTMM.WaveSweep" title="NonlinearTMM.SecondOrderNLTMM.WaveSweep"><code class="xref py py-obj docutils literal"><span class="pre">WaveSweep</span></code></a>(paramStr,&nbsp;valuesP1,&nbsp;valuesP2,&nbsp;...)</td>
-<td>Solves the structure for waves for series of <code class="xref any docutils literal"><span class="pre">valuesP1</span></code> and <code class="xref any docutils literal"><span class="pre">valuesP2</span></code> of param <code class="xref any docutils literal"><span class="pre">paramStr</span></code>.</td>
-</tr>
-</tbody>
-</table>
-<dl class="method">
-<dt id="NonlinearTMM.SecondOrderNLTMM.AddLayer">
-<code class="descname">AddLayer</code><span class="sig-paren">(</span><em>d</em>, <em>material</em><span class="sig-paren">)</span><a class="headerlink" href="#NonlinearTMM.SecondOrderNLTMM.AddLayer" title="Permalink to this definition">¶</a></dt>
-<dd><p>Adds layer to SecondOrderNLTMM. Equivalent of adding layer to P1, P2
-and Gen.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>d</strong> : float</p>
-<blockquote>
-<div><p>layer thickness (m)</p>
-</div></blockquote>
-<p><strong>material</strong> : <a class="reference internal" href="Material.html"><span class="doc">Material</span></a></p>
-<blockquote class="last">
-<div><p>The class containing the material parameters.</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="NonlinearTMM.SecondOrderNLTMM.GetIntensities">
-<code class="descname">GetIntensities</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#NonlinearTMM.SecondOrderNLTMM.GetIntensities" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the intensities and amplitutes of incident, reflected and
-transmitted wave for <code class="xref any docutils literal"><span class="pre">P1</span></code>, <code class="xref any docutils literal"><span class="pre">P2</span></code> and <code class="xref any docutils literal"><span class="pre">Gen</span></code>.
-The structure must be solved first.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><a class="reference internal" href="#NonlinearTMM._SecondOrderNLIntensities" title="NonlinearTMM._SecondOrderNLIntensities"><code class="xref any py py-class docutils literal"><span class="pre">_SecondOrderNLIntensities</span></code></a></p>
-<blockquote class="last">
-<div><p>Helper class to hold intensity data.</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="NonlinearTMM.SecondOrderNLTMM.SetParams">
-<code class="descname">SetParams</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#NonlinearTMM.SecondOrderNLTMM.SetParams" title="Permalink to this definition">¶</a></dt>
-<dd><p>Helper method to set the values of all the attributes. See the docstring
-of <a class="reference internal" href="#"><span class="doc">Second-order NLTMM</span></a>.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="NonlinearTMM.SecondOrderNLTMM.Solve">
-<code class="descname">Solve</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#NonlinearTMM.SecondOrderNLTMM.Solve" title="Permalink to this definition">¶</a></dt>
-<dd><p>Solves the structure.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="NonlinearTMM.SecondOrderNLTMM.Sweep">
-<code class="descname">Sweep</code><span class="sig-paren">(</span><em>paramStr</em>, <em>valuesP1</em>, <em>valuesP2</em>, <em>layerNr = 0</em>, <em>layerZ = 0.0</em>, <em>outPwr = True</em>, <em>outAbs = False</em>, <em>outEnh = False</em>, <em>outP1 = True</em>, <em>outP2 = True</em>, <em>outGen = True</em><span class="sig-paren">)</span><a class="headerlink" href="#NonlinearTMM.SecondOrderNLTMM.Sweep" title="Permalink to this definition">¶</a></dt>
-<dd><p>Solves the structure for series of <code class="xref any docutils literal"><span class="pre">valuesP1</span></code> and <code class="xref any docutils literal"><span class="pre">valuesP2</span></code>
-of param <code class="xref any docutils literal"><span class="pre">paramStr</span></code>. Using this function is more confortable and
-faster than just changing params and solving the structure (parallelized
-with OpenMP).</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>paramStr</strong> : str</p>
-<blockquote>
-<div><dl class="docutils">
-<dt>&#8216;wl&#8217;:</dt>
-<dd><p class="first last">Wavelength in meters</p>
-</dd>
-<dt>&#8216;beta&#8217;:</dt>
-<dd><p class="first last">normalized tangential wavevector</p>
-</dd>
-<dt>&#8216;I0&#8217;:</dt>
-<dd><p class="first last">intensity of the wave</p>
-</dd>
-</dl>
-<p>&#8216;d_i&#8217;: thikness of layer i (0..N-1)</p>
-</div></blockquote>
-<p><strong>valuesP1</strong> : ndarray of floats</p>
-<blockquote>
-<div><p>Correspondig values of param <code class="xref any docutils literal"><span class="pre">paramStr</span></code> for <code class="xref any docutils literal"><span class="pre">P1</span></code>.</p>
-</div></blockquote>
-<p><strong>valuesP2</strong> : ndarray of floats</p>
-<blockquote>
-<div><p>Correspondig values of param <code class="xref any docutils literal"><span class="pre">paramStr</span></code> for <code class="xref any docutils literal"><span class="pre">P2</span></code>.</p>
-</div></blockquote>
-<p><strong>layerNr</strong> : int</p>
-<blockquote>
-<div><p>Specifies layer, where electrical field enhancment is calculated.</p>
-</div></blockquote>
-<p><strong>layerZ</strong> : double</p>
-<blockquote>
-<div><p>Specifies z-coordinate of enchncment calculation inside <code class="xref any docutils literal"><span class="pre">layerNr</span></code>.</p>
-</div></blockquote>
-<p><strong>outPwr</strong> : bool</p>
-<blockquote>
-<div><p>Turns calculation of intensities on/off.</p>
-</div></blockquote>
-<p><strong>outAbs</strong> : bool</p>
-<blockquote>
-<div><p>Turns calculation of absoprtiopn in the entire structure on/off.</p>
-</div></blockquote>
-<p><strong>outEnh</strong> : bool</p>
-<blockquote>
-<div><p>Turns calculation of enhancment in layer <code class="xref any docutils literal"><span class="pre">layerNr</span></code> at distance
-<code class="xref any docutils literal"><span class="pre">layerZ</span></code> on/off.values</p>
-</div></blockquote>
-<p><strong>outP1</strong> : bool</p>
-<blockquote>
-<div><p>Turns calculation of the <code class="xref any docutils literal"><span class="pre">P1</span></code> on/off.</p>
-</div></blockquote>
-<p><strong>outP2</strong> : bool</p>
-<blockquote>
-<div><p>Turns calculation of the <code class="xref any docutils literal"><span class="pre">P2</span></code> on/off.</p>
-</div></blockquote>
-<p><strong>outGen</strong> : bool</p>
-<blockquote>
-<div><p>Turns calculation of the <code class="xref any docutils literal"><span class="pre">Gen</span></code> on/off.</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><a class="reference internal" href="#NonlinearTMM._SweepResultSecondOrderNLTMM" title="NonlinearTMM._SweepResultSecondOrderNLTMM"><code class="xref any py py-class docutils literal"><span class="pre">_SweepResultSecondOrderNLTMM</span></code></a></p>
-<blockquote class="last">
-<div><p>Helper class to store the result.</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="NonlinearTMM.SecondOrderNLTMM.UpdateGenParams">
-<code class="descname">UpdateGenParams</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#NonlinearTMM.SecondOrderNLTMM.UpdateGenParams" title="Permalink to this definition">¶</a></dt>
-<dd><p>Forces the update of the wavelength and beta of the generated beam <code class="xref any docutils literal"><span class="pre">Gen</span></code>.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="NonlinearTMM.SecondOrderNLTMM.WaveGetFields2D">
-<code class="descname">WaveGetFields2D</code><span class="sig-paren">(</span><em>zs</em>, <em>xs</em>, <em>dirStr = &quot;total&quot;</em><span class="sig-paren">)</span><a class="headerlink" href="#NonlinearTMM.SecondOrderNLTMM.WaveGetFields2D" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calculates 2D electric and magnetic fields of beam propagating in the
-structure. Analogous to the <a class="reference internal" href="TMM.html#NonlinearTMM.NonlinearTMM.GetFields2D" title="NonlinearTMM.NonlinearTMM.GetFields2D"><code class="xref any py py-meth docutils literal"><span class="pre">GetFields2D</span></code></a> of plane waves. Only for the
-calculation of the power of generated beam. For pump beams use the
-same method of <a class="reference internal" href="TMM.html#NonlinearTMM.NonlinearTMM" title="NonlinearTMM.NonlinearTMM"><code class="xref any py py-class docutils literal"><span class="pre">NonlinearTMM</span></code></a>.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>zs</strong> : ndarray of floats</p>
-<blockquote>
-<div><p>Points on z-axis where to calculate the fields. The beginning of the
-first layer is at z = 0.</p>
-</div></blockquote>
-<p><strong>xs</strong> : ndarray of floats</p>
-<blockquote>
-<div><p>Points on x-axis where to calculate the fields.</p>
-</div></blockquote>
-<p><strong>dir</strong> : {&#8216;total&#8217;, &#8216;forward&#8217;, &#8216;backward&#8217;}</p>
-<blockquote>
-<div><p>Specifies the components of the output fields.</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><a class="reference internal" href="TMM.html#NonlinearTMM._FieldsZX" title="NonlinearTMM._FieldsZX"><code class="xref any py py-class docutils literal"><span class="pre">_FieldsZX</span></code></a></p>
-<blockquote class="last">
-<div><p>Helper class to store electric and magnetic fields in regular grid.</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="NonlinearTMM.SecondOrderNLTMM.WaveGetPowerFlows">
-<code class="descname">WaveGetPowerFlows</code><span class="sig-paren">(</span><em>layerNr</em>, <em>x0 = float(&quot;nan&quot;)</em>, <em>x1 = float(&quot;nan&quot;)</em>, <em>z = 0.0</em><span class="sig-paren">)</span><a class="headerlink" href="#NonlinearTMM.SecondOrderNLTMM.WaveGetPowerFlows" title="Permalink to this definition">¶</a></dt>
-<dd><p>Analogous to the <a class="reference internal" href="#NonlinearTMM.SecondOrderNLTMM.GetIntensities" title="NonlinearTMM.SecondOrderNLTMM.GetIntensities"><code class="xref any py py-meth docutils literal"><span class="pre">GetIntensities</span></code></a>, but calculates the powers of the
-beams instead of the intensities of the plane-waves. Only for the
-calculation of the power of generated beam. For pump beams use the
-same method of <a class="reference internal" href="TMM.html#NonlinearTMM.NonlinearTMM" title="NonlinearTMM.NonlinearTMM"><code class="xref any py py-class docutils literal"><span class="pre">NonlinearTMM</span></code></a>.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>layerNr</strong> : int</p>
-<blockquote>
-<div><p>Specifies layer number where to calculate the power of the beam.</p>
-</div></blockquote>
-<p><strong>x0</strong> : float</p>
-<blockquote>
-<div><p>Specifies the starting point of the integration of the power in the
-x-direction. By default this parameter is selected by the <a class="reference internal" href="TMM.html#NonlinearTMM._Wave" title="NonlinearTMM._Wave"><code class="xref any py py-class docutils literal"><span class="pre">_Wave</span></code></a>
-class.</p>
-</div></blockquote>
-<p><strong>x1</strong> : float</p>
-<blockquote>
-<div><p>Specifies the end point of the integration of the power in the
-x-direction. By default this parameter is selected by the <a class="reference internal" href="TMM.html#NonlinearTMM._Wave" title="NonlinearTMM._Wave"><code class="xref any py py-class docutils literal"><span class="pre">_Wave</span></code></a>
-class.</p>
-</div></blockquote>
-<p><strong>z</strong> : float</p>
-<blockquote>
-<div><p>Specifies the z-position of the line through which the integration
-of the power of the beam is done.</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">tuple of floats (PB, PF)</p>
-<blockquote class="last">
-<div><p>PB is the power propageted into netagtive infinity and PF denotes
-the power propagation to the positive direction of z-axis.</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="NonlinearTMM.SecondOrderNLTMM.WaveSweep">
-<code class="descname">WaveSweep</code><span class="sig-paren">(</span><em>paramStr</em>, <em>valuesP1</em>, <em>valuesP2</em>, <em>layerNr = 0</em>, <em>layerZ = 0.0</em>, <em>outPwr = True</em>, <em>outR = False</em>, <em>outT = False</em>, <em>outEnh = False</em>, <em>outP1 = True</em>, <em>outP2 = True</em>, <em>outGen = True</em><span class="sig-paren">)</span><a class="headerlink" href="#NonlinearTMM.SecondOrderNLTMM.WaveSweep" title="Permalink to this definition">¶</a></dt>
-<dd><p>Solves the structure for waves for series of <code class="xref any docutils literal"><span class="pre">valuesP1</span></code> and <code class="xref any docutils literal"><span class="pre">valuesP2</span></code> of param
-<code class="xref any docutils literal"><span class="pre">paramStr</span></code>. Using this function is more confortable and faster than just
-changing the params and solving the structure. Analogous to <a class="reference internal" href="#NonlinearTMM.SecondOrderNLTMM.Sweep" title="NonlinearTMM.SecondOrderNLTMM.Sweep"><code class="xref any py py-meth docutils literal"><span class="pre">Sweep</span></code></a>.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>paramStr</strong> : str</p>
-<blockquote>
-<div><dl class="docutils">
-<dt>&#8216;wl&#8217;:</dt>
-<dd><p class="first last">Wavelength in meters</p>
-</dd>
-<dt>&#8216;beta&#8217;:</dt>
-<dd><p class="first last">normalized tangential wavevector</p>
-</dd>
-<dt>&#8216;I0&#8217;:</dt>
-<dd><p class="first last">intensity of the wave</p>
-</dd>
-<dt>&#8216;d_i&#8217;:</dt>
-<dd><p class="first last">thikness of layer i (0..N-1)</p>
-</dd>
-<dt>&#8216;w0&#8217;:</dt>
-<dd><p class="first last">waist size of the input beam</p>
-</dd>
-</dl>
-</div></blockquote>
-<p><strong>valuesP1</strong> : ndarray of floats</p>
-<blockquote>
-<div><p>Correspondig values of param <code class="xref any docutils literal"><span class="pre">paramStr</span></code> for <code class="xref any docutils literal"><span class="pre">P1</span></code>.</p>
-</div></blockquote>
-<p><strong>valuesP2</strong> : ndarray of floats</p>
-<blockquote>
-<div><p>Correspondig values of param <code class="xref any docutils literal"><span class="pre">paramStr</span></code> for <code class="xref any docutils literal"><span class="pre">P2</span></code>.</p>
-</div></blockquote>
-<p><strong>layerNr</strong> : int</p>
-<blockquote>
-<div><p>Specifies layer, where electrical field enhancment is calculated.</p>
-</div></blockquote>
-<p><strong>layerZ</strong> : double</p>
-<blockquote>
-<div><p>Specifies z-coordinate of enchncment calculation inside <code class="xref any docutils literal"><span class="pre">layerNr</span></code>.</p>
-</div></blockquote>
-<p><strong>outPwr</strong> : bool</p>
-<blockquote>
-<div><p>Turns calculation of all powers on/off.</p>
-</div></blockquote>
-<p><strong>outR</strong> : bool</p>
-<blockquote>
-<div><p>Turns calculation of reflected power on/off.</p>
-</div></blockquote>
-<p><strong>outT</strong> : bool</p>
-<blockquote>
-<div><p>Turns calculation of transmitted power on/off.</p>
-</div></blockquote>
-<p><strong>outEnh</strong> : bool</p>
-<blockquote>
-<div><p>Turns calculation of enhancment in layer layerNr at distance
-<code class="xref any docutils literal"><span class="pre">layerZ</span></code> on/off.</p>
-</div></blockquote>
-<p><strong>outP1</strong> : bool</p>
-<blockquote>
-<div><p>Turns calculation of the <code class="xref any docutils literal"><span class="pre">P1</span></code> on/off.</p>
-</div></blockquote>
-<p><strong>outP2</strong> : bool</p>
-<blockquote>
-<div><p>Turns calculation of the <code class="xref any docutils literal"><span class="pre">P2</span></code> on/off.</p>
-</div></blockquote>
-<p><strong>outGen</strong> : bool</p>
-<blockquote>
-<div><p>Turns calculation of the <code class="xref any docutils literal"><span class="pre">Gen</span></code> on/off.</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><a class="reference internal" href="#NonlinearTMM._WaveSweepResultSecondOrderNLTMM" title="NonlinearTMM._WaveSweepResultSecondOrderNLTMM"><code class="xref any py py-class docutils literal"><span class="pre">_WaveSweepResultSecondOrderNLTMM</span></code></a></p>
-<blockquote class="last">
-<div><p>Helper class to store the result.</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</dd></dl>
-
-</div>
-<div class="section" id="helper-classes">
-<h2>Helper classes<a class="headerlink" href="#helper-classes" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="NonlinearTMM._WaveSweepResultSecondOrderNLTMM">
-<em class="property">class </em><code class="descclassname">NonlinearTMM.</code><code class="descname">_WaveSweepResultSecondOrderNLTMM</code><a class="headerlink" href="#NonlinearTMM._WaveSweepResultSecondOrderNLTMM" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
-<p>Helper class for <cite>SecondOrderNLTMM</cite>. Stores the results of <cite>WaveSweep</cite>
-method.</p>
-<p class="rubric">Attributes</p>
-<table border="1" class="docutils">
-<colgroup>
-<col width="9%" />
-<col width="91%" />
-</colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td>P1</td>
-<td>(<a class="reference internal" href="TMM.html#NonlinearTMM._WaveSweepResultNonlinearTMM" title="NonlinearTMM._WaveSweepResultNonlinearTMM"><code class="xref any py py-class docutils literal"><span class="pre">_WaveSweepResultNonlinearTMM</span></code></a>) The sweep result of the first input beam.</td>
-</tr>
-<tr class="row-even"><td>P1</td>
-<td>(<a class="reference internal" href="TMM.html#NonlinearTMM._WaveSweepResultNonlinearTMM" title="NonlinearTMM._WaveSweepResultNonlinearTMM"><code class="xref any py py-class docutils literal"><span class="pre">_WaveSweepResultNonlinearTMM</span></code></a>) The sweep result of the second input beam.</td>
-</tr>
-<tr class="row-odd"><td>Gen</td>
-<td>(<a class="reference internal" href="TMM.html#NonlinearTMM._WaveSweepResultNonlinearTMM" title="NonlinearTMM._WaveSweepResultNonlinearTMM"><code class="xref any py py-class docutils literal"><span class="pre">_WaveSweepResultNonlinearTMM</span></code></a>) The sweep result of the generated beam.</td>
-</tr>
-<tr class="row-even"><td>wlsGen</td>
-<td>(ndarray of floats) Stores the wavelength of the generated wave.</td>
-</tr>
-<tr class="row-odd"><td>betasGen</td>
-<td>(ndarray of floats) Stores the normalized tangential wave vector the generated wave.</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="class">
-<dt id="NonlinearTMM._SweepResultSecondOrderNLTMM">
-<em class="property">class </em><code class="descclassname">NonlinearTMM.</code><code class="descname">_SweepResultSecondOrderNLTMM</code><a class="headerlink" href="#NonlinearTMM._SweepResultSecondOrderNLTMM" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
-<p>Helper class for <cite>SecondOrderNLTMM</cite>. Stores the results of <cite>Sweep</cite> method.</p>
-<p class="rubric">Attributes</p>
-<table border="1" class="docutils">
-<colgroup>
-<col width="9%" />
-<col width="91%" />
-</colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td>P1</td>
-<td>(<a class="reference internal" href="TMM.html#NonlinearTMM._SweepResultNonlinearTMM" title="NonlinearTMM._SweepResultNonlinearTMM"><code class="xref any py py-class docutils literal"><span class="pre">_SweepResultNonlinearTMM</span></code></a>) Sweep results for the first input wave.</td>
-</tr>
-<tr class="row-even"><td>P2</td>
-<td>(<a class="reference internal" href="TMM.html#NonlinearTMM._SweepResultNonlinearTMM" title="NonlinearTMM._SweepResultNonlinearTMM"><code class="xref any py py-class docutils literal"><span class="pre">_SweepResultNonlinearTMM</span></code></a>) Sweep results for the second input wave.</td>
-</tr>
-<tr class="row-odd"><td>Gen</td>
-<td>(<a class="reference internal" href="TMM.html#NonlinearTMM._SweepResultNonlinearTMM" title="NonlinearTMM._SweepResultNonlinearTMM"><code class="xref any py py-class docutils literal"><span class="pre">_SweepResultNonlinearTMM</span></code></a>) Sweep results for the generated wave.</td>
-</tr>
-<tr class="row-even"><td>wlsGen</td>
-<td>(ndarray of floats) Stores the wavelength of the generated wave.</td>
-</tr>
-<tr class="row-odd"><td>betasGen</td>
-<td>(ndarray of floats) Stores the normalized tangential wave vector the generated wave.</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="class">
-<dt id="NonlinearTMM._SecondOrderNLIntensities">
-<em class="property">class </em><code class="descclassname">NonlinearTMM.</code><code class="descname">_SecondOrderNLIntensities</code><a class="headerlink" href="#NonlinearTMM._SecondOrderNLIntensities" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
-<p>This is a helper class for <cite>SecondOrderNLTMM</cite>. It stores the results of
-<cite>GetIntensities</cite>.</p>
-<p class="rubric">Attributes</p>
-<table border="1" class="docutils">
-<colgroup>
-<col width="3%" />
-<col width="97%" />
-</colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td>P1</td>
-<td>(<a class="reference internal" href="TMM.html#NonlinearTMM._Intensities" title="NonlinearTMM._Intensities"><code class="xref any py py-class docutils literal"><span class="pre">_Intensities</span></code></a>) Instance of <cite>_Intensities</cite> class and holds the intensities of second inuput wave.</td>
-</tr>
-<tr class="row-even"><td>P2</td>
-<td>(<a class="reference internal" href="TMM.html#NonlinearTMM._Intensities" title="NonlinearTMM._Intensities"><code class="xref any py py-class docutils literal"><span class="pre">_Intensities</span></code></a>) Instance of <cite>_Intensities</cite> class and holds the intensities of first inuput wave.</td>
-</tr>
-<tr class="row-odd"><td>Gen</td>
-<td>(<a class="reference internal" href="TMM.html#NonlinearTMM._Intensities" title="NonlinearTMM._Intensities"><code class="xref any py py-class docutils literal"><span class="pre">_Intensities</span></code></a>) Instance of <cite>_Intensities</cite> class and holds the intensities of generated wave.</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</div>
-</div>
+  <section id="second-order-nltmm">
+<h1>Second-order NLTMM<a class="headerlink" href="#second-order-nltmm" title="Permalink to this heading">¶</a></h1>
+<section id="main-class">
+<h2>Main class<a class="headerlink" href="#main-class" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="helper-classes">
+<h2>Helper classes<a class="headerlink" href="#helper-classes" title="Permalink to this heading">¶</a></h2>
+</section>
+</section>
 
 
           </div>
+          
         </div>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table Of Contents</a></h3>
-  <ul>
-<li><a class="reference internal" href="#">Second-order NLTMM</a><ul>
-<li><a class="reference internal" href="#main-class">Main class</a></li>
-<li><a class="reference internal" href="#helper-classes">Helper classes</a></li>
+<h1 class="logo"><a href="index.html">NonlinearTMM</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="Introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="GettingStarted.html">Getting started</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="Reference.html">API reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="Material.html">Material</a></li>
+<li class="toctree-l2"><a class="reference internal" href="TMM.html">TMM</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Second-order NLTMM</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#main-class">Main class</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#helper-classes">Helper classes</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
 
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="_sources/SecondOrderNLTMM.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="Reference.html">API reference</a><ul>
+      <li>Previous: <a href="TMM.html" title="previous chapter">TMM</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             >index</a></li>
-        <li class="nav-item nav-item-0"><a href="index.html">NonlinearTMM 1.3.10 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="Reference.html" >API reference</a> &#187;</li> 
-      </ul>
+    <div class="footer">
+      &copy;2017, Ardi Loot.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 6.1.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
+      
+      |
+      <a href="_sources/SecondOrderNLTMM.rst.txt"
+          rel="nofollow">Page source</a>
     </div>
-    <div class="footer" role="contentinfo">
-        &#169; Copyright 2017, Ardi Loot.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.3.
-    </div>
+
+    
+
+    
   </body>
 </html>
