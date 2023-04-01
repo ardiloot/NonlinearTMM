@@ -1,6 +1,7 @@
 [![PyPI version](https://badge.fury.io/py/NonlinearTMM.svg)](https://badge.fury.io/py/NonlinearTMM)
-[![Build status](https://ci.appveyor.com/api/projects/status/cnvk7wrbuu7aevu0/branch/master?svg=true)](https://ci.appveyor.com/project/ardiloot/nonlineartmm/branch/master)
-[![Build Status](https://travis-ci.org/ardiloot/NonlinearTMM.svg?branch=master)](https://travis-ci.org/ardiloot/NonlinearTMM)
+[![Pytest](https://github.com/ardiloot/NonlinearTMM/actions/workflows/pytest.yml/badge.svg)](https://github.com/ardiloot/NonlinearTMM/actions/workflows/pytest.yml)
+[![PyPI](https://github.com/ardiloot/NonlinearTMM/actions/workflows/publish.yml/badge.svg)](https://github.com/ardiloot/NonlinearTMM/actions/workflows/publish.yml)
+
 
 # NonlinearTMM : Nonlinear transfer-matrix method
 
