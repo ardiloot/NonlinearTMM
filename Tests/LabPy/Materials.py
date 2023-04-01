@@ -105,7 +105,7 @@ class Material(Core.ParamsBaseClass):
         self.filename = path.join(materialsDir, "%s.yml" % (materialFile))
         
         stream = open(self.filename, "r")
-        self.rawData = yaml.load(stream)
+        self.rawData = yaml.safe_load(stream)
 
         self.nFunc = None
         self.kFunc = lambda wl: 0.0
