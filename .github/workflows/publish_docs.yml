@@ -24,5 +24,8 @@ jobs:
           pip install .
       - name: Build docks
         run: |
-          docs/make html
-
+          sphinx-build -M html docs/ docs/_build
+      - name: Deploy
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: docs/_build/html
