@@ -56,7 +56,7 @@ setup(
         "eigency>=2.0.0",
     ],
     extras_require={
-        "dev": ["pyyaml", "pytest", "flake8", "pip-tools", "matplotlib"],
+        "dev": ["pyyaml", "pytest", "flake8", "pip-tools", "matplotlib", "sphinx", "numpydoc"],
         "test": ["pyyaml", "pytest", "flake8"],
     },
 )
