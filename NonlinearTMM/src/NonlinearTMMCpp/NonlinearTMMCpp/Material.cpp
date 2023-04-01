@@ -59,6 +59,7 @@ namespace TMM {
 	}
 
 	const Tensor3d & Chi2Tensor::GetChi2Tensor() {
+		#pragma omp critical
 		if (needRotationRecalc) {
 			chi2Rotated = RotateTensor(chi2, phiX, phiY, phiZ);
 			needRotationRecalc = false;
