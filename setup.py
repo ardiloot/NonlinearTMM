@@ -12,10 +12,11 @@ def RemoveMain(listoffiles):
 
 extra_compile_args = []
 extra_link_args = []
+
 if sys.platform in ("linux", "darwin"):
     extra_compile_args.extend(["-std=c++11", "-fopenmp", "-msse3"])
-    extra_link_args.extend(["-lgomp"])
-else:
+    extra_link_args.extend(["-lgomp", "-fopenmp"])
+elif sys.platform == "win32":
     extra_compile_args.extend(["/openmp"])
 
 sources = ["NonlinearTMM/src/SecondOrderNLTMM.pyx"] + \
@@ -55,7 +56,7 @@ setup(
         "eigency>=2.0.0",
     ],
     extras_require={
-        "dev": ["pyyaml", "pytest", "flake8", "pip-tools"],
+        "dev": ["pyyaml", "pytest", "flake8", "pip-tools", "matplotlib"],
         "test": ["pyyaml", "pytest", "flake8"],
     },
 )
