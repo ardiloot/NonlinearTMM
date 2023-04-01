@@ -27,7 +27,7 @@ Alternatively, it is possible to install the package form the source code by
 
 .. code-block:: bash
 
-	pip intall .
+	pip install .
 	
 in the source code folder.
 
