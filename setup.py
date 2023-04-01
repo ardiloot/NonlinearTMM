@@ -15,8 +15,8 @@ extra_link_args = []
 if sys.platform in ("linux", "darwin"):
     extra_compile_args.extend(["-std=c++11", "-fopenmp", "-msse3"])
     extra_link_args.extend(["-lgomp"])
-# else:
-#     extra_compile_args.extend(["/openmp"])
+else:
+    extra_compile_args.extend(["/openmp"])
 
 sources = ["NonlinearTMM/src/SecondOrderNLTMM.pyx"] + \
     RemoveMain(glob.glob("NonlinearTMM/src/NonlinearTMMCpp/NonlinearTMMCpp/*.cpp"))
