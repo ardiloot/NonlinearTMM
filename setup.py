@@ -68,4 +68,7 @@ setup(
         "scipy",
         "eigency>=2.0.0",
     ],
+    extras_require={
+        "dev": ["pyyaml", "pytest", "flake8"],
+    },
 )
