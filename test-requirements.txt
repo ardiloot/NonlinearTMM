@@ -23,7 +23,7 @@ numpy==1.24.2
     #   NonlinearTMM (pyproject.toml)
     #   eigency
     #   scipy
-packaging==23.0
+packaging==23.1
     # via pytest
 pluggy==1.0.0
     # via pytest
