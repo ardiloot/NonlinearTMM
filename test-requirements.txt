@@ -31,7 +31,7 @@ pycodestyle==2.10.0
     # via flake8
 pyflakes==3.0.1
     # via flake8
-pytest==7.2.2
+pytest==7.4.0
     # via NonlinearTMM (pyproject.toml)
 pyyaml==6.0
     # via NonlinearTMM (pyproject.toml)
