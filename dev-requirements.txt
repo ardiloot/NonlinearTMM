@@ -65,7 +65,7 @@ numpy==1.25.0
     #   scipy
 numpydoc==1.5.0
     # via NonlinearTMM (pyproject.toml)
-packaging==23.0
+packaging==23.1
     # via
     #   build
     #   matplotlib
