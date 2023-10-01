@@ -6,7 +6,7 @@
 #
 eigency==3.4.0.0
     # via NonlinearTMM (pyproject.toml)
-numpy==1.25.0
+numpy==1.26.0
     # via
     #   NonlinearTMM (pyproject.toml)
     #   eigency
