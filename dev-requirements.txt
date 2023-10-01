@@ -79,7 +79,7 @@ pluggy==1.0.0
     # via pytest
 pycodestyle==2.10.0
     # via flake8
-pyflakes==3.0.1
+pyflakes==3.1.0
     # via flake8
 pygments==2.15.0
     # via sphinx
