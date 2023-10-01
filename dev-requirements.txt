@@ -83,7 +83,7 @@ pyflakes==3.0.1
     # via flake8
 pygments==2.15.0
     # via sphinx
-pyparsing==3.0.9
+pyparsing==3.1.1
     # via matplotlib
 pyproject-hooks==1.0.0
     # via build
