@@ -121,7 +121,7 @@ tomli==2.0.1
     # via
     #   build
     #   pytest
-urllib3==1.26.15
+urllib3==1.26.17
     # via requests
 wheel==0.40.0
     # via pip-tools
