@@ -18,7 +18,7 @@ iniconfig==2.0.0
     # via pytest
 mccabe==0.7.0
     # via flake8
-numpy==1.25.0
+numpy==1.26.1
     # via
     #   NonlinearTMM (pyproject.toml)
     #   eigency
