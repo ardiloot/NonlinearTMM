@@ -71,7 +71,7 @@ packaging==23.1
     #   matplotlib
     #   pytest
     #   sphinx
-pillow==9.5.0
+pillow==10.1.0
     # via matplotlib
 pip-tools==6.12.3
     # via NonlinearTMM (pyproject.toml)
