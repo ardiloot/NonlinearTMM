@@ -5,6 +5,8 @@
 #include <complex>
 #include <algorithm>
 #include <vector>
+#include <memory>
+#include <stdexcept>
 #include <Eigen/Dense>
 #include <unsupported/Eigen/CXX11/Tensor>
 
@@ -25,37 +27,37 @@ namespace TMM {
 	using Eigen::Tensor;
 	
 	//---------------------------------------------------------------
-	// Typedefs
+	// Type aliases
 	//---------------------------------------------------------------
 
-	typedef std::complex<double> dcomplex;
-	typedef Tensor<double, 3> Tensor3d;
-	typedef std::pair<double, double> pairdd;
+	using dcomplex = std::complex<double>;
+	using Tensor3d = Tensor<double, 3>;
+	using pairdd = std::pair<double, double>;
 
 	//---------------------------------------------------------------
 	// Constants
 	//---------------------------------------------------------------
 
-	const double PI = 3.141592653589793238462643383279502884L;
-	const double constC = 299792458.0;
-	const double constEps0 = 8.854187817e-12;
-	const double constMu0 = 1.2566370614e-6;
-	const dcomplex constI = dcomplex(0.0, 1.0);
-	const double INF = std::numeric_limits<double>::infinity();
-	const double constNAN = std::numeric_limits<double>::quiet_NaN();
-	const double constHbar = 1.054571800e-34;
+	constexpr double PI = 3.141592653589793238462643383279502884L;
+	constexpr double constC = 299792458.0;
+	constexpr double constEps0 = 8.854187817e-12;
+	constexpr double constMu0 = 1.2566370614e-6;
+	inline constexpr dcomplex constI{0.0, 1.0};
+	constexpr double INF = std::numeric_limits<double>::infinity();
+	constexpr double constNAN = std::numeric_limits<double>::quiet_NaN();
+	constexpr double constHbar = 1.054571800e-34;
 
 	//---------------------------------------------------------------
 	// ENUMs
 	//---------------------------------------------------------------
 
-	enum WaveDirection {
-		F,
-		B,
+	enum class WaveDirection {
+		F = 0,
+		B = 1,
 		TOT = -1,
 	};
 
-	enum NonlinearProcess {
+	enum class NonlinearProcess {
 		SHG,
 		SFG,
 		DFG,
@@ -63,13 +65,13 @@ namespace TMM {
 		PROCESS_NOT_DEFINED,
 	};
 
-	enum Polarization {
+	enum class Polarization {
 		P_POL,
 		S_POL,
 		NOT_DEFINED_POL,
 	};
 
-	enum NonlinearTmmMode {
+	enum class NonlinearTmmMode {
 		MODE_INCIDENT,
 		MODE_NONLINEAR,
 		MODE_VACUUM_FLUCTUATIONS,
@@ -77,7 +79,7 @@ namespace TMM {
 	};
 
 	// Params that are used in sweep must be here
-	enum TMMParam {
+	enum class TMMParam {
 		PARAM_WL,
 		PARAM_BETA,
 		PARAM_POL,
@@ -90,12 +92,13 @@ namespace TMM {
 		PARAM_NOT_DEFINED,
 	};
 
-	enum TMMParamType {
+	enum class TMMParamType {
 		PTYPE_NONLINEAR_TMM,
 		PTYPE_NONLINEAR_LAYER,
 		PTYPE_WAVE
 	};
 
+	// SweepOutput stays as plain enum for bitmask usage
 	enum SweepOutput {
 		SWEEP_I = (1 << 0),
 		SWEEP_R = (1 << 1),
@@ -111,47 +114,73 @@ namespace TMM {
 	};
 
 	//---------------------------------------------------------------
+	// Cython compatibility: Cython's auto-generated integer-to-enum
+	// conversion code uses bitwise shift and OR operators. These must
+	// be provided for enum class types.
+	//---------------------------------------------------------------
+
+#define ENUM_CLASS_CYTHON_COMPAT(EnumType) \
+	inline constexpr EnumType operator|(EnumType a, EnumType b) { \
+		return static_cast<EnumType>(static_cast<int>(a) | static_cast<int>(b)); \
+	} \
+	inline constexpr EnumType operator<<(EnumType a, int shift) { \
+		return static_cast<EnumType>(static_cast<int>(a) << shift); \
+	} \
+	inline constexpr EnumType operator*(EnumType a, EnumType b) { \
+		return static_cast<EnumType>(static_cast<int>(a) * static_cast<int>(b)); \
+	}
+
+	ENUM_CLASS_CYTHON_COMPAT(WaveDirection)
+	ENUM_CLASS_CYTHON_COMPAT(NonlinearProcess)
+	ENUM_CLASS_CYTHON_COMPAT(Polarization)
+	ENUM_CLASS_CYTHON_COMPAT(NonlinearTmmMode)
+	ENUM_CLASS_CYTHON_COMPAT(TMMParam)
+	ENUM_CLASS_CYTHON_COMPAT(TMMParamType)
+
+#undef ENUM_CLASS_CYTHON_COMPAT
+
+	//---------------------------------------------------------------
 	// Functions
 	//---------------------------------------------------------------
 
-	TMMParamType GetParamType(TMMParam param);
-	double WlToOmega(double wl);
-	double OmegaToWl(double omega);
-	Matrix3d RotationMatrixX(double phi);
-	Matrix3d RotationMatrixY(double phi);
-	Matrix3d RotationMatrixZ(double phi);
-	Tensor3d ApplyRotationMatrixToTensor(Tensor3d input, Matrix3d R);
-	Tensor3d RotateTensor(Tensor3d &input, double phiX = 0, double phiY = 0, double phiZ = 0);
-	double sqr(double a);
-	dcomplex sqr(dcomplex a);
-	template <typename T> T Interpolate(double x, const ArrayXd & xs, const Eigen::Array<T, Eigen::Dynamic, 1> & ys);
-	double GetDifferential(const ArrayXd &intVar, int nr);
-	pairdd const IntegrateWavePower(int layerNr, Polarization pol, double wl, dcomplex epsLayer, const Eigen::MatrixX2cd &Us,
+	[[nodiscard]] TMMParamType GetParamType(TMMParam param);
+	[[nodiscard]] constexpr double WlToOmega(double wl) { return 2.0 * PI * constC / wl; }
+	[[nodiscard]] constexpr double OmegaToWl(double omega) { return 2.0 * PI * constC / omega; }
+	[[nodiscard]] Matrix3d RotationMatrixX(double phi);
+	[[nodiscard]] Matrix3d RotationMatrixY(double phi);
+	[[nodiscard]] Matrix3d RotationMatrixZ(double phi);
+	[[nodiscard]] Tensor3d ApplyRotationMatrixToTensor(const Tensor3d& input, const Matrix3d& R);
+	[[nodiscard]] Tensor3d RotateTensor(Tensor3d &input, double phiX = 0, double phiY = 0, double phiZ = 0);
+	[[nodiscard]] constexpr double sqr(double a) { return a * a; }
+	[[nodiscard]] inline dcomplex sqr(dcomplex a) { return a * a; }
+	template <typename T> [[nodiscard]] T Interpolate(double x, const ArrayXd & xs, const Eigen::Array<T, Eigen::Dynamic, 1> & ys);
+	[[nodiscard]] double GetDifferential(const ArrayXd &intVar, int nr);
+	[[nodiscard]] pairdd IntegrateWavePower([[maybe_unused]] int layerNr, Polarization pol, double wl, dcomplex epsLayer, const Eigen::MatrixX2cd &Us,
 		const ArrayXd &kxs, const Eigen::MatrixX2cd &kzs,
 		double x0, double x1, double z, double Ly);
-	WaveDirection GetWaveDirection(dcomplex kzF, dcomplex eps, Polarization pol);
-	ArrayXcd FFTShift(ArrayXcd data);
-	ArrayXd IFFTShift(ArrayXd data);
-	ArrayXd FFTFreq(int n, double dx);
+	[[nodiscard]] WaveDirection GetWaveDirection(dcomplex kzF, dcomplex eps, Polarization pol);
+	[[nodiscard]] ArrayXcd FFTShift(ArrayXcd data);
+	[[nodiscard]] ArrayXd IFFTShift(ArrayXd data);
+	[[nodiscard]] ArrayXd FFTFreq(int n, double dx);
 
 	//---------------------------------------------------------------
 	// Inline SSE
 	//---------------------------------------------------------------
 
-	inline dcomplex FastExp(dcomplex z) {
+	[[nodiscard]] inline dcomplex FastExp(dcomplex z) {
 		double c = std::exp(real(z));
 		double y = imag(z);
 		dcomplex res(c * std::cos(y), c * std::sin(y));
 		return res;
 	}
 
-	inline dcomplex multSSE(dcomplex aa, dcomplex bb) {
+	[[nodiscard]] inline dcomplex multSSE(dcomplex aa, dcomplex bb) {
 #ifdef TMM_USE_SSE3
 		const __m128d mask = _mm_set_pd(-0.0, 0.0);
 
 		// Load to registers
-		__m128d a = _mm_load_pd((double*)&aa);
-		__m128d b = _mm_load_pd((double*)&bb);
+		__m128d a = _mm_load_pd(reinterpret_cast<const double*>(&aa));
+		__m128d b = _mm_load_pd(reinterpret_cast<const double*>(&bb));
 
 		// Real part
 		__m128d ab = _mm_mul_pd(a, b);
@@ -165,7 +194,7 @@ namespace TMM {
 		ab = _mm_hadd_pd(ab, b);
 
 		dcomplex res = 0.0;
-		_mm_storeu_pd((double*)&(res), ab);
+		_mm_storeu_pd(reinterpret_cast<double*>(&res), ab);
 		return res;
 #else
 		// Portable scalar fallback for non-x86 platforms (e.g., ARM)

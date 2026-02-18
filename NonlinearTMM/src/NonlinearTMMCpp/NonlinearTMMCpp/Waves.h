@@ -9,7 +9,7 @@ namespace TMM {
 	// ENUMs
 	//---------------------------------------------------------------
 
-	enum WaveType {
+	enum class WaveType {
 		PLANEWAVE,
 		GAUSSIANWAVE,
 		TUKEYWAVE,
@@ -20,7 +20,7 @@ namespace TMM {
 	// Functions
 	//---------------------------------------------------------------
 
-	ArrayXd TukeyFunc(ArrayXd xs, double w0, double a);
+	[[nodiscard]] ArrayXd TukeyFunc(const ArrayXd& xs, double w0, double a);
 	
 	//---------------------------------------------------------------
 	// Wave
@@ -87,30 +87,30 @@ namespace TMM {
 		void Solve(double wl_, double beta_, Material *materialLayer0_, Material *materialLayerThis_, double deltaKxSpdc_ = constNAN);
 
 		// Getters
-		WaveType GetWaveType();
-		double GetPwr();
-		bool GetOverrideE0();
-		double GetE0();
-		double GetW0();
-		double GetLy();
-		double GetA();
-		int GetNPointsInteg();
-		double GetMaxX();
-		bool IsDynamicMaxXEnabled();
-		double GetDynamicMaxXCoef();
-		double GetDynamicMaxXAddition();
-		double GetMaxPhi();
-		double GetDouble(TMMParam param);
-		pairdd GetXRange();
-		ArrayXd GetBetas();
-		ArrayXd GetPhis();
-		ArrayXd GetKxs();
-		ArrayXd GetKzs();
-		ArrayXd GetFieldProfileXs();
-		ArrayXd GetFieldProfile();
-		ArrayXcd GetExpansionCoefsKx();
-		double GetBeamArea();
-		bool IsCoherent();
+		[[nodiscard]] WaveType GetWaveType() const noexcept;
+		[[nodiscard]] double GetPwr() const noexcept;
+		[[nodiscard]] bool GetOverrideE0() const noexcept;
+		[[nodiscard]] double GetE0() const noexcept;
+		[[nodiscard]] double GetW0() const noexcept;
+		[[nodiscard]] double GetLy() const noexcept;
+		[[nodiscard]] double GetA() const noexcept;
+		[[nodiscard]] int GetNPointsInteg() const noexcept;
+		[[nodiscard]] double GetMaxX() const noexcept;
+		[[nodiscard]] bool IsDynamicMaxXEnabled() const noexcept;
+		[[nodiscard]] double GetDynamicMaxXCoef() const noexcept;
+		[[nodiscard]] double GetDynamicMaxXAddition() const noexcept;
+		[[nodiscard]] double GetMaxPhi() const noexcept;
+		[[nodiscard]] double GetDouble(TMMParam param) const;
+		[[nodiscard]] pairdd GetXRange() const;
+		[[nodiscard]] ArrayXd GetBetas() const;
+		[[nodiscard]] ArrayXd GetPhis() const noexcept;
+		[[nodiscard]] ArrayXd GetKxs() const;
+		[[nodiscard]] ArrayXd GetKzs() const;
+		[[nodiscard]] ArrayXd GetFieldProfileXs() const;
+		[[nodiscard]] ArrayXd GetFieldProfile() const;
+		[[nodiscard]] ArrayXcd GetExpansionCoefsKx() const;
+		[[nodiscard]] double GetBeamArea() const;
+		[[nodiscard]] bool IsCoherent() const noexcept;
 	};
 
 

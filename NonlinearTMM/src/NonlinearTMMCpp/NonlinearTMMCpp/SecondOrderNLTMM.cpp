@@ -42,25 +42,23 @@ namespace TMM {
 
 		switch (process)
 		{
-		case TMM::SHG:
+		case NonlinearProcess::SHG:
 			throw std::runtime_error("Not implemented");
-			break;
-		case TMM::SFG:
+		case NonlinearProcess::SFG:
 			wlGen = OmegaToWl(WlToOmega(wlP1) + WlToOmega(wlP2));
 			betaGen = wlGen * (betaP1 / wlP1 + betaP2 / wlP2);
 			break;
-		case TMM::DFG:
+		case NonlinearProcess::DFG:
 			wlGen = OmegaToWl(WlToOmega(wlP1) - WlToOmega(wlP2));
 			betaGen = wlGen * (betaP1 / wlP1 - betaP2 / wlP2);
 			break;
-		case TMM::SPDC:
+		case NonlinearProcess::SPDC:
 			wlGen = OmegaToWl(WlToOmega(wlP1) - WlToOmega(wlP2));
 			betaGen = wlGen * (betaP1 / wlP1 - betaP2 / wlP2);
 			tmmP2.UpdateSPDCParams(deltaWlSpdc, solidAngleSpdc, deltaThetaSpdc, tmmP1.GetWl(), tmmP1.GetBeta());
 			break;
 		default:
 			throw std::runtime_error("Unknown process.");
-			break;
 		}
 
 		if (wlGen <= 0.0) {
@@ -74,20 +72,20 @@ namespace TMM {
 
 	void SecondOrderNLTMM::CalcInhomogeneosWaveParams(int layerNr, Material *material, InhomogeneosWaveParams * kpS, InhomogeneosWaveParams * kpA)
 	{
-		dcomplex kzFP1 = tmmP1.GetLayer(layerNr)->GetHw()->GetKz()(F);
-		dcomplex kzFP2 = tmmP2.GetLayer(layerNr)->GetHw()->GetKz()(F);
-		Fields FP1F = tmmP1.GetLayer(layerNr)->GetFields(0.0, F);
-		Fields FP2F = tmmP2.GetLayer(layerNr)->GetFields(0.0, F);
-		Fields FP1B = tmmP1.GetLayer(layerNr)->GetFields(0.0, B);
-		Fields FP2B = tmmP2.GetLayer(layerNr)->GetFields(0.0, B);
+		constexpr int iF = static_cast<int>(WaveDirection::F);
+		dcomplex kzFP1 = tmmP1.GetLayer(layerNr)->GetHw()->GetKz()(iF);
+		dcomplex kzFP2 = tmmP2.GetLayer(layerNr)->GetHw()->GetKz()(iF);
+		Fields FP1F = tmmP1.GetLayer(layerNr)->GetFields(0.0, WaveDirection::F);
+		Fields FP2F = tmmP2.GetLayer(layerNr)->GetFields(0.0, WaveDirection::F);
+		Fields FP1B = tmmP1.GetLayer(layerNr)->GetFields(0.0, WaveDirection::B);
+		Fields FP2B = tmmP2.GetLayer(layerNr)->GetFields(0.0, WaveDirection::B);
 		Chi2Tensor &chi2 = material->chi2;
 
 		switch (process)
 		{
-		case TMM::SHG:
+		case NonlinearProcess::SHG:
 			throw std::runtime_error("Not implemented");
-			break;
-		case TMM::SFG:
+		case NonlinearProcess::SFG:
 			kpS->kSzF = kzFP1 + kzFP2;
 			kpA->kSzF = kzFP1 - kzFP2;
 			kpS->pF = chi2.GetNonlinearPolarization(FP1F.E, FP2F.E);
@@ -95,8 +93,8 @@ namespace TMM {
 			kpA->pF = chi2.GetNonlinearPolarization(FP1F.E, FP2B.E);
 			kpA->pB = chi2.GetNonlinearPolarization(FP1B.E, FP2F.E);
 			break;
-		case TMM::DFG:
-		case TMM::SPDC:
+		case NonlinearProcess::DFG:
+		case NonlinearProcess::SPDC:
 			kpS->kSzF = kzFP1 - std::conj(kzFP2);
 			kpA->kSzF = kzFP1 + std::conj(kzFP2);
 			kpS->pF = chi2.GetNonlinearPolarization(FP1F.E, FP2F.E.conjugate());
@@ -106,7 +104,6 @@ namespace TMM {
 			break;
 		default:
 			throw std::runtime_error("Unknown process.");
-			break;
 		}
 
 		// Check inhomogenous wave directionality, correct if necessary
@@ -161,7 +158,7 @@ namespace TMM {
 	
 	void SecondOrderNLTMM::SolveWaves(ArrayXd * betasP1, ArrayXcd * E0sP1, ArrayXd * betasP2, ArrayXcd * E0sP2) {
 		Material *matLayer0 = tmmP1.GetLayer(0)->GetMaterial();
-		Material *matLayerThis = NULL;
+		Material *matLayerThis = nullptr;
 
 		// Solve wave P1
 		Wave *waveP1 = tmmP1.GetWave();
@@ -171,8 +168,7 @@ namespace TMM {
 
 		// Solve wave P2
 		Wave *waveP2 = tmmP2.GetWave();
-		if (waveP2->GetWaveType() == SPDCWAVE && process != SPDC) {
-			std::cerr << "SecondOrderNLTMM must be in SPDC mode to use SPDC wave." << std::endl;
+		if (waveP2->GetWaveType() == WaveType::SPDCWAVE && process != NonlinearProcess::SPDC) {
 			throw std::invalid_argument("SecondOrderNLTMM must be in SPDC mode to use SPDC wave.");
 		}
 		double deltaKxSpdc = tmmP2.CalcDeltaKxSpdc();
@@ -182,10 +178,10 @@ namespace TMM {
 	}
 	SecondOrderNLTMM::SecondOrderNLTMM()
 	{
-		SetProcess(SFG);
-		tmmP1.SetMode(MODE_INCIDENT);
-		tmmP2.SetMode(MODE_INCIDENT);
-		tmmGen.SetMode(MODE_NONLINEAR);
+		SetProcess(NonlinearProcess::SFG);
+		tmmP1.SetMode(NonlinearTmmMode::MODE_INCIDENT);
+		tmmP2.SetMode(NonlinearTmmMode::MODE_INCIDENT);
+		tmmGen.SetMode(NonlinearTmmMode::MODE_NONLINEAR);
 		deltaWlSpdc = constNAN;
 		solidAngleSpdc = constNAN;
 		deltaThetaSpdc = constNAN;
@@ -194,10 +190,10 @@ namespace TMM {
 	void SecondOrderNLTMM::SetProcess(NonlinearProcess process_)
 	{
 		process = process_;
-		if (process == SPDC) {
-			tmmP2.SetMode(MODE_VACUUM_FLUCTUATIONS);
+		if (process == NonlinearProcess::SPDC) {
+			tmmP2.SetMode(NonlinearTmmMode::MODE_VACUUM_FLUCTUATIONS);
 		} else {
-			tmmP2.SetMode(MODE_INCIDENT);
+			tmmP2.SetMode(NonlinearTmmMode::MODE_INCIDENT);
 		}
 	}
 
@@ -236,37 +232,37 @@ namespace TMM {
 		return res;
 	}
 
-	NonlinearTMM * SecondOrderNLTMM::GetP1() {
+	NonlinearTMM * SecondOrderNLTMM::GetP1() noexcept {
 		return &tmmP1;
 	}
 
-	NonlinearTMM * SecondOrderNLTMM::GetP2() {
+	NonlinearTMM * SecondOrderNLTMM::GetP2() noexcept {
 		return &tmmP2;
 	}
 
-	NonlinearTMM * SecondOrderNLTMM::GetGen() {
+	NonlinearTMM * SecondOrderNLTMM::GetGen() noexcept {
 		return &tmmGen;
 	}
 
-	double SecondOrderNLTMM::GetDeltaWlSpdc() {
+	double SecondOrderNLTMM::GetDeltaWlSpdc() const noexcept {
 		return deltaWlSpdc;
 	}
 
-	double SecondOrderNLTMM::GetSolidAngleSpdc() {
+	double SecondOrderNLTMM::GetSolidAngleSpdc() const noexcept {
 		return solidAngleSpdc;
 	}
 
-	double SecondOrderNLTMM::GetDeltaThetaSpdc() {
+	double SecondOrderNLTMM::GetDeltaThetaSpdc() const noexcept {
 		return deltaThetaSpdc;
 	}
 
-	SweepResultSecondOrderNLTMM * SecondOrderNLTMM::Sweep(TMMParam param, const Eigen::Map<ArrayXd>& valuesP1, const Eigen::Map<ArrayXd>& valuesP2, int outmask, int paramLayer, int layerNr, double layerZ) {
+	std::unique_ptr<SweepResultSecondOrderNLTMM> SecondOrderNLTMM::Sweep(TMMParam param, const Eigen::Map<ArrayXd>& valuesP1, const Eigen::Map<ArrayXd>& valuesP2, int outmask, int paramLayer, int layerNr, double layerZ) {
 		if (valuesP1.size() != valuesP2.size()) {
 			throw std::invalid_argument("Value arrays must have the same size.");
 		}
 
-		// Alloc memory for result (dealloc is responsibility of the user)
-		SweepResultSecondOrderNLTMM *res = new SweepResultSecondOrderNLTMM(valuesP1.size(), outmask, layerNr, layerZ);
+		// Alloc memory for result
+		auto res = std::make_unique<SweepResultSecondOrderNLTMM>(valuesP1.size(), outmask, layerNr, layerZ);
 
 		#pragma omp parallel
 		{
@@ -282,7 +278,7 @@ namespace TMM {
 				//Set sweep param
 				nlTMMCopy.GetP1()->SetParam(param, valuesP1(i), paramLayer);
 				nlTMMCopy.GetP2()->SetParam(param, valuesP2(i), paramLayer);
-				if (GetParamType(param) == PTYPE_NONLINEAR_LAYER) {
+				if (GetParamType(param) == TMMParamType::PTYPE_NONLINEAR_LAYER) {
 					// TODO
 					nlTMMCopy.GetGen()->SetParam(param, valuesP2(i), paramLayer);
 				}
@@ -295,7 +291,7 @@ namespace TMM {
 		return res;
 	}
 
-	FieldsZX * SecondOrderNLTMM::WaveGetFields2D(const Eigen::Map<ArrayXd> &zs, const Eigen::Map<ArrayXd> &xs, WaveDirection dir) {
+	std::unique_ptr<FieldsZX> SecondOrderNLTMM::WaveGetFields2D(const Eigen::Map<ArrayXd> &zs, const Eigen::Map<ArrayXd> &xs, WaveDirection dir) {
 		// Do checking
 		UpdateGenParams();
 		CheckPrerequisites();
@@ -309,8 +305,8 @@ namespace TMM {
 		ArrayXd kxsP1 = betasP1 * 2.0 * PI / tmmP1.GetWl();
 		ArrayXd kxsP2 = betasP2 * 2.0 * PI / tmmP2.GetWl();
 
-		// Allocate space (deletion is the responsibility of the caller!)
-		FieldsZX *res = new FieldsZX(zs.size(), xs.size(), tmmGen.GetPolarization());
+		// Allocate space
+		auto res = std::make_unique<FieldsZX>(zs.size(), xs.size(), tmmGen.GetPolarization());
 		res->SetZero();
 
 		if (tmmP1.GetWave()->IsCoherent() && tmmP2.GetWave()->IsCoherent()) {
@@ -334,10 +330,9 @@ namespace TMM {
 
 						// Integrate fields
 						double kxGen = tmmThread.tmmGen.GetLayer(0)->GetKx();
-						FieldsZ *fGen = tmmThread.tmmGen.GetFields(zs, dir);
+						auto fGen = tmmThread.tmmGen.GetFields(zs, dir);
 						ArrayXcd phaseXGen = (constI * kxGen * xs).exp() * dkxP1 * dkxP2;
 						res->AddFields(*fGen, phaseXGen);
-						delete fGen;
 					}
 				}
 			}
@@ -354,8 +349,8 @@ namespace TMM {
 					tmmThread.tmmP2.SetE0(E0sP2(j));
 					double dkxP2 = GetDifferential(kxsP2, j);
 
-					FieldsZX *coherentFields = new FieldsZX(zs.size(), xs.size(), tmmGen.GetPolarization());
-					coherentFields->SetZero();
+					FieldsZX coherentFields(zs.size(), xs.size(), tmmGen.GetPolarization());
+					coherentFields.SetZero();
 					// Sum field coherently
 					for (int i = 0; i < betasP1.size(); i++) {
 						tmmThread.tmmP1.SetBeta(betasP1(i));
@@ -367,14 +362,12 @@ namespace TMM {
 
 						// Integrate fields
 						double kxGen = tmmThread.tmmGen.GetLayer(0)->GetKx();
-						FieldsZ *fGen = tmmThread.tmmGen.GetFields(zs, dir);
+						auto fGen = tmmThread.tmmGen.GetFields(zs, dir);
 						ArrayXcd phaseXGen = (constI * kxGen * xs).exp() * dkxP1 * dkxP2;
-						coherentFields->AddFields(*fGen, phaseXGen);
-						delete fGen;
+						coherentFields.AddFields(*fGen, phaseXGen);
 					}
 
-					res->AddSquaredFields(coherentFields);
-					delete coherentFields;
+					res->AddSquaredFields(&coherentFields);
 				}
 			}
 			res->TakeSqrt();
@@ -412,12 +405,12 @@ namespace TMM {
 		}
 
 		// X-range (TODO)
-		pairdd xrangeP1 = waveP1->GetXRange();
+		auto [xMinP1, xMaxP1] = waveP1->GetXRange();
 		if (std::isnan(x0)) {
-			x0 = xrangeP1.first;
+			x0 = xMinP1;
 		}
 		if (std::isnan(x1)) {
-			x1 = xrangeP1.second;
+			x1 = xMaxP1;
 		}
 
 		// Ly
@@ -508,9 +501,9 @@ namespace TMM {
 
 				// Sum powers
 				double dkxP2 = GetDifferential(kxsP2, j);
-				pairdd r = IntegrateWavePower(layerNr, polGen, wlGen, epsLayer, Us, kxs, kzs, x0, x1, z, Ly);
-				res.first += r.first * dkxP2;
-				res.second += r.second * dkxP2;
+				auto [rFwd, rBwd] = IntegrateWavePower(layerNr, polGen, wlGen, epsLayer, Us, kxs, kzs, x0, x1, z, Ly);
+				res.first += rFwd * dkxP2;
+				res.second += rBwd * dkxP2;
 			}
 		}
 		else {
@@ -522,15 +515,15 @@ namespace TMM {
 		return res;
 	}
 
-	WaveSweepResultSecondOrderNLTMM * SecondOrderNLTMM::WaveSweep(TMMParam param, const Eigen::Map<ArrayXd>& valuesP1, const Eigen::Map<ArrayXd>& valuesP2, int outmask, int paramLayer, int layerNr, double layerZ) {
+	std::unique_ptr<WaveSweepResultSecondOrderNLTMM> SecondOrderNLTMM::WaveSweep(TMMParam param, const Eigen::Map<ArrayXd>& valuesP1, const Eigen::Map<ArrayXd>& valuesP2, int outmask, int paramLayer, int layerNr, double layerZ) {
 		if (valuesP1.size() != valuesP2.size()) {
 			throw std::invalid_argument("Value arrays must have the same size.");
 		}
 
 		CheckPrerequisites(param);
 
-		// Alloc memory for result (dealloc is responsibility of the user)
-		WaveSweepResultSecondOrderNLTMM *res = new WaveSweepResultSecondOrderNLTMM(valuesP1.size(), outmask, layerNr, layerZ);
+		// Alloc memory for result
+		auto res = std::make_unique<WaveSweepResultSecondOrderNLTMM>(valuesP1.size(), outmask, layerNr, layerZ);
 
 		#pragma omp parallel
 		{
@@ -543,7 +536,7 @@ namespace TMM {
 				//Set sweep param
 				nlTMMCopy.GetP1()->SetParam(param, valuesP1(i), paramLayer);
 				nlTMMCopy.GetP2()->SetParam(param, valuesP2(i), paramLayer);
-				if (GetParamType(param) == PTYPE_NONLINEAR_LAYER) {
+				if (GetParamType(param) == TMMParamType::PTYPE_NONLINEAR_LAYER) {
 					// TODO
 					nlTMMCopy.GetGen()->SetParam(param, valuesP2(i), paramLayer);
 				}
@@ -576,15 +569,15 @@ namespace TMM {
 		if (outmask & SWEEP_GEN) {
 			// First layer
 			if ((outmask & SWEEP_I) || (outmask & SWEEP_R)) {
-				pairdd pf0 = tmm.WaveGetPowerFlows(0);
-				Gen.Pi(nr) = pf0.first;
-				Gen.Pr(nr) = pf0.second;
+				auto [fwd0, bwd0] = tmm.WaveGetPowerFlows(0);
+				Gen.Pi(nr) = fwd0;
+				Gen.Pr(nr) = bwd0;
 			}
 
 			// Last layer
 			if (outmask & SWEEP_T) {
-				pairdd pfL = tmm.WaveGetPowerFlows(tmm.GetGen()->LayersCount() - 1);
-				Gen.Pt(nr) = pfL.first;
+				auto [fwdL, bwdL] = tmm.WaveGetPowerFlows(tmm.GetGen()->LayersCount() - 1);
+				Gen.Pt(nr) = fwdL;
 			}
 
 			Gen.beamArea(nr) = tmm.GetP1()->GetWave()->GetBeamArea();

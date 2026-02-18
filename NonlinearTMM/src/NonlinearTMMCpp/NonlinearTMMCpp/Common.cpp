@@ -4,38 +4,23 @@ namespace TMM {
 	TMMParamType GetParamType(TMMParam param) {
 		switch (param)
 		{
-		case TMM::PARAM_WL:
-		case TMM::PARAM_BETA:
-		case TMM::PARAM_POL:
-		case TMM::PARAM_I0:
-		case TMM::PARAM_OVERRIDE_E0:
-		case TMM::PARAM_E0:
-		case TMM::PARAM_MODE:
-			return PTYPE_NONLINEAR_TMM;
-			break;
-		case TMM::PARAM_WAVE_W0:
-			return PTYPE_WAVE;
-			break;
-		case TMM::PARAM_LAYER_D:
-			return PTYPE_NONLINEAR_LAYER;
-			break;
+		case TMMParam::PARAM_WL:
+		case TMMParam::PARAM_BETA:
+		case TMMParam::PARAM_POL:
+		case TMMParam::PARAM_I0:
+		case TMMParam::PARAM_OVERRIDE_E0:
+		case TMMParam::PARAM_E0:
+		case TMMParam::PARAM_MODE:
+			return TMMParamType::PTYPE_NONLINEAR_TMM;
+		case TMMParam::PARAM_WAVE_W0:
+			return TMMParamType::PTYPE_WAVE;
+		case TMMParam::PARAM_LAYER_D:
+			return TMMParamType::PTYPE_NONLINEAR_LAYER;
 		default:
 			std::cerr << "Param has no type" << std::endl;
 			throw std::invalid_argument("Param has no type");
-			break;
 		}
 	}
-	double WlToOmega(double wl) {
-		double omega = 2.0 * PI * constC / wl;
-		return omega;
-	}
-
-	double OmegaToWl(double omega)
-	{
-		double wl = 2.0 * PI * constC / omega;
-		return wl;
-	}
-
 	Matrix3d RotationMatrixX(double phi) {
 		Matrix3d res;
 		res << 1.0, 0.0, 0.0, 0.0, std::cos(phi), -std::sin(phi), 0.0, std::sin(phi), std::cos(phi);
@@ -54,7 +39,7 @@ namespace TMM {
 		return res;
 	}
 
-	Tensor3d ApplyRotationMatrixToTensor(Tensor3d input, Matrix3d R) {
+	Tensor3d ApplyRotationMatrixToTensor(const Tensor3d& input, const Matrix3d& R) {
 		Tensor3d res(3, 3, 3);
 		res.setZero();
 
@@ -87,14 +72,6 @@ namespace TMM {
 		output = ApplyRotationMatrixToTensor(output, Ry);
 		output = ApplyRotationMatrixToTensor(output, Rz);
 		return output;
-	}
-
-	double sqr(double a) {
-		return a * a;
-	}
-
-	dcomplex sqr(dcomplex a) {
-		return a * a;
 	}
 
 	template<typename T> T Interpolate(double x, const ArrayXd & xs, const Eigen::Array<T, Eigen::Dynamic, 1> & ys) {
@@ -275,12 +252,15 @@ namespace TMM {
 	}
 	*/
 
-	pairdd const IntegrateWavePower(int layerNr, Polarization pol, double wl, dcomplex epsLayer, const Eigen::MatrixX2cd & Us, const ArrayXd & kxs, const Eigen::MatrixX2cd & kzs, double x0, double x1, double z, double Ly) {
+	pairdd IntegrateWavePower([[maybe_unused]] int layerNr, Polarization pol, double wl, dcomplex epsLayer, const Eigen::MatrixX2cd & Us, const ArrayXd & kxs, const Eigen::MatrixX2cd & kzs, double x0, double x1, double z, double Ly) {
 
 		if (x0 != -x1 || z != 0) {
 			std::cerr << "Currently only x0 = -x1, z = 0 supported." << std::endl;
 			throw std::invalid_argument("Currently only x0 = -x1, z = 0 supported.");
 		}
+
+		constexpr int iF = static_cast<int>(WaveDirection::F);
+		constexpr int iB = static_cast<int>(WaveDirection::B);
 
 		int m = kxs.size();
 		// Precalc differentials
@@ -293,10 +273,10 @@ namespace TMM {
 		dcomplex integValue2dF = 0.0;
 		dcomplex integValue2dB = 0.0;
 		for (int i = 0; i < m; i++) {
-			dcomplex UF = Us(i, F);
-			dcomplex kzF = kzs(i, F);
-			dcomplex UB = Us(i, B);
-			dcomplex kzB = kzs(i, B);
+			dcomplex UF = Us(i, iF);
+			dcomplex kzF = kzs(i, iF);
+			dcomplex UB = Us(i, iB);
+			dcomplex kzB = kzs(i, iB);
 			//double kx = kxs(i);
 			double dkx = dkxs(i);			
 			integValue2dF += dkx * dkx * UF * std::conj(UF) * kzF * (x1 - x0);
@@ -306,20 +286,20 @@ namespace TMM {
 		// Polarization spetcific
 		double omega = WlToOmega(wl);
 		double resF, resB;
-		if (pol == P_POL) {
+		if (pol == Polarization::P_POL) {
 			for (int i = 0; i < m; i++) {
 				double kx = kxs(i);
-				dcomplex kzF = kzs(i, F);
-				dcomplex UF = Us(i, F);
-				dcomplex kzB = kzs(i, B);
-				dcomplex UB = Us(i, B);
+				dcomplex kzF = kzs(i, iF);
+				dcomplex UF = Us(i, iF);
+				dcomplex kzB = kzs(i, iB);
+				dcomplex UB = Us(i, iB);
 				dcomplex integValue1dF = 0.0, integValue1dB = 0.0;
 				for (int j = i + 1; j < m; j++) {
 					double kxP = kxs(j);
-					dcomplex kzPF = kzs(j, F);
-					dcomplex UPF = Us(j, F);
-					dcomplex kzPB = kzs(j, B);
-					dcomplex UPB = Us(j, B);
+					dcomplex kzPF = kzs(j, iF);
+					dcomplex UPF = Us(j, iF);
+					dcomplex kzPB = kzs(j, iB);
+					dcomplex UPB = Us(j, iB);
 					double dkxP = dkxs(j);
 					double dk = kx - kxP;
 
@@ -333,21 +313,21 @@ namespace TMM {
 			}
 			resF = Ly / (2.0 * omega * constEps0) * std::real(integValue2dF / epsLayer);
 			resB = -Ly / (2.0 * omega * constEps0) * std::real(integValue2dB / epsLayer);
-		} else if (pol == S_POL) {
+		} else if (pol == Polarization::S_POL) {
 			// Almost identical to p-polarization, copy for performance
 			for (int i = 0; i < m; i++) {
 				double kx = kxs(i);
-				dcomplex kzF = kzs(i, F);
-				dcomplex UF = Us(i, F);
-				dcomplex kzB = kzs(i, B);
-				dcomplex UB = Us(i, B);
+				dcomplex kzF = kzs(i, iF);
+				dcomplex UF = Us(i, iF);
+				dcomplex kzB = kzs(i, iB);
+				dcomplex UB = Us(i, iB);
 				dcomplex integValue1dF = 0.0, integValue1dB = 0.0;
 				for (int j = i + 1; j < m; j++) {
 					double kxP = kxs(j);
-					dcomplex kzPF = kzs(j, F);
-					dcomplex UPF = Us(j, F);
-					dcomplex kzPB = kzs(j, B);
-					dcomplex UPB = Us(j, B);
+					dcomplex kzPF = kzs(j, iF);
+					dcomplex UPF = Us(j, iF);
+					dcomplex kzPB = kzs(j, iB);
+					dcomplex UPB = Us(j, iB);
 					double dkxP = dkxs(j);
 					double dk = kx - kxP;
 
@@ -374,33 +354,32 @@ namespace TMM {
 		double pwrFlow;
 		switch (pol)
 		{
-		case TMM::P_POL:
+		case Polarization::P_POL:
 			pwrFlow = real(kzF / eps);
 			break;
-		case TMM::S_POL:
+		case Polarization::S_POL:
 			pwrFlow = real(kzF);
 			break;
 		default:
 			#pragma omp critical
 			std::cerr << "Unknown polarization." << std::endl;
 			throw std::invalid_argument("Unknown polarization.");
-			break;
 		}
 
 		WaveDirection res;
 
 		if (real(kzF) > 0.0) {
-			res = F;
+			res = WaveDirection::F;
 		}
 		else if (real(kzF) < 0.0) {
-			res = B;
+			res = WaveDirection::B;
 		}
 		else {
 			if (imag(kzF) > 0.0) {
-				res = F;
+				res = WaveDirection::F;
 			}
 			else if (imag(kzF) < 0.0) {
-				res = B;
+				res = WaveDirection::B;
 			}
 			else {
 				// Only if kz = 0.0
@@ -410,13 +389,13 @@ namespace TMM {
 			}
 		}
 
-		if (res == F && (/*imag(kzF) < 0.0 || */ pwrFlow < 0.0)) {
+		if (res == WaveDirection::F && (/*imag(kzF) < 0.0 || */ pwrFlow < 0.0)) {
 			#pragma omp critical
 			std::cerr << "F: " << kzF << " " << eps << ": " << pwrFlow << std::endl;
 			//throw std::runtime_error("Could not determine wave direction.");
 		}
 
-		if (res == B && (/*imag(kzF) > 0.0 || */pwrFlow > 0.0)) {
+		if (res == WaveDirection::B && (/*imag(kzF) > 0.0 || */pwrFlow > 0.0)) {
 			#pragma omp critical
 			std::cerr << "B: " << kzF << " " << eps << ": " << pwrFlow << std::endl;
 			//throw std::runtime_error("Could not determine wave direction.");

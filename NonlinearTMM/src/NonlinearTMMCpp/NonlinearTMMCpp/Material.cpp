@@ -1,4 +1,5 @@
 #include "Material.h"
+#include <array>
 
 namespace TMM {
 
@@ -39,8 +40,8 @@ namespace TMM {
 			throw std::runtime_error("d index not in range 1..3, 1..6");
 		}
 		needRotationRecalc = true;
-		int dIndex2[6] = { 0, 1, 2, 1, 0, 0 };
-		int dIndex3[6] = { 0, 1, 2, 2, 2, 1 };
+		constexpr std::array<int, 6> dIndex2 = { 0, 1, 2, 1, 0, 0 };
+		constexpr std::array<int, 6> dIndex3 = { 0, 1, 2, 2, 2, 1 };
 		chi2(i1 - 1, dIndex2[i2 - 1], dIndex3[i2 - 1]) = 2.0 * value;
 		chi2(i1 - 1, dIndex3[i2 - 1], dIndex2[i2 - 1]) = 2.0 * value;
 	}
@@ -53,7 +54,7 @@ namespace TMM {
 		needRotationRecalc = false;
 	}
 
-	bool Chi2Tensor::IsNonlinear() const
+	bool Chi2Tensor::IsNonlinear() const noexcept
 	{
 		return isNonlinear;
 	}
@@ -122,7 +123,7 @@ namespace TMM {
 		return res;
 	}
 	
-	bool Material::IsNonlinear() const
+	bool Material::IsNonlinear() const noexcept
 	{
 		return chi2.IsNonlinear();
 	}

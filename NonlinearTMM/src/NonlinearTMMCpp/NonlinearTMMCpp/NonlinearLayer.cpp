@@ -5,70 +5,72 @@ namespace TMM{
 	Fields::Fields() {
 		E = Vector3cd::Zero();
 		H = Vector3cd::Zero();
-		dir = TOT;
+		dir = WaveDirection::TOT;
 	}
 
 	void Fields::SetFieldsPpol(const Array2cd &Hy, const Array2cd &Ex, const Array2cd &Ez, WaveDirection dir_)
 	{
+		constexpr int iF = static_cast<int>(WaveDirection::F);
+		constexpr int iB = static_cast<int>(WaveDirection::B);
 		E = Vector3cd::Zero();
 		H = Vector3cd::Zero();
 		dir = dir_;
 
 		switch (dir)
 		{
-		case F:
-			E(0) = Ex(F);
-			E(2) = Ez(F);
-			H(1) = Hy(F);
+		case WaveDirection::F:
+			E(0) = Ex(iF);
+			E(2) = Ez(iF);
+			H(1) = Hy(iF);
 			break;
-		case B:
-			E(0) = Ex(B);
-			E(2) = Ez(B);
-			H(1) = Hy(B);
+		case WaveDirection::B:
+			E(0) = Ex(iB);
+			E(2) = Ez(iB);
+			H(1) = Hy(iB);
 			break;
-		case TOT:
-			E(0) = Ex(F) + Ex(B);
-			E(2) = Ez(F) + Ez(B);
-			H(1) = Hy(F) + Hy(B);
+		case WaveDirection::TOT:
+			E(0) = Ex(iF) + Ex(iB);
+			E(2) = Ez(iF) + Ez(iB);
+			H(1) = Hy(iF) + Hy(iB);
 			break;
 		default:
 			throw std::invalid_argument("Unknown wave direction.");
-			break;
 		}
 	}
 	void Fields::SetFieldsSpol(const Array2cd &Ey, const Array2cd &Hx, const Array2cd &Hz, WaveDirection dir_)
 	{
+		constexpr int iF = static_cast<int>(WaveDirection::F);
+		constexpr int iB = static_cast<int>(WaveDirection::B);
 		E = Vector3cd::Zero();
 		H = Vector3cd::Zero();
 		dir = dir_;
 
 		switch (dir)
 		{
-		case F:
-			E(1) = Ey(F);
-			H(0) = Hx(F);
-			H(2) = Hz(F);
+		case WaveDirection::F:
+			E(1) = Ey(iF);
+			H(0) = Hx(iF);
+			H(2) = Hz(iF);
 			break;
-		case B:
-			E(1) = Ey(B);
-			H(0) = Hx(B);
-			H(2) = Hz(B);
+		case WaveDirection::B:
+			E(1) = Ey(iB);
+			H(0) = Hx(iB);
+			H(2) = Hz(iB);
 			break;
-		case TOT:
-			E(1) = Ey(F) + Ey(B);
-			H(0) = Hx(F) + Hx(B);
-			H(2) = Hz(F) + Hz(B);
+		case WaveDirection::TOT:
+			E(1) = Ey(iF) + Ey(iB);
+			H(0) = Hx(iF) + Hx(iB);
+			H(2) = Hz(iF) + Hz(iB);
 			break;
 		default:
 			throw std::invalid_argument("Unknown wave direction.");
-			break;
 		}
 	}
 
 	InhomogeneosWaveParams::InhomogeneosWaveParams() {
 		kSzF = 0.0;
 		pF = Vector3cd::Zero();
-		pF = Vector3cd::Zero();
+		pB = Vector3cd::Zero();
 	}
 
 	HomogeneousWave::HomogeneousWave(NonlinearLayer * layer_) {
@@ -81,21 +83,23 @@ namespace TMM{
 
 	void HomogeneousWave::Solve(NonlinearLayer * layer_) {
 		layer = layer_;
-		kz(F) = std::sqrt(dcomplex(layer->kNorm - sqr(layer->kx))); // Slowest part (AVX?)
-		kz(B) = -kz(F);
+		constexpr int iF = static_cast<int>(WaveDirection::F);
+		constexpr int iB = static_cast<int>(WaveDirection::B);
+		kz(iF) = std::sqrt(dcomplex(layer->kNorm - sqr(layer->kx))); // Slowest part (AVX?)
+		kz(iB) = -kz(iF);
 
 		phase = Array2cd::Ones();
 		if (!std::isinf(layer->d)) {
 			phase = (constI * kz * layer->d).exp();
 		}
 
-		if (imag(kz(F)) < 0.0) {
+		if (imag(kz(iF)) < 0.0) {
 			// Shold not hapen, checking
 			std::cerr << "kzF imaginary part negative" << std::endl;
 			throw std::runtime_error("kzF imaginary part negative");
 		}
 
-		if (real(kz(F)) < 0.0) {
+		if (real(kz(iF)) < 0.0) {
 			// Shold not hapen, checking
 			std::cerr << "kzF real part negative" << std::endl;
 			throw std::runtime_error("kzF real part negative");
@@ -106,7 +110,7 @@ namespace TMM{
 			propMatrix = Matrix2cd::Identity();
 		}
 		else {
-			propMatrix << phase(F), 0.0, 0.0, phase(B);
+			propMatrix << phase(iF), 0.0, 0.0, phase(iB);
 		}
 		solved = true;
 	}
@@ -122,7 +126,7 @@ namespace TMM{
 		if (!solved) {
 			throw std::runtime_error("Homogeneous wave must be solved first");
 		}
-		return  kz(F);
+		return  kz(static_cast<int>(WaveDirection::F));
 	}
 
 	double HomogeneousWave::GetKx() const {
@@ -163,11 +167,13 @@ namespace TMM{
 
 	void InhomogeneousWave::Solve(NonlinearLayer * layer_, InhomogeneosWaveParams & params) {
 		layer = layer_;
+		constexpr int iF = static_cast<int>(WaveDirection::F);
+		constexpr int iB = static_cast<int>(WaveDirection::B);
 
 		// kS
-		kSz(F) = params.kSzF;
-		kSz(B) = -kSz(F);
-		kSNorm = sqr(layer->kx) + sqr(kSz(F));
+		kSz(iF) = params.kSzF;
+		kSz(iB) = -kSz(iF);
+		kSNorm = sqr(layer->kx) + sqr(kSz(iF));
 
 		// Phase
 		phaseS = Array2cd::Ones();
@@ -185,13 +191,13 @@ namespace TMM{
 			By << 0.0, 0.0;
 		}
 		else {
-			if (layer->pol == S_POL) {
+			if (layer->pol == Polarization::S_POL) {
 				By = -(py / constEps0) * sqr(layer->k0) / (layer->kNorm - kSNorm);
-				By(B) *= phaseS(F);
+				By(iB) *= phaseS(iF);
 			}
-			else if (layer->pol == P_POL) {
+			else if (layer->pol == Polarization::P_POL) {
 				By = -layer->omega / (layer->kNorm - kSNorm) * (kSz * px - layer->kx * pz);
-				By(B) *= phaseS(F);
+				By(iB) *= phaseS(iF);
 			}
 			else {
 				throw std::runtime_error("Unknown polarization");
@@ -238,7 +244,7 @@ namespace TMM{
 		material = material_;
 		wl = 0.0;
 		beta = 0.0;
-		pol = NOT_DEFINED_POL;
+		pol = Polarization::NOT_DEFINED_POL;
 		omega = 0.0;
 		n = 0.0;
 		eps = 0.0;
@@ -278,7 +284,7 @@ namespace TMM{
 		solved = true;
 	}
 
-	bool NonlinearLayer::IsNonlinear() const
+	bool NonlinearLayer::IsNonlinear() const noexcept
 	{
 		return isNonlinear;
 	}
@@ -304,25 +310,24 @@ namespace TMM{
 	void NonlinearLayer::SetParam(TMMParam param, double value) {
 		switch (param)
 		{
-		case PARAM_LAYER_D:
+		case TMMParam::PARAM_LAYER_D:
 			SetThickness(value);
 			break;
 		default:
 			throw std::invalid_argument("Param not in list.");
-			break;
 		}
 	}
 
-	double NonlinearLayer::GetThickness() {
+	double NonlinearLayer::GetThickness() const noexcept {
 		return d;
 	}
 
-	Material * NonlinearLayer::GetMaterial() {
+	Material * NonlinearLayer::GetMaterial() const noexcept {
 		// It is the responsibility of the user to ensure, that material ptr stays valid
 		return material;
 	}
 
-	HomogeneousWave *NonlinearLayer::GetHw()
+	HomogeneousWave *NonlinearLayer::GetHw() noexcept
 	{
 		return &hw;
 	}
@@ -341,15 +346,13 @@ namespace TMM{
 		return k0;
 	}
 
-	double NonlinearLayer::GetDouble(TMMParam param) {
+	double NonlinearLayer::GetDouble(TMMParam param) const {
 		switch (param)
 		{
-		case PARAM_LAYER_D:
+		case TMMParam::PARAM_LAYER_D:
 			return GetThickness();
-			break;
 		default:
 			throw std::invalid_argument("Param not in list.");
-			break;
 		}
 	}
 
@@ -386,7 +389,7 @@ namespace TMM{
 			expKAz = (constI * iwa.kSz * z).exp();
 		}
 
-		if (pol == P_POL) {
+		if (pol == Polarization::P_POL) {
 			dcomplex c = -1.0 / (omega * eps * constEps0);
 			Array2cd Hy = GetMainFields(z);
 			Array2cd Ex = (-hw.kz * Hy) * c;
@@ -398,7 +401,7 @@ namespace TMM{
 			}
 			res.SetFieldsPpol(Hy, Ex, Ez, dir);
 		}
-		else if (pol == S_POL) {
+		else if (pol == Polarization::S_POL) {
 			double c = 1.0 / (omega * constMu0);
 			Array2cd Ey = GetMainFields(z);
 			Array2cd Hx = (-hw.kz * Ey) * c;
@@ -419,7 +422,7 @@ namespace TMM{
 		if (!solved) {
 			throw std::runtime_error("NonlinearLayer must be solved first.");
 		}
-		Fields f = GetFields(z, TOT);
+		Fields f = GetFields(z, WaveDirection::TOT);
 		double Sz = 0.5 * real(f.E(0) * std::conj(f.H(1)) - f.E(1) * std::conj(f.H(0)));
 		return Sz;
 	}
@@ -427,7 +430,6 @@ namespace TMM{
 	double NonlinearLayer::GetAbsorbedIntensity() const {
 		if (!solved) {
 			throw std::runtime_error("NonlinearLayer must be solved first.");
-			std::cerr << "NonlinearLayer must be solved first." << std::endl;
 		}
 
 		if (std::abs(imag(eps)) < 1e-14) {
@@ -437,10 +439,10 @@ namespace TMM{
 
 		if (IsNonlinear()) {
 			throw std::runtime_error("Absorbed power calculation is not allowed in nonlinear media.");
-			std::cerr << "Absorbed power calculation is not allowed in nonlinear media." << std::endl;
 		}
 
-		dcomplex kzF = hw.kz(F);
+		constexpr int iF = static_cast<int>(WaveDirection::F);
+		dcomplex kzF = hw.kz(iF);
 		dcomplex dk1 = kzF - std::conj(kzF);
 		dcomplex dk2 = kzF + std::conj(kzF);
 		dcomplex intValue1 = -constI * (std::exp(constI * dk1 * d) - 1.0) / dk1;
@@ -448,8 +450,8 @@ namespace TMM{
 		dcomplex intValue3 = constI * (std::exp(-constI * dk2 * d) - 1.0) / dk2;
 		dcomplex intValue4 = constI * (std::exp(-constI * dk1 * d) - 1.0) / dk1;
 
-		Vector3cd E0F = GetFields(0.0, F).E;
-		Vector3cd E0B = GetFields(0.0, B).E;
+		Vector3cd E0F = GetFields(0.0, WaveDirection::F).E;
+		Vector3cd E0B = GetFields(0.0, WaveDirection::B).E;
 		Vector3cd E0FC = E0F.conjugate();
 		Vector3cd E0BC = E0B.conjugate();
 

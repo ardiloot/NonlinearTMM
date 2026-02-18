@@ -2,7 +2,7 @@
 
 namespace TMM {
 
-	ArrayXd TukeyFunc(ArrayXd xs, double w0, double a) {
+	ArrayXd TukeyFunc(const ArrayXd& xs, double w0, double a) {
 		ArrayXd res(xs.size());
 		for (int i = 0; i < xs.size(); i++) {
 			double x = xs(i);
@@ -66,16 +66,14 @@ namespace TMM {
 		fieldProfileXs = xs;
 		switch (waveType)
 		{
-		case TMM::GAUSSIANWAVE:
+		case WaveType::GAUSSIANWAVE:
 			fieldProfile = E0 * (-(xs * xs) / sqr(w0 / 1.2533141369277430)).exp();
 			break;
-		case TMM::TUKEYWAVE:
+		case WaveType::TUKEYWAVE:
 			fieldProfile = E0 * TukeyFunc(xs, w0 / (0.25 * a + 0.75), a);
 			break;
 		default:
-			std::cerr << "Unknown FFT wave type." << std::endl;
 			throw std::invalid_argument("Unknown FFT wave type.");
-			break;
 		}
 
 		// FFT spectrum
@@ -121,13 +119,13 @@ namespace TMM {
 	}
 
 	Wave::Wave() : phis(0), kxs(0), kzs(0), expansionCoefsKx(0), fieldProfileXs(0), fieldProfile(0) {
-		waveType = PLANEWAVE;
+		waveType = WaveType::PLANEWAVE;
 		pwr = 1.0;
 		overrideE0 = false;
 		E0OverrideValue = 1.0;
 		w0 = 100e-6;
-		materialLayer0 = NULL;
-		materialLayerThis = NULL;
+		materialLayer0 = nullptr;
+		materialLayerThis = nullptr;
 		Ly = 1e-3;
 		a = 0.7;
 		nPointsInteg = 100;
@@ -204,12 +202,11 @@ namespace TMM {
 	void Wave::SetParam(TMMParam param, double value) {
 		switch (param)
 		{
-		case PARAM_WAVE_W0:
+		case TMMParam::PARAM_WAVE_W0:
 			SetW0(value);
 			break;
 		default:
 			throw std::invalid_argument("Param not in list.");
-			break;
 		}
 	}
 
@@ -238,17 +235,16 @@ namespace TMM {
 		beamArea = w0 * Ly / std::cos(thLayer0);
 
 		// Solve
-		if (waveType == PLANEWAVE) {
+		if (waveType == WaveType::PLANEWAVE) {
 			SolvePlaneWave();
 		}
-		else if (waveType == GAUSSIANWAVE || waveType == TUKEYWAVE) {
+		else if (waveType == WaveType::GAUSSIANWAVE || waveType == WaveType::TUKEYWAVE) {
 			SolveFFTWave();
 		}
-		else if (waveType == SPDCWAVE) {
+		else if (waveType == WaveType::SPDCWAVE) {
 			SolveSpdcWave();
 		}
 		else {
-			std::cerr << "Unknown wave type." << std::endl;
 			throw std::invalid_argument("Unknown wave type.");
 		}
 		solved = true;
@@ -257,71 +253,69 @@ namespace TMM {
 
 	// Getters
 
-	WaveType Wave::GetWaveType() {
+	WaveType Wave::GetWaveType() const noexcept {
 		return waveType;
 	}
 
-	double Wave::GetPwr() {
+	double Wave::GetPwr() const noexcept {
 		return pwr;
 	}
 
-	bool Wave::GetOverrideE0() {
+	bool Wave::GetOverrideE0() const noexcept {
 		return overrideE0;
 	}
 
-	double Wave::GetE0() {
+	double Wave::GetE0() const noexcept {
 		return E0OverrideValue;
 	}
 
-	double Wave::GetW0() {
+	double Wave::GetW0() const noexcept {
 		return w0;
 	}
 
-	double Wave::GetLy() {
+	double Wave::GetLy() const noexcept {
 		return Ly;
 	}
 
-	double Wave::GetA() {
+	double Wave::GetA() const noexcept {
 		return a;
 	}
 
-	int Wave::GetNPointsInteg() {
+	int Wave::GetNPointsInteg() const noexcept {
 		return nPointsInteg;
 	}
 
-	double Wave::GetMaxX() {
+	double Wave::GetMaxX() const noexcept {
 		return maxX;
 	}
 
-	bool Wave::IsDynamicMaxXEnabled() {
+	bool Wave::IsDynamicMaxXEnabled() const noexcept {
 		return dynamicMaxX;
 	}
 
-	double Wave::GetDynamicMaxXCoef() {
+	double Wave::GetDynamicMaxXCoef() const noexcept {
 		return dynamicMaxXCoef;
 	}
 
-	double Wave::GetDynamicMaxXAddition() {
+	double Wave::GetDynamicMaxXAddition() const noexcept {
 		return dynamicMaxXAddition;
 	}
 
-	double Wave::GetMaxPhi() {
+	double Wave::GetMaxPhi() const noexcept {
 		return maxPhi;
 	}
 
-	double Wave::GetDouble(TMMParam param) {
+	double Wave::GetDouble(TMMParam param) const {
 		switch (param)
 		{
-		case PARAM_WAVE_W0:
+		case TMMParam::PARAM_WAVE_W0:
 			return GetW0();
-			break;
 		default:
 			throw std::invalid_argument("Param not in list.");
-			break;
 		}
 	}
 
-	pairdd Wave::GetXRange() {
+	pairdd Wave::GetXRange() const {
 		if (!solved) {
 			std::cerr << "Wave must be solved first." << std::endl;
 			throw std::runtime_error("Wave must be solved first.");
@@ -329,7 +323,7 @@ namespace TMM {
 		return pairdd(-maxXThis, maxXThis);
 	}
 
-	ArrayXd Wave::GetBetas() {
+	ArrayXd Wave::GetBetas() const {
 		if (!solved) {
 			std::cerr << "Wave must be solved first." << std::endl;
 			throw std::runtime_error("Wave must be solved first.");
@@ -337,9 +331,9 @@ namespace TMM {
 		return kxs / k0;
 	}
 
-	ArrayXd Wave::GetPhis() { return phis; }
+	ArrayXd Wave::GetPhis() const noexcept { return phis; }
 
-	ArrayXd Wave::GetKxs() {
+	ArrayXd Wave::GetKxs() const {
 		if (!solved) {
 			std::cerr << "Wave must be solved first." << std::endl;
 			throw std::runtime_error("Wave must be solved first.");
@@ -347,7 +341,7 @@ namespace TMM {
 		return kxs;
 	}
 
-	ArrayXd Wave::GetKzs() {
+	ArrayXd Wave::GetKzs() const {
 		if (!solved) {
 			std::cerr << "Wave must be solved first." << std::endl;
 			throw std::runtime_error("Wave must be solved first.");
@@ -355,7 +349,7 @@ namespace TMM {
 		return kzs;
 	}
 
-	ArrayXd Wave::GetFieldProfileXs() {
+	ArrayXd Wave::GetFieldProfileXs() const {
 		if (!solved) {
 			std::cerr << "Wave must be solved first." << std::endl;
 			throw std::runtime_error("Wave must be solved first.");
@@ -363,7 +357,7 @@ namespace TMM {
 		return fieldProfileXs;
 	}
 
-	ArrayXd Wave::GetFieldProfile() {
+	ArrayXd Wave::GetFieldProfile() const {
 		if (!solved) {
 			std::cerr << "Wave must be solved first." << std::endl;
 			throw std::runtime_error("Wave must be solved first.");
@@ -371,7 +365,7 @@ namespace TMM {
 		return fieldProfile;
 	}
 
-	ArrayXcd Wave::GetExpansionCoefsKx() {
+	ArrayXcd Wave::GetExpansionCoefsKx() const {
 		if (!solved) {
 			std::cerr << "Wave must be solved first." << std::endl;
 			throw std::runtime_error("Wave must be solved first.");
@@ -379,7 +373,7 @@ namespace TMM {
 		return expansionCoefsKx;
 	}
 
-	double Wave::GetBeamArea() {
+	double Wave::GetBeamArea() const {
 		if (!solved) {
 			std::cerr << "Wave must be solved first." << std::endl;
 			throw std::runtime_error("Wave must be solved first.");
@@ -387,8 +381,8 @@ namespace TMM {
 		return beamArea;
 	}
 
-	bool Wave::IsCoherent() {
-		if (waveType == SPDCWAVE) {
+	bool Wave::IsCoherent() const noexcept {
+		if (waveType == WaveType::SPDCWAVE) {
 			return false;
 		}
 		return true;

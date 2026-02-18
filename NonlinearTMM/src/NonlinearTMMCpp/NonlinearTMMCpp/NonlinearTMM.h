@@ -3,6 +3,8 @@
 #include "Material.h"
 #include "Waves.h"
 #include "NonlinearLayer.h"
+#include <functional>
+#include <memory>
 
 namespace TMM {	
 	class NonlinearTMM;
@@ -11,7 +13,7 @@ namespace TMM {
 	// Functions
 	//---------------------------------------------------------------
 
-	typedef std::function<void(const ArrayXcd&, const ArrayXcd&, MatrixXcd&)> OuterProductSSEEigenFunc;
+	using OuterProductSSEEigenFunc = std::function<void(const ArrayXcd&, const ArrayXcd&, MatrixXcd&)>;
 	void OuterProductSSEEigenComplex(const ArrayXcd& X, const ArrayXcd& Y, MatrixXcd& R);
 	void OuterProductSSEEigenComplexAdd(const ArrayXcd& X, const ArrayXcd& Y, MatrixXcd& R);
 	void OuterProductGoodEigenComplex(const ArrayXcd& X, const ArrayXcd& Y, MatrixXcd& R);
@@ -49,7 +51,7 @@ namespace TMM {
 		ArrayXd enh;
 
 		SweepResultNonlinearTMM(int n, int outmask_, int layerNr_, double layerZ_);
-		int GetOutmask();
+		[[nodiscard]] int GetOutmask() const noexcept;
 		void SetValues(int nr, NonlinearTMM &tmm);
 	};
 
@@ -67,7 +69,7 @@ namespace TMM {
 		ArrayXd enh, beamArea;
 
 		WaveSweepResultNonlinearTMM(int n, int outmask_, int layerNr_, double layerZ_);
-		int GetOutmask();
+		[[nodiscard]] int GetOutmask() const noexcept;
 		void SetValues(int nr, NonlinearTMM &tmm);
 	};
 
@@ -95,12 +97,12 @@ namespace TMM {
 		MatrixXcd Ex, Ey, Ez, Hx, Hy, Hz;
 		FieldsZX(int n, int m, Polarization pol_);
 		void SetZero();
-		Polarization GetPol();
+		[[nodiscard]] Polarization GetPol() const noexcept;
 		void SetFields(const FieldsZ &f, const ArrayXcd &phaseX, bool add = false);
 		void AddFields(const FieldsZ &f, const ArrayXcd &phaseX);
 		void AddSquaredFields(FieldsZX *toAdd);
 		void TakeSqrt();
-		MatrixXd GetENorm();
+		[[nodiscard]] MatrixXd GetENorm() const;
 
 	};
 
@@ -139,9 +141,9 @@ namespace TMM {
 	public:
 		NonlinearTMM();
 		void AddLayer(double d_, Material *material_);
-		NonlinearLayer* GetLayer(int layerNr);
-		int LayersCount() const;
-		void CheckPrerequisites(TMMParam toIgnore = PARAM_NOT_DEFINED);
+		[[nodiscard]] NonlinearLayer* GetLayer(int layerNr);
+		[[nodiscard]] int LayersCount() const noexcept;
+		void CheckPrerequisites(TMMParam toIgnore = TMMParam::PARAM_NOT_DEFINED);
 
 		// Setters
 		void SetWl(double wl_);
@@ -155,35 +157,35 @@ namespace TMM {
 		void SetParam(TMMParam param, dcomplex value, int paramLayer = -1);
 
 		// Getters
-		double GetWl();
-		double GetBeta();
-		Polarization GetPolarization();
-		double GetI0();
-		bool GetOverrideE0();
-		dcomplex GetE0();
-		NonlinearTmmMode GetMode();
-		double GetDouble(TMMParam param);
-		dcomplex GetComplex(TMMParam param);
+		[[nodiscard]] double GetWl() const noexcept;
+		[[nodiscard]] double GetBeta() const noexcept;
+		[[nodiscard]] Polarization GetPolarization() const noexcept;
+		[[nodiscard]] double GetI0() const noexcept;
+		[[nodiscard]] bool GetOverrideE0() const noexcept;
+		[[nodiscard]] dcomplex GetE0() const noexcept;
+		[[nodiscard]] NonlinearTmmMode GetMode() const noexcept;
+		[[nodiscard]] double GetDouble(TMMParam param) const;
+		[[nodiscard]] dcomplex GetComplex(TMMParam param) const;
 
 		// Plane wave functionality
 		void Solve();
-		Intensities GetIntensities() const;
-		double GetAbsorbedIntensity() const;
-		double GetEnhancement(int layerNr, double z);
-		SweepResultNonlinearTMM* Sweep(TMMParam param, const Eigen::Map<ArrayXd> &values, int outmask = SWEEP_PWRFLOWS, int paramLayer = -1, int layerNr = 0, double layerZ = 0);
-		FieldsZ* GetFields(const Eigen::Map<ArrayXd> &zs, WaveDirection dir = TOT);
-		FieldsZX* GetFields2D(const Eigen::Map<ArrayXd> &zs, const Eigen::Map<ArrayXd> &xs, WaveDirection dir = TOT);
+		[[nodiscard]] Intensities GetIntensities() const;
+		[[nodiscard]] double GetAbsorbedIntensity() const;
+		[[nodiscard]] double GetEnhancement(int layerNr, double z);
+		[[nodiscard]] std::unique_ptr<SweepResultNonlinearTMM> Sweep(TMMParam param, const Eigen::Map<ArrayXd> &values, int outmask = SWEEP_PWRFLOWS, int paramLayer = -1, int layerNr = 0, double layerZ = 0);
+		[[nodiscard]] std::unique_ptr<FieldsZ> GetFields(const Eigen::Map<ArrayXd> &zs, WaveDirection dir = WaveDirection::TOT);
+		[[nodiscard]] std::unique_ptr<FieldsZX> GetFields2D(const Eigen::Map<ArrayXd> &zs, const Eigen::Map<ArrayXd> &xs, WaveDirection dir = WaveDirection::TOT);
 
 		// Waves
-		Wave* GetWave();
-		pairdd WaveGetPowerFlows(int layerNr, double x0 = constNAN, double x1 = constNAN, double z = 0.0);
-		double WaveGetEnhancement(int layerNr, double z);
-		WaveSweepResultNonlinearTMM * WaveSweep(TMMParam param, const Eigen::Map<ArrayXd> &values, int outmask = SWEEP_PWRFLOWS, int paramLayer = -1, int layerNr = 0, double layerZ = 0);
-		FieldsZX* WaveGetFields2D(const Eigen::Map<ArrayXd> &zs, const Eigen::Map<ArrayXd> &xs, WaveDirection dir = TOT);
+		[[nodiscard]] Wave* GetWave() noexcept;
+		[[nodiscard]] pairdd WaveGetPowerFlows(int layerNr, double x0 = constNAN, double x1 = constNAN, double z = 0.0);
+		[[nodiscard]] double WaveGetEnhancement(int layerNr, double z);
+		[[nodiscard]] std::unique_ptr<WaveSweepResultNonlinearTMM> WaveSweep(TMMParam param, const Eigen::Map<ArrayXd> &values, int outmask = SWEEP_PWRFLOWS, int paramLayer = -1, int layerNr = 0, double layerZ = 0);
+		[[nodiscard]] std::unique_ptr<FieldsZX> WaveGetFields2D(const Eigen::Map<ArrayXd> &zs, const Eigen::Map<ArrayXd> &xs, WaveDirection dir = WaveDirection::TOT);
 
 		// SPDC (used internally by SecondOrderNLTMM)
 		void UpdateSPDCParams(double deltaWlSpdc_, double solidAngleSpdc_, double deltaThetaSpdc_, double wlP1Spdc_, double betaP1Spdc_);
-		double CalcDeltaKxSpdc();
+		[[nodiscard]] double CalcDeltaKxSpdc();
 	};
 
 }
