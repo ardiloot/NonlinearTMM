@@ -1,9 +1,53 @@
 [build-system]
 requires = [
-    "setuptools>=42",
+    "setuptools>=68",
     "setuptools_scm",
-    "oldest-supported-numpy",
-    "Cython",
-    "eigency"
+    "numpy>=2",
+    "Cython>=3.0,<4",
+    "eigency>=3.4.0.0",
 ]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "NonlinearTMM"
+description = "Nonlinear transfer matrix method"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.10"
+authors = [
+    { name = "Ardi Loot", email = "ardi.loot@outlook.com" },
+]
+dynamic = ["version"]
+dependencies = [
+    "numpy>=2",
+    "scipy>=1.14",
+    "eigency>=2.0.0",
+]
+
+[project.optional-dependencies]
+test = ["pyyaml", "pytest", "flake8"]
+
+[dependency-groups]
+dev = ["pyyaml", "pytest", "flake8", "matplotlib", "sphinx", "numpydoc"]
+
+[project.urls]
+Homepage = "https://github.com/ardiloot/NonlinearTMM"
+Repository = "https://github.com/ardiloot/NonlinearTMM"
+Documentation = "https://ardiloot.github.io/NonlinearTMM/"
+
+[tool.setuptools]
+packages = ["NonlinearTMM"]
+
+[tool.setuptools.package-data]
+"NonlinearTMM" = [
+    "src/eigen-3.4.0/**/*",
+    "src/*.pxd",
+    "src/NonlinearTMMCpp/NonlinearTMMCpp/*.h",
+    "src/NonlinearTMMCpp/NonlinearTMMCpp/*.cpp",
+    "src/*.pyx",
+]
+
+[tool.setuptools_scm]
+
+[tool.pytest.ini_options]
+testpaths = ["Tests"]

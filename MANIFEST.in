@@ -1,7 +1,0 @@
-include LICENSE
-include README.md
-recursive-include Examples *.py
-recursive-include Tests *.py
-recursive-include NonlinearTMM/src/eigen-3.4.0 *
-recursive-include NonlinearTMM/src *.pxd
-recursive-include NonlinearTMM/src/NonlinearTMMCpp/NonlinearTMMCpp *.h

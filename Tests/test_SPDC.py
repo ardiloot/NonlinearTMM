@@ -164,7 +164,7 @@ def test_SPDCPwrs(tmmParams, waveP1Type, betaP1):
     srInt = tmm.Sweep("beta", betasP1Int, betasP2Int)
     
     # Int power
-    pwrSPDC = np.trapz(srInt.Gen.It, kxsP2Int)
+    pwrSPDC = np.trapezoid(srInt.Gen.It, kxsP2Int)
     
     # Wave integration
     # --------------------------------------------------------------------------

@@ -14,6 +14,7 @@ NonlinearTMM/_SecondOrderNLTMMCython.cp36-win_amd64.pyd
 NonlinearTMM/src/SecondOrderNLTMM.cpp
 *.pyc
 *.pyd
+*.so
 .settings/
 .cache/
 
@@ -27,3 +28,5 @@ NonlinearTMM/src/SecondOrderNLTMM.cpp
 /publish.bat
 /NonlinearTMM.egg-info/
 /venv/
+.venv/
+__pycache__/
