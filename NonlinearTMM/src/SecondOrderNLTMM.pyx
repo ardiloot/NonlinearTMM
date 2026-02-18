@@ -395,7 +395,7 @@ cdef class _Wave:
         
         """
         
-        for name, value in kwargs.iteritems():
+        for name, value in kwargs.items():
             if name not in waveParamsSet:
                 raise ValueError("Unknown kwarg %s" % (name))
             setattr(self, name, value)
@@ -1079,7 +1079,7 @@ cdef class NonlinearTMM:
         of :any:`NonlinearTMM`.
         
         """
-        for name, value in kwargs.iteritems():
+        for name, value in kwargs.items():
             if name not in paramDict:
                 raise ValueError("Unknown kwarg %s" % (name))
             setattr(self, name, value)
@@ -1731,7 +1731,7 @@ cdef class SecondOrderNLTMM:
         of :any:`SecondOrderNLTMM`.
         
         """
-        for name, value in kwargs.iteritems():
+        for name, value in kwargs.items():
             if name not in paramDictSecondOrderNLTMM:
                 raise ValueError("Unknown kwarg %s" % (name))
             setattr(self, name, value)

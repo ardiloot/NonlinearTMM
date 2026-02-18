@@ -1,1 +1,30 @@
-docs/* linguist-documentation
+# Default to auto line-ending normalization
+* text=auto
+
+# Source files
+*.py        text diff=python
+*.pyx       text diff=python
+*.pxd       text diff=python
+*.cpp       text diff=cpp
+*.h         text diff=cpp
+
+# Config / docs
+*.yml       text
+*.yaml      text
+*.rst       text
+*.md        text
+*.txt       text
+*.toml      text
+*.cfg       text
+
+# Windows-native project files
+*.sln       text eol=crlf
+*.vcxproj   text eol=crlf
+
+# Vendored / generated (GitHub linguist)
+NonlinearTMM/src/eigen-3.4.0/** linguist-vendored
+NonlinearTMM/src/SecondOrderNLTMM.cpp linguist-generated
+docs/** linguist-documentation
+
+# Lock file
+uv.lock linguist-generated merge=binary

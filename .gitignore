@@ -1,32 +1,43 @@
-/build/
-NonlinearTMM/src/NonlinearTMMCpp/NonlinearTMMCpp/x64/Release/vc140.pdb
-NonlinearTMM/src/NonlinearTMMCpp/NonlinearTMMCpp/x64/
-NonlinearTMM/src/NonlinearTMMCpp/x64/
-NonlinearTMM/src/NonlinearTMMCpp/NonlinearTMMCpp.sdf
-NonlinearTMM/src/NonlinearTMMCpp/.vs/NonlinearTMMCpp/v14/.suo
-NonlinearTMM/src/NonlinearTMMCpp/NonlinearTMMCpp/NonlinearTMMCpp.vcxproj.filters
-NonlinearTMM/src/NonlinearTMMCpp/NonlinearTMMCpp/NonlinearTMMCpp.vcxproj.user
-*.vspx
-*.psess
-NonlinearTMM/src/NonlinearTMMCpp/ipch
-NonlinearTMM/src/NonlinearTMMCpp/NonlinearTMMCpp.VC.db
-NonlinearTMM/_SecondOrderNLTMMCython.cp36-win_amd64.pyd
-NonlinearTMM/src/SecondOrderNLTMM.cpp
+# Python
+__pycache__/
 *.pyc
+*.pyo
 *.pyd
 *.so
-.settings/
-.cache/
+*.egg-info/
+dist/
+build/
+MANIFEST
 
-/.project
-/.pydevproject
-/git/
-/cloc.txt
-/MANIFEST
-/dist/
-/prepare_to_publish.bat
-/publish.bat
-/NonlinearTMM.egg-info/
-/venv/
+# Cython generated
+NonlinearTMM/src/SecondOrderNLTMM.cpp
+
+# Virtual environments
 .venv/
-__pycache__/
+venv/
+
+# IDE / editor
+.settings/
+.project
+.pydevproject
+.cache/
+.pytest_cache/
+
+# Visual Studio
+.vs/
+*.sdf
+*.VC.db
+*.VC.opendb
+*.VC.VC.opendb
+*.vcxproj.filters
+*.vcxproj.user
+*.vspx
+*.psess
+ipch/
+x64/
+
+# Docs build
+docs/_build/
+
+# Misc
+cloc.txt

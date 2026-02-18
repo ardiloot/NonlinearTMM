@@ -3,18 +3,18 @@
 namespace TMM {
 
 	void OuterProductSSEEigenComplex(const ArrayXcd & X, const ArrayXcd & Y, MatrixXcd & R) {
-		register dcomplex* ptrR = &R(0, 0);
-		const register dcomplex* ptrX = (dcomplex*)&X(0);
-		const register dcomplex* ptrY = (dcomplex*)&Y(0);
-		const register int n = X.size();
-		const register int m = Y.size();
+		dcomplex* ptrR = &R(0, 0);
+		const dcomplex* ptrX = (dcomplex*)&X(0);
+		const dcomplex* ptrY = (dcomplex*)&Y(0);
+		const int n = X.size();
+		const int m = Y.size();
 
 		for (int i = 0; i < n; i++) {
-			register int k = i * m;
-			register dcomplex v = ptrX[i];
+			int k = i * m;
+			dcomplex v = ptrX[i];
 			for (int j = 0; j < m; j++) {
-				register int k2 = k + j;
-				register dcomplex w = ptrY[j];
+				int k2 = k + j;
+				dcomplex w = ptrY[j];
 				ptrR[k2] = multSSE(v, w);
 			}
 		}
@@ -22,19 +22,19 @@ namespace TMM {
 
 	void OuterProductSSEEigenComplexAdd(const ArrayXcd & X, const ArrayXcd & Y, MatrixXcd & R) {
 		// Identical to previous, but add to result (performance)
-		register double* ptrR = (double*)&R(0, 0);
-		const register dcomplex* ptrX = (dcomplex*)&X(0);
-		const register dcomplex* ptrY = (dcomplex*)&Y(0);
-		const register int n = X.size();
-		const register int m = Y.size();
+		double* ptrR = (double*)&R(0, 0);
+		const dcomplex* ptrX = (dcomplex*)&X(0);
+		const dcomplex* ptrY = (dcomplex*)&Y(0);
+		const int n = X.size();
+		const int m = Y.size();
 
 		for (int i = 0; i < n; i++) {
-			register int k = 2 * i * m;
-			register dcomplex v = ptrX[i];
+			int k = 2 * i * m;
+			dcomplex v = ptrX[i];
 			for (int j = 0; j < m; j++) {
-				register int k2 = k + 2 * j;
-				register dcomplex w = ptrY[j];
-				register dcomplex r = multSSE(v, w);
+				int k2 = k + 2 * j;
+				dcomplex w = ptrY[j];
+				dcomplex r = multSSE(v, w);
 				double realP = real(r);
 				double imagP = imag(r);
 
