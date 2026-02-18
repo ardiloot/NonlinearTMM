@@ -1185,7 +1185,7 @@ cdef class NonlinearTMM:
         else:
             param = TmmParamFromStr(paramStr)
         
-        resCpp = self._thisptr.Sweep(param, Map[ArrayXd](values), outmask, paramLayer, layerNr, layerZ)
+        resCpp = self._thisptr.Sweep(param, Map[ArrayXd](values), outmask, paramLayer, layerNr, layerZ).release()
         res = _SweepResultNonlinearTMM()
         res._Init(resCpp);
         return res
@@ -1211,7 +1211,7 @@ cdef class NonlinearTMM:
             
         """
         cdef FieldsZCpp *resCpp;
-        resCpp = self._thisptr.GetFields(Map[ArrayXd](zs), WaveDirectionFromStr(dir))
+        resCpp = self._thisptr.GetFields(Map[ArrayXd](zs), WaveDirectionFromStr(dir)).release()
         res = _FieldsZ()
         res._Init(resCpp)
         return res
@@ -1239,7 +1239,7 @@ cdef class NonlinearTMM:
             
         """
         cdef FieldsZXCpp *resCpp;
-        resCpp = self._thisptr.GetFields2D(Map[ArrayXd](zs), Map[ArrayXd](xs), WaveDirectionFromStr(dir))
+        resCpp = self._thisptr.GetFields2D(Map[ArrayXd](zs), Map[ArrayXd](xs), WaveDirectionFromStr(dir)).release()
         res = _FieldsZX()
         res._Init(resCpp)
         return res
@@ -1405,7 +1405,7 @@ cdef class NonlinearTMM:
         else:
             param = TmmParamFromStr(paramStr)
             
-        resCpp = self._thisptr.WaveSweep(param, Map[ArrayXd](values), outmask, paramLayer, layerNr, layerZ)
+        resCpp = self._thisptr.WaveSweep(param, Map[ArrayXd](values), outmask, paramLayer, layerNr, layerZ).release()
         res = _WaveSweepResultNonlinearTMM()
         res._Init(resCpp);
         return res
@@ -1435,7 +1435,7 @@ cdef class NonlinearTMM:
         """
         cdef FieldsZXCpp *resCpp;
         cdef WaveDirectionCpp direction = WaveDirectionFromStr(dirStr)
-        resCpp = self._thisptr.WaveGetFields2D(Map[ArrayXd](zs), Map[ArrayXd](xs), direction)
+        resCpp = self._thisptr.WaveGetFields2D(Map[ArrayXd](zs), Map[ArrayXd](xs), direction).release()
         res = _FieldsZX()
         res._Init(resCpp)
         return res
@@ -1862,7 +1862,7 @@ cdef class SecondOrderNLTMM:
         else:
             param = TmmParamFromStr(paramStr)
         
-        resCpp = self._thisptr.Sweep(param, Map[ArrayXd](valuesP1), Map[ArrayXd](valuesP2), outmask, paramLayer, layerNr, layerZ)
+        resCpp = self._thisptr.Sweep(param, Map[ArrayXd](valuesP1), Map[ArrayXd](valuesP2), outmask, paramLayer, layerNr, layerZ).release()
         res = _SweepResultSecondOrderNLTMM()
         res._Init(resCpp);
         return res
@@ -1982,7 +1982,7 @@ cdef class SecondOrderNLTMM:
         else:
             param = TmmParamFromStr(paramStr)
             
-        resCpp = self._thisptr.WaveSweep(param, Map[ArrayXd](valuesP1), Map[ArrayXd](valuesP2), outmask, paramLayer, layerNr, layerZ)
+        resCpp = self._thisptr.WaveSweep(param, Map[ArrayXd](valuesP1), Map[ArrayXd](valuesP2), outmask, paramLayer, layerNr, layerZ).release()
         res = _WaveSweepResultSecondOrderNLTMM()
         res._Init(resCpp);
         return res
@@ -2015,7 +2015,7 @@ cdef class SecondOrderNLTMM:
         
         cdef FieldsZXCpp *resCpp;
         cdef WaveDirectionCpp direction = WaveDirectionFromStr(dirStr)
-        resCpp = self._thisptr.WaveGetFields2D(Map[ArrayXd](zs), Map[ArrayXd](xs), direction)
+        resCpp = self._thisptr.WaveGetFields2D(Map[ArrayXd](zs), Map[ArrayXd](xs), direction).release()
         res = _FieldsZX()
         res._Init(resCpp)
         return res

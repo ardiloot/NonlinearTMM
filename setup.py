@@ -1,3 +1,4 @@
+import platform
 import sys
 import glob
 
@@ -16,10 +17,12 @@ extra_compile_args = []
 extra_link_args = []
 
 if sys.platform in ("linux", "darwin"):
-    extra_compile_args.extend(["-std=c++11", "-fopenmp", "-msse3"])
+    extra_compile_args.extend(["-std=c++17", "-fopenmp"])
+    if platform.machine() in ("x86_64", "AMD64", "i686", "i386"):
+        extra_compile_args.append("-msse3")
     extra_link_args.extend(["-lgomp", "-fopenmp"])
 elif sys.platform == "win32":
-    extra_compile_args.extend(["/openmp"])
+    extra_compile_args.extend(["/std:c++17", "/openmp"])
 
 sources = ["NonlinearTMM/src/SecondOrderNLTMM.pyx"] + _remove_main(
     glob.glob("NonlinearTMM/src/NonlinearTMMCpp/NonlinearTMMCpp/*.cpp")
@@ -40,7 +43,6 @@ extensions = cythonize(
         extra_link_args=extra_link_args,
         ),
     ],
-    force=True,
 )
 
 setup(ext_modules=extensions)

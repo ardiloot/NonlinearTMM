@@ -9,7 +9,7 @@ namespace TMM {
 	// ENUMs
 	//---------------------------------------------------------------
 
-	enum WaveType {
+	enum class WaveType {
 		PLANEWAVE,
 		GAUSSIANWAVE,
 		TUKEYWAVE,
@@ -20,7 +20,7 @@ namespace TMM {
 	// Functions
 	//---------------------------------------------------------------
 
-	ArrayXd TukeyFunc(ArrayXd xs, double w0, double a);
+	ArrayXd TukeyFunc(const ArrayXd& xs, double w0, double a);
 	
 	//---------------------------------------------------------------
 	// Wave

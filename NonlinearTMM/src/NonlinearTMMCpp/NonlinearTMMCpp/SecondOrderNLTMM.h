@@ -1,4 +1,5 @@
 #pragma once
+#include <memory>
 #include "Common.h"
 #include "NonlinearTMM.h"
 
@@ -74,18 +75,18 @@ namespace TMM {
 		double GetSolidAngleSpdc();
 		double GetDeltaThetaSpdc();
 
-		void CheckPrerequisites(TMMParam toIgnore = PARAM_NOT_DEFINED);
+		void CheckPrerequisites(TMMParam toIgnore = TMMParam::PARAM_NOT_DEFINED);
 		void UpdateGenParams();
 		
 		// Planewaves
 		void Solve();
 		SecondOrderNLIntensities GetIntensities() const;
-		SweepResultSecondOrderNLTMM* Sweep(TMMParam param, const Eigen::Map<ArrayXd> &valuesP1, const Eigen::Map<ArrayXd> &valuesP2, int outmask = SWEEP_ALL_WAVE_PWRS, int paramLayer = -1, int layerNr = 0, double layerZ = 0.0);
+		std::unique_ptr<SweepResultSecondOrderNLTMM> Sweep(TMMParam param, const Eigen::Map<ArrayXd> &valuesP1, const Eigen::Map<ArrayXd> &valuesP2, int outmask = SWEEP_ALL_WAVE_PWRS, int paramLayer = -1, int layerNr = 0, double layerZ = 0.0);
 
 		// Waves
 		pairdd WaveGetPowerFlows(int layerNr, double x0 = constNAN, double x1 = constNAN, double z = 0.0);
-		WaveSweepResultSecondOrderNLTMM * WaveSweep(TMMParam param, const Eigen::Map<ArrayXd>& valuesP1, const Eigen::Map<ArrayXd>& valuesP2, int outmask = SWEEP_ALL_WAVE_PWRS, int paramLayer = -1, int layerNr = 0, double layerZ = 0.0);
-		FieldsZX * WaveGetFields2D(const Eigen::Map<ArrayXd> &zs, const Eigen::Map<ArrayXd> &xs, WaveDirection dir = TOT);
+		std::unique_ptr<WaveSweepResultSecondOrderNLTMM> WaveSweep(TMMParam param, const Eigen::Map<ArrayXd>& valuesP1, const Eigen::Map<ArrayXd>& valuesP2, int outmask = SWEEP_ALL_WAVE_PWRS, int paramLayer = -1, int layerNr = 0, double layerZ = 0.0);
+		std::unique_ptr<FieldsZX> WaveGetFields2D(const Eigen::Map<ArrayXd> &zs, const Eigen::Map<ArrayXd> &xs, WaveDirection dir = WaveDirection::TOT);
 		
 	};
 }

@@ -58,7 +58,7 @@ namespace TMM {
 		void Solve(NonlinearLayer *layer_);
 
 	public:
-		HomogeneousWave(NonlinearLayer *layer_ = NULL);
+		HomogeneousWave(NonlinearLayer *layer_ = nullptr);
 		double GetKx() const;
 		Array2cd GetKz() const;
 		dcomplex GetKzF() const;
@@ -85,7 +85,7 @@ namespace TMM {
 		void Solve(NonlinearLayer *layer_, InhomogeneosWaveParams &params);
 
 	public:
-		InhomogeneousWave(NonlinearLayer *layer_ = NULL);
+		InhomogeneousWave(NonlinearLayer *layer_ = nullptr);
 		Array2cd GetMainFields(double z) const;
 	};
 
@@ -141,11 +141,11 @@ namespace TMM {
 		double GetDouble(TMMParam param);
 
 		Array2cd GetMainFields(double z) const;
-		Fields GetFields(double z, WaveDirection dir = TOT) const;
+		Fields GetFields(double z, WaveDirection dir = WaveDirection::TOT) const;
 		double GetIntensity(double z) const;
 		double GetAbsorbedIntensity() const;
 		double GetSrcIntensity() const;
-		double GetENorm(double z, WaveDirection dir = TOT) const;
+		double GetENorm(double z, WaveDirection dir = WaveDirection::TOT) const;
 		
 	};
 }

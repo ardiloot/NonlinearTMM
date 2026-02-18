@@ -1,4 +1,5 @@
 from libcpp cimport bool
+from libcpp.memory cimport unique_ptr
 from eigency.core cimport *
 from libcpp.pair cimport pair
 
@@ -8,33 +9,33 @@ from libcpp.pair cimport pair
         
 cdef extern from "Common.h" namespace "TMM":
     cdef enum PolarizationCpp "TMM::Polarization":
-        P_POL,
-        S_POL
+        P_POL "TMM::Polarization::P_POL",
+        S_POL "TMM::Polarization::S_POL"
         
     cdef enum WaveDirectionCpp "TMM::WaveDirection":
-        F,
-        B,
-        TOT
+        F "TMM::WaveDirection::F",
+        B "TMM::WaveDirection::B",
+        TOT "TMM::WaveDirection::TOT"
         
     cdef enum NonlinearTmmModeCpp "TMM::NonlinearTmmMode":
-        MODE_INCIDENT,
-        MODE_NONLINEAR
+        MODE_INCIDENT "TMM::NonlinearTmmMode::MODE_INCIDENT",
+        MODE_NONLINEAR "TMM::NonlinearTmmMode::MODE_NONLINEAR"
         
     cdef enum TMMParamCpp "TMM::TMMParam":
-        PARAM_WL,
-        PARAM_BETA,
-        PARAM_POL,
-        PARAM_I0,
-        PARAM_OVERRIDE_E0,
-        PARAM_E0,
-        PARAM_MODE,
-        PARAM_WAVE_W0,
-        PARAM_LAYER_D,
+        PARAM_WL "TMM::TMMParam::PARAM_WL",
+        PARAM_BETA "TMM::TMMParam::PARAM_BETA",
+        PARAM_POL "TMM::TMMParam::PARAM_POL",
+        PARAM_I0 "TMM::TMMParam::PARAM_I0",
+        PARAM_OVERRIDE_E0 "TMM::TMMParam::PARAM_OVERRIDE_E0",
+        PARAM_E0 "TMM::TMMParam::PARAM_E0",
+        PARAM_MODE "TMM::TMMParam::PARAM_MODE",
+        PARAM_WAVE_W0 "TMM::TMMParam::PARAM_WAVE_W0",
+        PARAM_LAYER_D "TMM::TMMParam::PARAM_LAYER_D",
         
     cdef enum NonlinearProcessCpp "TMM::NonlinearProcess":
-        SFG,
-        DFG,
-        SPDC,
+        SFG "TMM::NonlinearProcess::SFG",
+        DFG "TMM::NonlinearProcess::DFG",
+        SPDC "TMM::NonlinearProcess::SPDC",
         
     cdef enum SweepOutputCpp "TMM::SweepOutput":
         SWEEP_PWRFLOWS,
@@ -75,10 +76,10 @@ cdef extern from "Material.h" namespace "TMM":
 
 cdef extern from "Waves.h" namespace "TMM":
     cdef enum WaveTypeCpp "TMM::WaveType":
-        PLANEWAVE,
-        GAUSSIANWAVE,
-        TUKEYWAVE,
-        SPDCWAVE
+        PLANEWAVE "TMM::WaveType::PLANEWAVE",
+        GAUSSIANWAVE "TMM::WaveType::GAUSSIANWAVE",
+        TUKEYWAVE "TMM::WaveType::TUKEYWAVE",
+        SPDCWAVE "TMM::WaveType::SPDCWAVE"
 
     cdef cppclass WaveCpp "TMM::Wave":
         void SetWaveType(WaveTypeCpp waveType_) except +
@@ -194,9 +195,9 @@ cdef extern from "NonlinearTMM.h" namespace "TMM":
         # Plane waves
         void Solve() except +
         IntensitiesCpp GetIntensities() except +
-        SweepResultNonlinearTMMCpp* Sweep(TMMParamCpp param, Map[ArrayXd] &, int outmask, int paramLayer, int layerNr, double layerZ) except +
-        FieldsZCpp* GetFields(Map[ArrayXd] &, WaveDirectionCpp dir) except +
-        FieldsZXCpp* GetFields2D(Map[ArrayXd] &, Map[ArrayXd] &, WaveDirectionCpp dir) except +
+        unique_ptr[SweepResultNonlinearTMMCpp] Sweep(TMMParamCpp param, Map[ArrayXd] &, int outmask, int paramLayer, int layerNr, double layerZ) except +
+        unique_ptr[FieldsZCpp] GetFields(Map[ArrayXd] &, WaveDirectionCpp dir) except +
+        unique_ptr[FieldsZXCpp] GetFields2D(Map[ArrayXd] &, Map[ArrayXd] &, WaveDirectionCpp dir) except +
         double GetAbsorbedIntensity() except +
         double GetEnhancement(int layerNr, double z) except +
         
@@ -204,8 +205,8 @@ cdef extern from "NonlinearTMM.h" namespace "TMM":
         WaveCpp* GetWave() except +
         pair[double, double] WaveGetPowerFlows(int layerNr, double x0, double x1, double z) except +
         double WaveGetEnhancement(int layerNr, double z) except +
-        WaveSweepResultNonlinearTMMCpp* WaveSweep(TMMParamCpp param, Map[ArrayXd] &, int outmask, int paramLayer, int layerNr, double layerZ) except +
-        FieldsZXCpp* WaveGetFields2D(Map[ArrayXd] &, Map[ArrayXd] &, WaveDirectionCpp) except +
+        unique_ptr[WaveSweepResultNonlinearTMMCpp] WaveSweep(TMMParamCpp param, Map[ArrayXd] &, int outmask, int paramLayer, int layerNr, double layerZ) except +
+        unique_ptr[FieldsZXCpp] WaveGetFields2D(Map[ArrayXd] &, Map[ArrayXd] &, WaveDirectionCpp) except +
       
         
 #===============================================================================
@@ -242,8 +243,8 @@ cdef extern from "SecondOrderNLTMM.h" namespace "TMM":
         
         void Solve() except +
         SecondOrderNLIntensitiesCpp GetIntensities() except +
-        SweepResultSecondOrderNLTMMCpp* Sweep(TMMParamCpp param, Map[ArrayXd] &, Map[ArrayXd] &, int outmask, int paramLayer, int layerNr, double layerZ) except +
+        unique_ptr[SweepResultSecondOrderNLTMMCpp] Sweep(TMMParamCpp param, Map[ArrayXd] &, Map[ArrayXd] &, int outmask, int paramLayer, int layerNr, double layerZ) except +
         
         pair[double, double] WaveGetPowerFlows(int layerNr, double x0, double x1, double z) except +
-        WaveSweepResultSecondOrderNLTMMCpp * WaveSweep(TMMParamCpp param, Map[ArrayXd] & valuesP1, Map[ArrayXd] & valuesP2, int outmask, int paramLayer, int layerNr, double layerZ) except +
-        FieldsZXCpp * WaveGetFields2D(Map[ArrayXd]& zs, Map[ArrayXd]& xs, WaveDirectionCpp dir) except +
+        unique_ptr[WaveSweepResultSecondOrderNLTMMCpp] WaveSweep(TMMParamCpp param, Map[ArrayXd] & valuesP1, Map[ArrayXd] & valuesP2, int outmask, int paramLayer, int layerNr, double layerZ) except +
+        unique_ptr[FieldsZXCpp] WaveGetFields2D(Map[ArrayXd]& zs, Map[ArrayXd]& xs, WaveDirectionCpp dir) except +

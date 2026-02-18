@@ -2,7 +2,7 @@
 
 namespace TMM {
 
-	ArrayXd TukeyFunc(ArrayXd xs, double w0, double a) {
+	ArrayXd TukeyFunc(const ArrayXd& xs, double w0, double a) {
 		ArrayXd res(xs.size());
 		for (int i = 0; i < xs.size(); i++) {
 			double x = xs(i);
@@ -66,16 +66,14 @@ namespace TMM {
 		fieldProfileXs = xs;
 		switch (waveType)
 		{
-		case TMM::GAUSSIANWAVE:
+		case WaveType::GAUSSIANWAVE:
 			fieldProfile = E0 * (-(xs * xs) / sqr(w0 / 1.2533141369277430)).exp();
 			break;
-		case TMM::TUKEYWAVE:
+		case WaveType::TUKEYWAVE:
 			fieldProfile = E0 * TukeyFunc(xs, w0 / (0.25 * a + 0.75), a);
 			break;
 		default:
-			std::cerr << "Unknown FFT wave type." << std::endl;
 			throw std::invalid_argument("Unknown FFT wave type.");
-			break;
 		}
 
 		// FFT spectrum
@@ -121,13 +119,13 @@ namespace TMM {
 	}
 
 	Wave::Wave() : phis(0), kxs(0), kzs(0), expansionCoefsKx(0), fieldProfileXs(0), fieldProfile(0) {
-		waveType = PLANEWAVE;
+		waveType = WaveType::PLANEWAVE;
 		pwr = 1.0;
 		overrideE0 = false;
 		E0OverrideValue = 1.0;
 		w0 = 100e-6;
-		materialLayer0 = NULL;
-		materialLayerThis = NULL;
+		materialLayer0 = nullptr;
+		materialLayerThis = nullptr;
 		Ly = 1e-3;
 		a = 0.7;
 		nPointsInteg = 100;
@@ -204,12 +202,11 @@ namespace TMM {
 	void Wave::SetParam(TMMParam param, double value) {
 		switch (param)
 		{
-		case PARAM_WAVE_W0:
+		case TMMParam::PARAM_WAVE_W0:
 			SetW0(value);
 			break;
 		default:
 			throw std::invalid_argument("Param not in list.");
-			break;
 		}
 	}
 
@@ -238,17 +235,16 @@ namespace TMM {
 		beamArea = w0 * Ly / std::cos(thLayer0);
 
 		// Solve
-		if (waveType == PLANEWAVE) {
+		if (waveType == WaveType::PLANEWAVE) {
 			SolvePlaneWave();
 		}
-		else if (waveType == GAUSSIANWAVE || waveType == TUKEYWAVE) {
+		else if (waveType == WaveType::GAUSSIANWAVE || waveType == WaveType::TUKEYWAVE) {
 			SolveFFTWave();
 		}
-		else if (waveType == SPDCWAVE) {
+		else if (waveType == WaveType::SPDCWAVE) {
 			SolveSpdcWave();
 		}
 		else {
-			std::cerr << "Unknown wave type." << std::endl;
 			throw std::invalid_argument("Unknown wave type.");
 		}
 		solved = true;
@@ -312,12 +308,10 @@ namespace TMM {
 	double Wave::GetDouble(TMMParam param) {
 		switch (param)
 		{
-		case PARAM_WAVE_W0:
+		case TMMParam::PARAM_WAVE_W0:
 			return GetW0();
-			break;
 		default:
 			throw std::invalid_argument("Param not in list.");
-			break;
 		}
 	}
 
@@ -388,7 +382,7 @@ namespace TMM {
 	}
 
 	bool Wave::IsCoherent() {
-		if (waveType == SPDCWAVE) {
+		if (waveType == WaveType::SPDCWAVE) {
 			return false;
 		}
 		return true;
