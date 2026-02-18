@@ -20,7 +20,7 @@ namespace TMM {
 	// Functions
 	//---------------------------------------------------------------
 
-	ArrayXd TukeyFunc(const ArrayXd& xs, double w0, double a);
+	[[nodiscard]] ArrayXd TukeyFunc(const ArrayXd& xs, double w0, double a);
 	
 	//---------------------------------------------------------------
 	// Wave
@@ -87,30 +87,30 @@ namespace TMM {
 		void Solve(double wl_, double beta_, Material *materialLayer0_, Material *materialLayerThis_, double deltaKxSpdc_ = constNAN);
 
 		// Getters
-		WaveType GetWaveType() const;
-		double GetPwr() const;
-		bool GetOverrideE0() const;
-		double GetE0() const;
-		double GetW0() const;
-		double GetLy() const;
-		double GetA() const;
-		int GetNPointsInteg() const;
-		double GetMaxX() const;
-		bool IsDynamicMaxXEnabled() const;
-		double GetDynamicMaxXCoef() const;
-		double GetDynamicMaxXAddition() const;
-		double GetMaxPhi() const;
-		double GetDouble(TMMParam param) const;
-		pairdd GetXRange() const;
-		ArrayXd GetBetas() const;
-		ArrayXd GetPhis() const;
-		ArrayXd GetKxs() const;
-		ArrayXd GetKzs() const;
-		ArrayXd GetFieldProfileXs() const;
-		ArrayXd GetFieldProfile() const;
-		ArrayXcd GetExpansionCoefsKx() const;
-		double GetBeamArea() const;
-		bool IsCoherent() const;
+		[[nodiscard]] WaveType GetWaveType() const noexcept;
+		[[nodiscard]] double GetPwr() const noexcept;
+		[[nodiscard]] bool GetOverrideE0() const noexcept;
+		[[nodiscard]] double GetE0() const noexcept;
+		[[nodiscard]] double GetW0() const noexcept;
+		[[nodiscard]] double GetLy() const noexcept;
+		[[nodiscard]] double GetA() const noexcept;
+		[[nodiscard]] int GetNPointsInteg() const noexcept;
+		[[nodiscard]] double GetMaxX() const noexcept;
+		[[nodiscard]] bool IsDynamicMaxXEnabled() const noexcept;
+		[[nodiscard]] double GetDynamicMaxXCoef() const noexcept;
+		[[nodiscard]] double GetDynamicMaxXAddition() const noexcept;
+		[[nodiscard]] double GetMaxPhi() const noexcept;
+		[[nodiscard]] double GetDouble(TMMParam param) const;
+		[[nodiscard]] pairdd GetXRange() const;
+		[[nodiscard]] ArrayXd GetBetas() const;
+		[[nodiscard]] ArrayXd GetPhis() const noexcept;
+		[[nodiscard]] ArrayXd GetKxs() const;
+		[[nodiscard]] ArrayXd GetKzs() const;
+		[[nodiscard]] ArrayXd GetFieldProfileXs() const;
+		[[nodiscard]] ArrayXd GetFieldProfile() const;
+		[[nodiscard]] ArrayXcd GetExpansionCoefsKx() const;
+		[[nodiscard]] double GetBeamArea() const;
+		[[nodiscard]] bool IsCoherent() const noexcept;
 	};
 
 

@@ -23,10 +23,10 @@ namespace TMM {
 		void SetD(int i1, int i2, double value);
 		void Clear();
 
-		bool IsNonlinear() const;
-		const Tensor3d & GetChi2Tensor();
-		double GetChi2Element(int i1, int i2, int i3);
-		Vector3cd GetNonlinearPolarization(const Vector3cd &E1, const Vector3cd &E2);
+		[[nodiscard]] bool IsNonlinear() const noexcept;
+		[[nodiscard]] const Tensor3d & GetChi2Tensor();
+		[[nodiscard]] double GetChi2Element(int i1, int i2, int i3);
+		[[nodiscard]] Vector3cd GetNonlinearPolarization(const Vector3cd &E1, const Vector3cd &E2);
 	};
 
 	//---------------------------------------------------------------
@@ -44,7 +44,7 @@ namespace TMM {
 
 		Material(dcomplex n_);
 		Material(ArrayXd wlsExp_, ArrayXcd nsExp_);
-		dcomplex GetN(double wl) const;
-		bool IsNonlinear() const;
+		[[nodiscard]] dcomplex GetN(double wl) const;
+		[[nodiscard]] bool IsNonlinear() const noexcept;
 	};
 }

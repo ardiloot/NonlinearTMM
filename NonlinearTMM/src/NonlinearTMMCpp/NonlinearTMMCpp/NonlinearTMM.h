@@ -51,7 +51,7 @@ namespace TMM {
 		ArrayXd enh;
 
 		SweepResultNonlinearTMM(int n, int outmask_, int layerNr_, double layerZ_);
-		int GetOutmask() const;
+		[[nodiscard]] int GetOutmask() const noexcept;
 		void SetValues(int nr, NonlinearTMM &tmm);
 	};
 
@@ -69,7 +69,7 @@ namespace TMM {
 		ArrayXd enh, beamArea;
 
 		WaveSweepResultNonlinearTMM(int n, int outmask_, int layerNr_, double layerZ_);
-		int GetOutmask() const;
+		[[nodiscard]] int GetOutmask() const noexcept;
 		void SetValues(int nr, NonlinearTMM &tmm);
 	};
 
@@ -97,12 +97,12 @@ namespace TMM {
 		MatrixXcd Ex, Ey, Ez, Hx, Hy, Hz;
 		FieldsZX(int n, int m, Polarization pol_);
 		void SetZero();
-		Polarization GetPol() const;
+		[[nodiscard]] Polarization GetPol() const noexcept;
 		void SetFields(const FieldsZ &f, const ArrayXcd &phaseX, bool add = false);
 		void AddFields(const FieldsZ &f, const ArrayXcd &phaseX);
 		void AddSquaredFields(FieldsZX *toAdd);
 		void TakeSqrt();
-		MatrixXd GetENorm() const;
+		[[nodiscard]] MatrixXd GetENorm() const;
 
 	};
 
@@ -141,8 +141,8 @@ namespace TMM {
 	public:
 		NonlinearTMM();
 		void AddLayer(double d_, Material *material_);
-		NonlinearLayer* GetLayer(int layerNr);
-		int LayersCount() const;
+		[[nodiscard]] NonlinearLayer* GetLayer(int layerNr);
+		[[nodiscard]] int LayersCount() const noexcept;
 		void CheckPrerequisites(TMMParam toIgnore = TMMParam::PARAM_NOT_DEFINED);
 
 		// Setters
@@ -157,35 +157,35 @@ namespace TMM {
 		void SetParam(TMMParam param, dcomplex value, int paramLayer = -1);
 
 		// Getters
-		double GetWl() const;
-		double GetBeta() const;
-		Polarization GetPolarization() const;
-		double GetI0() const;
-		bool GetOverrideE0() const;
-		dcomplex GetE0() const;
-		NonlinearTmmMode GetMode() const;
-		double GetDouble(TMMParam param) const;
-		dcomplex GetComplex(TMMParam param) const;
+		[[nodiscard]] double GetWl() const noexcept;
+		[[nodiscard]] double GetBeta() const noexcept;
+		[[nodiscard]] Polarization GetPolarization() const noexcept;
+		[[nodiscard]] double GetI0() const noexcept;
+		[[nodiscard]] bool GetOverrideE0() const noexcept;
+		[[nodiscard]] dcomplex GetE0() const noexcept;
+		[[nodiscard]] NonlinearTmmMode GetMode() const noexcept;
+		[[nodiscard]] double GetDouble(TMMParam param) const;
+		[[nodiscard]] dcomplex GetComplex(TMMParam param) const;
 
 		// Plane wave functionality
 		void Solve();
-		Intensities GetIntensities() const;
-		double GetAbsorbedIntensity() const;
-		double GetEnhancement(int layerNr, double z);
+		[[nodiscard]] Intensities GetIntensities() const;
+		[[nodiscard]] double GetAbsorbedIntensity() const;
+		[[nodiscard]] double GetEnhancement(int layerNr, double z);
 		[[nodiscard]] std::unique_ptr<SweepResultNonlinearTMM> Sweep(TMMParam param, const Eigen::Map<ArrayXd> &values, int outmask = SWEEP_PWRFLOWS, int paramLayer = -1, int layerNr = 0, double layerZ = 0);
 		[[nodiscard]] std::unique_ptr<FieldsZ> GetFields(const Eigen::Map<ArrayXd> &zs, WaveDirection dir = WaveDirection::TOT);
 		[[nodiscard]] std::unique_ptr<FieldsZX> GetFields2D(const Eigen::Map<ArrayXd> &zs, const Eigen::Map<ArrayXd> &xs, WaveDirection dir = WaveDirection::TOT);
 
 		// Waves
-		Wave* GetWave();
-		pairdd WaveGetPowerFlows(int layerNr, double x0 = constNAN, double x1 = constNAN, double z = 0.0);
-		double WaveGetEnhancement(int layerNr, double z);
+		[[nodiscard]] Wave* GetWave() noexcept;
+		[[nodiscard]] pairdd WaveGetPowerFlows(int layerNr, double x0 = constNAN, double x1 = constNAN, double z = 0.0);
+		[[nodiscard]] double WaveGetEnhancement(int layerNr, double z);
 		[[nodiscard]] std::unique_ptr<WaveSweepResultNonlinearTMM> WaveSweep(TMMParam param, const Eigen::Map<ArrayXd> &values, int outmask = SWEEP_PWRFLOWS, int paramLayer = -1, int layerNr = 0, double layerZ = 0);
 		[[nodiscard]] std::unique_ptr<FieldsZX> WaveGetFields2D(const Eigen::Map<ArrayXd> &zs, const Eigen::Map<ArrayXd> &xs, WaveDirection dir = WaveDirection::TOT);
 
 		// SPDC (used internally by SecondOrderNLTMM)
 		void UpdateSPDCParams(double deltaWlSpdc_, double solidAngleSpdc_, double deltaThetaSpdc_, double wlP1Spdc_, double betaP1Spdc_);
-		double CalcDeltaKxSpdc();
+		[[nodiscard]] double CalcDeltaKxSpdc();
 	};
 
 }

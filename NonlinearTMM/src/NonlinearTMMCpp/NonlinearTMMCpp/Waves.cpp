@@ -253,55 +253,55 @@ namespace TMM {
 
 	// Getters
 
-	WaveType Wave::GetWaveType() const {
+	WaveType Wave::GetWaveType() const noexcept {
 		return waveType;
 	}
 
-	double Wave::GetPwr() const {
+	double Wave::GetPwr() const noexcept {
 		return pwr;
 	}
 
-	bool Wave::GetOverrideE0() const {
+	bool Wave::GetOverrideE0() const noexcept {
 		return overrideE0;
 	}
 
-	double Wave::GetE0() const {
+	double Wave::GetE0() const noexcept {
 		return E0OverrideValue;
 	}
 
-	double Wave::GetW0() const {
+	double Wave::GetW0() const noexcept {
 		return w0;
 	}
 
-	double Wave::GetLy() const {
+	double Wave::GetLy() const noexcept {
 		return Ly;
 	}
 
-	double Wave::GetA() const {
+	double Wave::GetA() const noexcept {
 		return a;
 	}
 
-	int Wave::GetNPointsInteg() const {
+	int Wave::GetNPointsInteg() const noexcept {
 		return nPointsInteg;
 	}
 
-	double Wave::GetMaxX() const {
+	double Wave::GetMaxX() const noexcept {
 		return maxX;
 	}
 
-	bool Wave::IsDynamicMaxXEnabled() const {
+	bool Wave::IsDynamicMaxXEnabled() const noexcept {
 		return dynamicMaxX;
 	}
 
-	double Wave::GetDynamicMaxXCoef() const {
+	double Wave::GetDynamicMaxXCoef() const noexcept {
 		return dynamicMaxXCoef;
 	}
 
-	double Wave::GetDynamicMaxXAddition() const {
+	double Wave::GetDynamicMaxXAddition() const noexcept {
 		return dynamicMaxXAddition;
 	}
 
-	double Wave::GetMaxPhi() const {
+	double Wave::GetMaxPhi() const noexcept {
 		return maxPhi;
 	}
 
@@ -331,7 +331,7 @@ namespace TMM {
 		return kxs / k0;
 	}
 
-	ArrayXd Wave::GetPhis() const { return phis; }
+	ArrayXd Wave::GetPhis() const noexcept { return phis; }
 
 	ArrayXd Wave::GetKxs() const {
 		if (!solved) {
@@ -381,7 +381,7 @@ namespace TMM {
 		return beamArea;
 	}
 
-	bool Wave::IsCoherent() const {
+	bool Wave::IsCoherent() const noexcept {
 		if (waveType == WaveType::SPDCWAVE) {
 			return false;
 		}

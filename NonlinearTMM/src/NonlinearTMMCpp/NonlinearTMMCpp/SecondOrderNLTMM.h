@@ -68,23 +68,23 @@ namespace TMM {
 		void SetSolidAngleSpdc(double value);
 		void SetDeltaThetaSpdc(double value);
 		void AddLayer(double d_, Material *material_);
-		NonlinearTMM* GetP1();
-		NonlinearTMM* GetP2();
-		NonlinearTMM* GetGen();
-		double GetDeltaWlSpdc() const;
-		double GetSolidAngleSpdc() const;
-		double GetDeltaThetaSpdc() const;
+		[[nodiscard]] NonlinearTMM* GetP1() noexcept;
+		[[nodiscard]] NonlinearTMM* GetP2() noexcept;
+		[[nodiscard]] NonlinearTMM* GetGen() noexcept;
+		[[nodiscard]] double GetDeltaWlSpdc() const noexcept;
+		[[nodiscard]] double GetSolidAngleSpdc() const noexcept;
+		[[nodiscard]] double GetDeltaThetaSpdc() const noexcept;
 
 		void CheckPrerequisites(TMMParam toIgnore = TMMParam::PARAM_NOT_DEFINED);
 		void UpdateGenParams();
 		
 		// Planewaves
 		void Solve();
-		SecondOrderNLIntensities GetIntensities() const;
+		[[nodiscard]] SecondOrderNLIntensities GetIntensities() const;
 		[[nodiscard]] std::unique_ptr<SweepResultSecondOrderNLTMM> Sweep(TMMParam param, const Eigen::Map<ArrayXd> &valuesP1, const Eigen::Map<ArrayXd> &valuesP2, int outmask = SWEEP_ALL_WAVE_PWRS, int paramLayer = -1, int layerNr = 0, double layerZ = 0.0);
 
 		// Waves
-		pairdd WaveGetPowerFlows(int layerNr, double x0 = constNAN, double x1 = constNAN, double z = 0.0);
+		[[nodiscard]] pairdd WaveGetPowerFlows(int layerNr, double x0 = constNAN, double x1 = constNAN, double z = 0.0);
 		[[nodiscard]] std::unique_ptr<WaveSweepResultSecondOrderNLTMM> WaveSweep(TMMParam param, const Eigen::Map<ArrayXd>& valuesP1, const Eigen::Map<ArrayXd>& valuesP2, int outmask = SWEEP_ALL_WAVE_PWRS, int paramLayer = -1, int layerNr = 0, double layerZ = 0.0);
 		[[nodiscard]] std::unique_ptr<FieldsZX> WaveGetFields2D(const Eigen::Map<ArrayXd> &zs, const Eigen::Map<ArrayXd> &xs, WaveDirection dir = WaveDirection::TOT);
 		

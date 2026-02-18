@@ -59,10 +59,10 @@ namespace TMM {
 
 	public:
 		HomogeneousWave(NonlinearLayer *layer_ = nullptr);
-		double GetKx() const;
-		Array2cd GetKz() const;
-		dcomplex GetKzF() const;
-		Array2cd GetMainFields(double z) const;
+		[[nodiscard]] double GetKx() const;
+		[[nodiscard]] Array2cd GetKz() const;
+		[[nodiscard]] dcomplex GetKzF() const;
+		[[nodiscard]] Array2cd GetMainFields(double z) const;
 	};
 
 	//---------------------------------------------------------------
@@ -86,7 +86,7 @@ namespace TMM {
 
 	public:
 		InhomogeneousWave(NonlinearLayer *layer_ = nullptr);
-		Array2cd GetMainFields(double z) const;
+		[[nodiscard]] Array2cd GetMainFields(double z) const;
 	};
 
 	//---------------------------------------------------------------
@@ -126,26 +126,26 @@ namespace TMM {
 	public:
 		NonlinearLayer(double d_, Material *material_);
 		
-		bool IsNonlinear() const;
+		[[nodiscard]] bool IsNonlinear() const noexcept;
 		void SetNonlinearity(InhomogeneosWaveParams kpS_, InhomogeneosWaveParams kpA_);
 		void ClearNonlinearity();
 		
 		void SetThickness(double d_);
 		void SetParam(TMMParam param, double value);
 
-		double GetThickness() const;
-		Material * GetMaterial() const;
-		HomogeneousWave* GetHw();
-		double GetKx() const;
-		double GetK0() const;
-		double GetDouble(TMMParam param) const;
+		[[nodiscard]] double GetThickness() const noexcept;
+		[[nodiscard]] Material * GetMaterial() const noexcept;
+		[[nodiscard]] HomogeneousWave* GetHw() noexcept;
+		[[nodiscard]] double GetKx() const;
+		[[nodiscard]] double GetK0() const;
+		[[nodiscard]] double GetDouble(TMMParam param) const;
 
-		Array2cd GetMainFields(double z) const;
-		Fields GetFields(double z, WaveDirection dir = WaveDirection::TOT) const;
-		double GetIntensity(double z) const;
-		double GetAbsorbedIntensity() const;
-		double GetSrcIntensity() const;
-		double GetENorm(double z, WaveDirection dir = WaveDirection::TOT) const;
+		[[nodiscard]] Array2cd GetMainFields(double z) const;
+		[[nodiscard]] Fields GetFields(double z, WaveDirection dir = WaveDirection::TOT) const;
+		[[nodiscard]] double GetIntensity(double z) const;
+		[[nodiscard]] double GetAbsorbedIntensity() const;
+		[[nodiscard]] double GetSrcIntensity() const;
+		[[nodiscard]] double GetENorm(double z, WaveDirection dir = WaveDirection::TOT) const;
 		
 	};
 }

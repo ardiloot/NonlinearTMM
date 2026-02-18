@@ -284,7 +284,7 @@ namespace TMM{
 		solved = true;
 	}
 
-	bool NonlinearLayer::IsNonlinear() const
+	bool NonlinearLayer::IsNonlinear() const noexcept
 	{
 		return isNonlinear;
 	}
@@ -318,16 +318,16 @@ namespace TMM{
 		}
 	}
 
-	double NonlinearLayer::GetThickness() const {
+	double NonlinearLayer::GetThickness() const noexcept {
 		return d;
 	}
 
-	Material * NonlinearLayer::GetMaterial() const {
+	Material * NonlinearLayer::GetMaterial() const noexcept {
 		// It is the responsibility of the user to ensure, that material ptr stays valid
 		return material;
 	}
 
-	HomogeneousWave *NonlinearLayer::GetHw()
+	HomogeneousWave *NonlinearLayer::GetHw() noexcept
 	{
 		return &hw;
 	}

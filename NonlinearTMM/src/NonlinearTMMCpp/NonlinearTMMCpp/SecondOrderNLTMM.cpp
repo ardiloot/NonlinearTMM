@@ -232,27 +232,27 @@ namespace TMM {
 		return res;
 	}
 
-	NonlinearTMM * SecondOrderNLTMM::GetP1() {
+	NonlinearTMM * SecondOrderNLTMM::GetP1() noexcept {
 		return &tmmP1;
 	}
 
-	NonlinearTMM * SecondOrderNLTMM::GetP2() {
+	NonlinearTMM * SecondOrderNLTMM::GetP2() noexcept {
 		return &tmmP2;
 	}
 
-	NonlinearTMM * SecondOrderNLTMM::GetGen() {
+	NonlinearTMM * SecondOrderNLTMM::GetGen() noexcept {
 		return &tmmGen;
 	}
 
-	double SecondOrderNLTMM::GetDeltaWlSpdc() const {
+	double SecondOrderNLTMM::GetDeltaWlSpdc() const noexcept {
 		return deltaWlSpdc;
 	}
 
-	double SecondOrderNLTMM::GetSolidAngleSpdc() const {
+	double SecondOrderNLTMM::GetSolidAngleSpdc() const noexcept {
 		return solidAngleSpdc;
 	}
 
-	double SecondOrderNLTMM::GetDeltaThetaSpdc() const {
+	double SecondOrderNLTMM::GetDeltaThetaSpdc() const noexcept {
 		return deltaThetaSpdc;
 	}
 

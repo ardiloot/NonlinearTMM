@@ -54,7 +54,7 @@ namespace TMM {
 		needRotationRecalc = false;
 	}
 
-	bool Chi2Tensor::IsNonlinear() const
+	bool Chi2Tensor::IsNonlinear() const noexcept
 	{
 		return isNonlinear;
 	}
@@ -123,7 +123,7 @@ namespace TMM {
 		return res;
 	}
 	
-	bool Material::IsNonlinear() const
+	bool Material::IsNonlinear() const noexcept
 	{
 		return chi2.IsNonlinear();
 	}

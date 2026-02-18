@@ -42,7 +42,7 @@ namespace TMM {
 	constexpr double constC = 299792458.0;
 	constexpr double constEps0 = 8.854187817e-12;
 	constexpr double constMu0 = 1.2566370614e-6;
-	inline const dcomplex constI = dcomplex(0.0, 1.0);
+	inline constexpr dcomplex constI{0.0, 1.0};
 	constexpr double INF = std::numeric_limits<double>::infinity();
 	constexpr double constNAN = std::numeric_limits<double>::quiet_NaN();
 	constexpr double constHbar = 1.054571800e-34;
@@ -146,35 +146,35 @@ namespace TMM {
 	[[nodiscard]] TMMParamType GetParamType(TMMParam param);
 	[[nodiscard]] constexpr double WlToOmega(double wl) { return 2.0 * PI * constC / wl; }
 	[[nodiscard]] constexpr double OmegaToWl(double omega) { return 2.0 * PI * constC / omega; }
-	Matrix3d RotationMatrixX(double phi);
-	Matrix3d RotationMatrixY(double phi);
-	Matrix3d RotationMatrixZ(double phi);
-	Tensor3d ApplyRotationMatrixToTensor(const Tensor3d& input, const Matrix3d& R);
-	Tensor3d RotateTensor(Tensor3d &input, double phiX = 0, double phiY = 0, double phiZ = 0);
+	[[nodiscard]] Matrix3d RotationMatrixX(double phi);
+	[[nodiscard]] Matrix3d RotationMatrixY(double phi);
+	[[nodiscard]] Matrix3d RotationMatrixZ(double phi);
+	[[nodiscard]] Tensor3d ApplyRotationMatrixToTensor(const Tensor3d& input, const Matrix3d& R);
+	[[nodiscard]] Tensor3d RotateTensor(Tensor3d &input, double phiX = 0, double phiY = 0, double phiZ = 0);
 	[[nodiscard]] constexpr double sqr(double a) { return a * a; }
 	[[nodiscard]] inline dcomplex sqr(dcomplex a) { return a * a; }
-	template <typename T> T Interpolate(double x, const ArrayXd & xs, const Eigen::Array<T, Eigen::Dynamic, 1> & ys);
-	double GetDifferential(const ArrayXd &intVar, int nr);
-	pairdd IntegrateWavePower([[maybe_unused]] int layerNr, Polarization pol, double wl, dcomplex epsLayer, const Eigen::MatrixX2cd &Us,
+	template <typename T> [[nodiscard]] T Interpolate(double x, const ArrayXd & xs, const Eigen::Array<T, Eigen::Dynamic, 1> & ys);
+	[[nodiscard]] double GetDifferential(const ArrayXd &intVar, int nr);
+	[[nodiscard]] pairdd IntegrateWavePower([[maybe_unused]] int layerNr, Polarization pol, double wl, dcomplex epsLayer, const Eigen::MatrixX2cd &Us,
 		const ArrayXd &kxs, const Eigen::MatrixX2cd &kzs,
 		double x0, double x1, double z, double Ly);
-	WaveDirection GetWaveDirection(dcomplex kzF, dcomplex eps, Polarization pol);
-	ArrayXcd FFTShift(ArrayXcd data);
-	ArrayXd IFFTShift(ArrayXd data);
-	ArrayXd FFTFreq(int n, double dx);
+	[[nodiscard]] WaveDirection GetWaveDirection(dcomplex kzF, dcomplex eps, Polarization pol);
+	[[nodiscard]] ArrayXcd FFTShift(ArrayXcd data);
+	[[nodiscard]] ArrayXd IFFTShift(ArrayXd data);
+	[[nodiscard]] ArrayXd FFTFreq(int n, double dx);
 
 	//---------------------------------------------------------------
 	// Inline SSE
 	//---------------------------------------------------------------
 
-	inline dcomplex FastExp(dcomplex z) {
+	[[nodiscard]] inline dcomplex FastExp(dcomplex z) {
 		double c = std::exp(real(z));
 		double y = imag(z);
 		dcomplex res(c * std::cos(y), c * std::sin(y));
 		return res;
 	}
 
-	inline dcomplex multSSE(dcomplex aa, dcomplex bb) {
+	[[nodiscard]] inline dcomplex multSSE(dcomplex aa, dcomplex bb) {
 #ifdef TMM_USE_SSE3
 		const __m128d mask = _mm_set_pd(-0.0, 0.0);
 

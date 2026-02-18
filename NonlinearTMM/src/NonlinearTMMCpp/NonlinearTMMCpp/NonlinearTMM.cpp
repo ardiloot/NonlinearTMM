@@ -137,7 +137,7 @@ namespace TMM {
 		enh.setConstant(constNAN);
 	}
 
-	int SweepResultNonlinearTMM::GetOutmask() const {
+	int SweepResultNonlinearTMM::GetOutmask() const noexcept {
 		return outmask;
 	}
 
@@ -187,7 +187,7 @@ namespace TMM {
 		Hz.setZero();
 	}
 
-	Polarization FieldsZX::GetPol() const {
+	Polarization FieldsZX::GetPol() const noexcept {
 		return pol;
 	}
 
@@ -594,7 +594,7 @@ namespace TMM {
 		return &layers[layerNr];
 	}
 
-	int NonlinearTMM::LayersCount() const {
+	int NonlinearTMM::LayersCount() const noexcept {
 		return layers.size();
 	}
 
@@ -883,7 +883,7 @@ namespace TMM {
 
 	}
 
-	Wave * NonlinearTMM::GetWave() {
+	Wave * NonlinearTMM::GetWave() noexcept {
 		return &wave;
 	}
 
@@ -1008,31 +1008,31 @@ namespace TMM {
 
 	// Getters
 
-	double NonlinearTMM::GetWl() const {
+	double NonlinearTMM::GetWl() const noexcept {
 		return wl;
 	}
 
-	double NonlinearTMM::GetBeta() const {
+	double NonlinearTMM::GetBeta() const noexcept {
 		return beta;
 	}
 
-	Polarization NonlinearTMM::GetPolarization() const {
+	Polarization NonlinearTMM::GetPolarization() const noexcept {
 		return pol;
 	}
 
-	double NonlinearTMM::GetI0() const {
+	double NonlinearTMM::GetI0() const noexcept {
 		return I0;
 	}
 
-	bool NonlinearTMM::GetOverrideE0() const {
+	bool NonlinearTMM::GetOverrideE0() const noexcept {
 		return overrideE0;
 	}
 
-	dcomplex NonlinearTMM::GetE0() const {
+	dcomplex NonlinearTMM::GetE0() const noexcept {
 		return E0;
 	}
 
-	NonlinearTmmMode NonlinearTMM::GetMode() const {
+	NonlinearTmmMode NonlinearTMM::GetMode() const noexcept {
 		return mode;
 	}
 
@@ -1072,7 +1072,7 @@ namespace TMM {
 		beamArea.setConstant(constNAN);
 	}
 
-	int WaveSweepResultNonlinearTMM::GetOutmask() const {
+	int WaveSweepResultNonlinearTMM::GetOutmask() const noexcept {
 		return outmask;
 	}
 
