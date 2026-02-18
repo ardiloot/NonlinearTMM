@@ -16,8 +16,8 @@ void TestNonlinearTmm() {
 	tmm.AddLayer(TMM::INF, &airN);
 
 	tmm.SetParam(TMM::PARAM_WL, wl);
-	tmm.SetParam(TMM::PARAM_POL, (int)pol);
-	tmm.SetParam(TMM::PARAM_MODE, (int)mode);
+	tmm.SetParam(TMM::PARAM_POL, static_cast<int>(pol));
+	tmm.SetParam(TMM::PARAM_MODE, static_cast<int>(mode));
 	tmm.SetParam(TMM::PARAM_I0, 1.0);
 	//tmm.SetParam(TMM::PARAM_OVERRIDE_E0, true);
 	//tmm.SetParam(TMM::PARAM_E0, 1.0);

@@ -87,30 +87,30 @@ namespace TMM {
 		void Solve(double wl_, double beta_, Material *materialLayer0_, Material *materialLayerThis_, double deltaKxSpdc_ = constNAN);
 
 		// Getters
-		WaveType GetWaveType();
-		double GetPwr();
-		bool GetOverrideE0();
-		double GetE0();
-		double GetW0();
-		double GetLy();
-		double GetA();
-		int GetNPointsInteg();
-		double GetMaxX();
-		bool IsDynamicMaxXEnabled();
-		double GetDynamicMaxXCoef();
-		double GetDynamicMaxXAddition();
-		double GetMaxPhi();
-		double GetDouble(TMMParam param);
-		pairdd GetXRange();
-		ArrayXd GetBetas();
-		ArrayXd GetPhis();
-		ArrayXd GetKxs();
-		ArrayXd GetKzs();
-		ArrayXd GetFieldProfileXs();
-		ArrayXd GetFieldProfile();
-		ArrayXcd GetExpansionCoefsKx();
-		double GetBeamArea();
-		bool IsCoherent();
+		WaveType GetWaveType() const;
+		double GetPwr() const;
+		bool GetOverrideE0() const;
+		double GetE0() const;
+		double GetW0() const;
+		double GetLy() const;
+		double GetA() const;
+		int GetNPointsInteg() const;
+		double GetMaxX() const;
+		bool IsDynamicMaxXEnabled() const;
+		double GetDynamicMaxXCoef() const;
+		double GetDynamicMaxXAddition() const;
+		double GetMaxPhi() const;
+		double GetDouble(TMMParam param) const;
+		pairdd GetXRange() const;
+		ArrayXd GetBetas() const;
+		ArrayXd GetPhis() const;
+		ArrayXd GetKxs() const;
+		ArrayXd GetKzs() const;
+		ArrayXd GetFieldProfileXs() const;
+		ArrayXd GetFieldProfile() const;
+		ArrayXcd GetExpansionCoefsKx() const;
+		double GetBeamArea() const;
+		bool IsCoherent() const;
 	};
 
 

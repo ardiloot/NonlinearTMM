@@ -318,11 +318,11 @@ namespace TMM{
 		}
 	}
 
-	double NonlinearLayer::GetThickness() {
+	double NonlinearLayer::GetThickness() const {
 		return d;
 	}
 
-	Material * NonlinearLayer::GetMaterial() {
+	Material * NonlinearLayer::GetMaterial() const {
 		// It is the responsibility of the user to ensure, that material ptr stays valid
 		return material;
 	}
@@ -346,7 +346,7 @@ namespace TMM{
 		return k0;
 	}
 
-	double NonlinearLayer::GetDouble(TMMParam param) {
+	double NonlinearLayer::GetDouble(TMMParam param) const {
 		switch (param)
 		{
 		case TMMParam::PARAM_LAYER_D:

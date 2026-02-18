@@ -253,59 +253,59 @@ namespace TMM {
 
 	// Getters
 
-	WaveType Wave::GetWaveType() {
+	WaveType Wave::GetWaveType() const {
 		return waveType;
 	}
 
-	double Wave::GetPwr() {
+	double Wave::GetPwr() const {
 		return pwr;
 	}
 
-	bool Wave::GetOverrideE0() {
+	bool Wave::GetOverrideE0() const {
 		return overrideE0;
 	}
 
-	double Wave::GetE0() {
+	double Wave::GetE0() const {
 		return E0OverrideValue;
 	}
 
-	double Wave::GetW0() {
+	double Wave::GetW0() const {
 		return w0;
 	}
 
-	double Wave::GetLy() {
+	double Wave::GetLy() const {
 		return Ly;
 	}
 
-	double Wave::GetA() {
+	double Wave::GetA() const {
 		return a;
 	}
 
-	int Wave::GetNPointsInteg() {
+	int Wave::GetNPointsInteg() const {
 		return nPointsInteg;
 	}
 
-	double Wave::GetMaxX() {
+	double Wave::GetMaxX() const {
 		return maxX;
 	}
 
-	bool Wave::IsDynamicMaxXEnabled() {
+	bool Wave::IsDynamicMaxXEnabled() const {
 		return dynamicMaxX;
 	}
 
-	double Wave::GetDynamicMaxXCoef() {
+	double Wave::GetDynamicMaxXCoef() const {
 		return dynamicMaxXCoef;
 	}
 
-	double Wave::GetDynamicMaxXAddition() {
+	double Wave::GetDynamicMaxXAddition() const {
 		return dynamicMaxXAddition;
 	}
 
-	double Wave::GetMaxPhi() {
+	double Wave::GetMaxPhi() const {
 		return maxPhi;
 	}
 
-	double Wave::GetDouble(TMMParam param) {
+	double Wave::GetDouble(TMMParam param) const {
 		switch (param)
 		{
 		case TMMParam::PARAM_WAVE_W0:
@@ -315,7 +315,7 @@ namespace TMM {
 		}
 	}
 
-	pairdd Wave::GetXRange() {
+	pairdd Wave::GetXRange() const {
 		if (!solved) {
 			std::cerr << "Wave must be solved first." << std::endl;
 			throw std::runtime_error("Wave must be solved first.");
@@ -323,7 +323,7 @@ namespace TMM {
 		return pairdd(-maxXThis, maxXThis);
 	}
 
-	ArrayXd Wave::GetBetas() {
+	ArrayXd Wave::GetBetas() const {
 		if (!solved) {
 			std::cerr << "Wave must be solved first." << std::endl;
 			throw std::runtime_error("Wave must be solved first.");
@@ -331,9 +331,9 @@ namespace TMM {
 		return kxs / k0;
 	}
 
-	ArrayXd Wave::GetPhis() { return phis; }
+	ArrayXd Wave::GetPhis() const { return phis; }
 
-	ArrayXd Wave::GetKxs() {
+	ArrayXd Wave::GetKxs() const {
 		if (!solved) {
 			std::cerr << "Wave must be solved first." << std::endl;
 			throw std::runtime_error("Wave must be solved first.");
@@ -341,7 +341,7 @@ namespace TMM {
 		return kxs;
 	}
 
-	ArrayXd Wave::GetKzs() {
+	ArrayXd Wave::GetKzs() const {
 		if (!solved) {
 			std::cerr << "Wave must be solved first." << std::endl;
 			throw std::runtime_error("Wave must be solved first.");
@@ -349,7 +349,7 @@ namespace TMM {
 		return kzs;
 	}
 
-	ArrayXd Wave::GetFieldProfileXs() {
+	ArrayXd Wave::GetFieldProfileXs() const {
 		if (!solved) {
 			std::cerr << "Wave must be solved first." << std::endl;
 			throw std::runtime_error("Wave must be solved first.");
@@ -357,7 +357,7 @@ namespace TMM {
 		return fieldProfileXs;
 	}
 
-	ArrayXd Wave::GetFieldProfile() {
+	ArrayXd Wave::GetFieldProfile() const {
 		if (!solved) {
 			std::cerr << "Wave must be solved first." << std::endl;
 			throw std::runtime_error("Wave must be solved first.");
@@ -365,7 +365,7 @@ namespace TMM {
 		return fieldProfile;
 	}
 
-	ArrayXcd Wave::GetExpansionCoefsKx() {
+	ArrayXcd Wave::GetExpansionCoefsKx() const {
 		if (!solved) {
 			std::cerr << "Wave must be solved first." << std::endl;
 			throw std::runtime_error("Wave must be solved first.");
@@ -373,7 +373,7 @@ namespace TMM {
 		return expansionCoefsKx;
 	}
 
-	double Wave::GetBeamArea() {
+	double Wave::GetBeamArea() const {
 		if (!solved) {
 			std::cerr << "Wave must be solved first." << std::endl;
 			throw std::runtime_error("Wave must be solved first.");
@@ -381,7 +381,7 @@ namespace TMM {
 		return beamArea;
 	}
 
-	bool Wave::IsCoherent() {
+	bool Wave::IsCoherent() const {
 		if (waveType == WaveType::SPDCWAVE) {
 			return false;
 		}

@@ -252,7 +252,7 @@ namespace TMM {
 	}
 	*/
 
-	pairdd IntegrateWavePower(int layerNr, Polarization pol, double wl, dcomplex epsLayer, const Eigen::MatrixX2cd & Us, const ArrayXd & kxs, const Eigen::MatrixX2cd & kzs, double x0, double x1, double z, double Ly) {
+	pairdd IntegrateWavePower([[maybe_unused]] int layerNr, Polarization pol, double wl, dcomplex epsLayer, const Eigen::MatrixX2cd & Us, const ArrayXd & kxs, const Eigen::MatrixX2cd & kzs, double x0, double x1, double z, double Ly) {
 
 		if (x0 != -x1 || z != 0) {
 			std::cerr << "Currently only x0 = -x1, z = 0 supported." << std::endl;

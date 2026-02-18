@@ -1,11 +1,12 @@
 #include "NonlinearTMM.h"
+#include <array>
 
 namespace TMM {
 
 	void OuterProductSSEEigenComplex(const ArrayXcd & X, const ArrayXcd & Y, MatrixXcd & R) {
 		dcomplex* ptrR = &R(0, 0);
-		const dcomplex* ptrX = (dcomplex*)&X(0);
-		const dcomplex* ptrY = (dcomplex*)&Y(0);
+		const dcomplex* ptrX = reinterpret_cast<const dcomplex*>(&X(0));
+		const dcomplex* ptrY = reinterpret_cast<const dcomplex*>(&Y(0));
 		const int n = X.size();
 		const int m = Y.size();
 
@@ -22,9 +23,9 @@ namespace TMM {
 
 	void OuterProductSSEEigenComplexAdd(const ArrayXcd & X, const ArrayXcd & Y, MatrixXcd & R) {
 		// Identical to previous, but add to result (performance)
-		double* ptrR = (double*)&R(0, 0);
-		const dcomplex* ptrX = (dcomplex*)&X(0);
-		const dcomplex* ptrY = (dcomplex*)&Y(0);
+		double* ptrR = reinterpret_cast<double*>(&R(0, 0));
+		const dcomplex* ptrX = reinterpret_cast<const dcomplex*>(&X(0));
+		const dcomplex* ptrY = reinterpret_cast<const dcomplex*>(&Y(0));
 		const int n = X.size();
 		const int m = Y.size();
 
@@ -49,8 +50,8 @@ namespace TMM {
 
 	void OuterProductGoodEigenComplex(const ArrayXcd & X, const ArrayXcd & Y, MatrixXcd & R) {
 		dcomplex* ptrR = &R(0, 0);
-		dcomplex* ptrX = (dcomplex*)&X(0);
-		dcomplex* ptrY = (dcomplex*)&Y(0);
+		const dcomplex* ptrX = reinterpret_cast<const dcomplex*>(&X(0));
+		const dcomplex* ptrY = reinterpret_cast<const dcomplex*>(&Y(0));
 		int n = X.size();
 		int m = Y.size();
 
@@ -66,9 +67,9 @@ namespace TMM {
 	}
 
 	void OuterProductGoodEigenComplexAdd(const ArrayXcd & X, const ArrayXcd & Y, MatrixXcd & R) {
-		double* ptrR = (double*)&R(0, 0);
-		dcomplex* ptrX = (dcomplex*)&X(0);
-		dcomplex* ptrY = (dcomplex*)&Y(0);
+		double* ptrR = reinterpret_cast<double*>(&R(0, 0));
+		const dcomplex* ptrX = reinterpret_cast<const dcomplex*>(&X(0));
+		const dcomplex* ptrY = reinterpret_cast<const dcomplex*>(&Y(0));
 		int n = X.size();
 		int m = Y.size();
 
@@ -96,8 +97,8 @@ namespace TMM {
 			throw std::invalid_argument("mat and toAdd must be the same size.");
 		}
 
-		double* ptrMat = (double *)&mat(0, 0);
-		dcomplex* ptrToAdd = (dcomplex *)&toAdd(0, 0);
+		double* ptrMat = reinterpret_cast<double*>(&mat(0, 0));
+		const dcomplex* ptrToAdd = reinterpret_cast<const dcomplex*>(&toAdd(0, 0));
 		int n = mat.cols() * mat.rows();
 
 		for (int i = 0; i < n; i++) {
@@ -136,7 +137,7 @@ namespace TMM {
 		enh.setConstant(constNAN);
 	}
 
-	int SweepResultNonlinearTMM::GetOutmask() {
+	int SweepResultNonlinearTMM::GetOutmask() const {
 		return outmask;
 	}
 
@@ -186,7 +187,7 @@ namespace TMM {
 		Hz.setZero();
 	}
 
-	Polarization FieldsZX::GetPol() {
+	Polarization FieldsZX::GetPol() const {
 		return pol;
 	}
 
@@ -273,7 +274,7 @@ namespace TMM {
 		}
 	}
 
-	MatrixXd FieldsZX::GetENorm() {
+	MatrixXd FieldsZX::GetENorm() const {
 		MatrixXd res;
 		switch (pol)
 		{
@@ -577,7 +578,7 @@ namespace TMM {
 			throw std::invalid_argument("First layer must have infinite thickness.");
 		}
 
-		layers.push_back(NonlinearLayer(d_, material_));
+		layers.emplace_back(d_, material_);
 		systemMatrices.resize(layers.size());
 		systemMatricesNL.resize(layers.size());
 		transferMatrices.resize(layers.size());
@@ -816,12 +817,12 @@ namespace TMM {
 		}
 		layerZ += z;
 
-		double xs[] = { 0.0 };
-		double zs0[] = { -1e-9 };
-		double zsL[] = { layerZ };
-		Eigen::Map<ArrayXd> xsMap(xs, 1);
-		Eigen::Map<ArrayXd> zs0Map(zs0, 1);
-		Eigen::Map<ArrayXd> zsLMap(zsL, 1);
+		std::array<double, 1> xs = { 0.0 };
+		std::array<double, 1> zs0 = { -1e-9 };
+		std::array<double, 1> zsL = { layerZ };
+		Eigen::Map<ArrayXd> xsMap(xs.data(), 1);
+		Eigen::Map<ArrayXd> zs0Map(zs0.data(), 1);
+		Eigen::Map<ArrayXd> zsLMap(zsL.data(), 1);
 
 		auto f0 = WaveGetFields2D(zs0Map, xsMap, WaveDirection::F);
 		auto fL = WaveGetFields2D(zsLMap, xsMap, WaveDirection::TOT);
@@ -904,13 +905,13 @@ namespace TMM {
 		double Ly = wave.GetLy();
 		
 		// Adjust range
-		pairdd xrange = wave.GetXRange();
+		auto [xMin, xMax] = wave.GetXRange();
 		if (std::isnan(x0)) {
-			x0 = xrange.first;
+			x0 = xMin;
 		}
 
 		if (std::isnan(x1)) {
-			x1 = xrange.second;
+			x1 = xMax;
 		}
 
 		// Init memory
@@ -943,10 +944,10 @@ namespace TMM {
 		else {
 			// Incoherent
 			for (int i = 0; i < betas.size(); i++) {
-				pairdd r = IntegrateWavePower(layerNr, pol, wl, epsLayer, Us.row(i), kxs.row(i), kzs.row(i), x0, x1, z, Ly);
+				auto [rFwd, rBwd] = IntegrateWavePower(layerNr, pol, wl, epsLayer, Us.row(i), kxs.row(i), kzs.row(i), x0, x1, z, Ly);
 				double dkx = GetDifferential(kxs, i);
-				res.first += r.first * dkx;
-				res.second += r.second * dkx;
+				res.first += rFwd * dkx;
+				res.second += rBwd * dkx;
 			}
 		}
 		return res;
@@ -1007,35 +1008,35 @@ namespace TMM {
 
 	// Getters
 
-	double NonlinearTMM::GetWl() {
+	double NonlinearTMM::GetWl() const {
 		return wl;
 	}
 
-	double NonlinearTMM::GetBeta() {
+	double NonlinearTMM::GetBeta() const {
 		return beta;
 	}
 
-	Polarization NonlinearTMM::GetPolarization() {
+	Polarization NonlinearTMM::GetPolarization() const {
 		return pol;
 	}
 
-	double NonlinearTMM::GetI0() {
+	double NonlinearTMM::GetI0() const {
 		return I0;
 	}
 
-	bool NonlinearTMM::GetOverrideE0() {
+	bool NonlinearTMM::GetOverrideE0() const {
 		return overrideE0;
 	}
 
-	dcomplex NonlinearTMM::GetE0() {
+	dcomplex NonlinearTMM::GetE0() const {
 		return E0;
 	}
 
-	NonlinearTmmMode NonlinearTMM::GetMode() {
+	NonlinearTmmMode NonlinearTMM::GetMode() const {
 		return mode;
 	}
 
-	double NonlinearTMM::GetDouble(TMMParam param) {
+	double NonlinearTMM::GetDouble(TMMParam param) const {
 		switch (param)
 		{
 		case TMMParam::PARAM_WL:
@@ -1049,7 +1050,7 @@ namespace TMM {
 		}
 	}
 
-	dcomplex NonlinearTMM::GetComplex(TMMParam param) {
+	dcomplex NonlinearTMM::GetComplex(TMMParam param) const {
 		switch (param)
 		{
 		case TMMParam::PARAM_E0:
@@ -1071,22 +1072,22 @@ namespace TMM {
 		beamArea.setConstant(constNAN);
 	}
 
-	int WaveSweepResultNonlinearTMM::GetOutmask() {
+	int WaveSweepResultNonlinearTMM::GetOutmask() const {
 		return outmask;
 	}
 
 	void WaveSweepResultNonlinearTMM::SetValues(int nr, NonlinearTMM & tmm) {
 		// First layer
 		if ((outmask & SWEEP_I) || (outmask & SWEEP_R)) {
-			pairdd pf0 = tmm.WaveGetPowerFlows(0);
-			Pi(nr) = pf0.first;
-			Pr(nr) = pf0.second;
+			auto [fwd0, bwd0] = tmm.WaveGetPowerFlows(0);
+			Pi(nr) = fwd0;
+			Pr(nr) = bwd0;
 		}
 
 		// Last layer
 		if (outmask & SWEEP_T) {
-			pairdd pfL = tmm.WaveGetPowerFlows(tmm.LayersCount() - 1);
-			Pt(nr) = pfL.first;
+			auto [fwdL, bwdL] = tmm.WaveGetPowerFlows(tmm.LayersCount() - 1);
+			Pt(nr) = fwdL;
 		}
 
 		if (outmask & SWEEP_ENH) {

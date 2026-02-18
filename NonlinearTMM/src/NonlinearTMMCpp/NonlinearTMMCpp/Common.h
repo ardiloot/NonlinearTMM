@@ -143,19 +143,19 @@ namespace TMM {
 	// Functions
 	//---------------------------------------------------------------
 
-	TMMParamType GetParamType(TMMParam param);
-	constexpr double WlToOmega(double wl) { return 2.0 * PI * constC / wl; }
-	constexpr double OmegaToWl(double omega) { return 2.0 * PI * constC / omega; }
+	[[nodiscard]] TMMParamType GetParamType(TMMParam param);
+	[[nodiscard]] constexpr double WlToOmega(double wl) { return 2.0 * PI * constC / wl; }
+	[[nodiscard]] constexpr double OmegaToWl(double omega) { return 2.0 * PI * constC / omega; }
 	Matrix3d RotationMatrixX(double phi);
 	Matrix3d RotationMatrixY(double phi);
 	Matrix3d RotationMatrixZ(double phi);
 	Tensor3d ApplyRotationMatrixToTensor(const Tensor3d& input, const Matrix3d& R);
 	Tensor3d RotateTensor(Tensor3d &input, double phiX = 0, double phiY = 0, double phiZ = 0);
-	constexpr double sqr(double a) { return a * a; }
-	inline dcomplex sqr(dcomplex a) { return a * a; }
+	[[nodiscard]] constexpr double sqr(double a) { return a * a; }
+	[[nodiscard]] inline dcomplex sqr(dcomplex a) { return a * a; }
 	template <typename T> T Interpolate(double x, const ArrayXd & xs, const Eigen::Array<T, Eigen::Dynamic, 1> & ys);
 	double GetDifferential(const ArrayXd &intVar, int nr);
-	pairdd IntegrateWavePower(int layerNr, Polarization pol, double wl, dcomplex epsLayer, const Eigen::MatrixX2cd &Us,
+	pairdd IntegrateWavePower([[maybe_unused]] int layerNr, Polarization pol, double wl, dcomplex epsLayer, const Eigen::MatrixX2cd &Us,
 		const ArrayXd &kxs, const Eigen::MatrixX2cd &kzs,
 		double x0, double x1, double z, double Ly);
 	WaveDirection GetWaveDirection(dcomplex kzF, dcomplex eps, Polarization pol);
@@ -179,8 +179,8 @@ namespace TMM {
 		const __m128d mask = _mm_set_pd(-0.0, 0.0);
 
 		// Load to registers
-		__m128d a = _mm_load_pd((double*)&aa);
-		__m128d b = _mm_load_pd((double*)&bb);
+		__m128d a = _mm_load_pd(reinterpret_cast<const double*>(&aa));
+		__m128d b = _mm_load_pd(reinterpret_cast<const double*>(&bb));
 
 		// Real part
 		__m128d ab = _mm_mul_pd(a, b);
@@ -194,7 +194,7 @@ namespace TMM {
 		ab = _mm_hadd_pd(ab, b);
 
 		dcomplex res = 0.0;
-		_mm_storeu_pd((double*)&(res), ab);
+		_mm_storeu_pd(reinterpret_cast<double*>(&res), ab);
 		return res;
 #else
 		// Portable scalar fallback for non-x86 platforms (e.g., ARM)

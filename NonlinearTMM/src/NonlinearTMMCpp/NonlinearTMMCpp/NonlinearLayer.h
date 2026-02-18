@@ -133,12 +133,12 @@ namespace TMM {
 		void SetThickness(double d_);
 		void SetParam(TMMParam param, double value);
 
-		double GetThickness();
-		Material * GetMaterial();
+		double GetThickness() const;
+		Material * GetMaterial() const;
 		HomogeneousWave* GetHw();
 		double GetKx() const;
 		double GetK0() const;
-		double GetDouble(TMMParam param);
+		double GetDouble(TMMParam param) const;
 
 		Array2cd GetMainFields(double z) const;
 		Fields GetFields(double z, WaveDirection dir = WaveDirection::TOT) const;

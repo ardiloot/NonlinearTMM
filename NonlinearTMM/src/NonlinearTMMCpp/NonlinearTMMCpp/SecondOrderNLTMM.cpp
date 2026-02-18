@@ -244,15 +244,15 @@ namespace TMM {
 		return &tmmGen;
 	}
 
-	double SecondOrderNLTMM::GetDeltaWlSpdc() {
+	double SecondOrderNLTMM::GetDeltaWlSpdc() const {
 		return deltaWlSpdc;
 	}
 
-	double SecondOrderNLTMM::GetSolidAngleSpdc() {
+	double SecondOrderNLTMM::GetSolidAngleSpdc() const {
 		return solidAngleSpdc;
 	}
 
-	double SecondOrderNLTMM::GetDeltaThetaSpdc() {
+	double SecondOrderNLTMM::GetDeltaThetaSpdc() const {
 		return deltaThetaSpdc;
 	}
 
@@ -405,12 +405,12 @@ namespace TMM {
 		}
 
 		// X-range (TODO)
-		pairdd xrangeP1 = waveP1->GetXRange();
+		auto [xMinP1, xMaxP1] = waveP1->GetXRange();
 		if (std::isnan(x0)) {
-			x0 = xrangeP1.first;
+			x0 = xMinP1;
 		}
 		if (std::isnan(x1)) {
-			x1 = xrangeP1.second;
+			x1 = xMaxP1;
 		}
 
 		// Ly
@@ -501,9 +501,9 @@ namespace TMM {
 
 				// Sum powers
 				double dkxP2 = GetDifferential(kxsP2, j);
-				pairdd r = IntegrateWavePower(layerNr, polGen, wlGen, epsLayer, Us, kxs, kzs, x0, x1, z, Ly);
-				res.first += r.first * dkxP2;
-				res.second += r.second * dkxP2;
+				auto [rFwd, rBwd] = IntegrateWavePower(layerNr, polGen, wlGen, epsLayer, Us, kxs, kzs, x0, x1, z, Ly);
+				res.first += rFwd * dkxP2;
+				res.second += rBwd * dkxP2;
 			}
 		}
 		else {
@@ -569,15 +569,15 @@ namespace TMM {
 		if (outmask & SWEEP_GEN) {
 			// First layer
 			if ((outmask & SWEEP_I) || (outmask & SWEEP_R)) {
-				pairdd pf0 = tmm.WaveGetPowerFlows(0);
-				Gen.Pi(nr) = pf0.first;
-				Gen.Pr(nr) = pf0.second;
+				auto [fwd0, bwd0] = tmm.WaveGetPowerFlows(0);
+				Gen.Pi(nr) = fwd0;
+				Gen.Pr(nr) = bwd0;
 			}
 
 			// Last layer
 			if (outmask & SWEEP_T) {
-				pairdd pfL = tmm.WaveGetPowerFlows(tmm.GetGen()->LayersCount() - 1);
-				Gen.Pt(nr) = pfL.first;
+				auto [fwdL, bwdL] = tmm.WaveGetPowerFlows(tmm.GetGen()->LayersCount() - 1);
+				Gen.Pt(nr) = fwdL;
 			}
 
 			Gen.beamArea(nr) = tmm.GetP1()->GetWave()->GetBeamArea();
