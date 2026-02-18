@@ -8,6 +8,11 @@
 #include <Eigen/Dense>
 #include <unsupported/Eigen/CXX11/Tensor>
 
+#if defined(__SSE3__) || defined(_M_X64) || defined(_M_AMD64)
+#include <pmmintrin.h>
+#define TMM_USE_SSE3 1
+#endif
+
 namespace TMM {
 	using Eigen::Array2cd;
 	using Eigen::ArrayXd;
@@ -134,15 +139,6 @@ namespace TMM {
 	//---------------------------------------------------------------
 
 	inline dcomplex FastExp(dcomplex z) {
-		/*
-		double y = imag(z);
-		__m128d c2 = _mm_set1_pd(std::exp(real(z)));
-		__m128d xy = _mm_set_pd(std::cos(y), std::sin(y));
-		xy = _mm_mul_pd(xy, c2);
-		dcomplex res;
-		_mm_storeu_pd((double*)&(res), xy);
-		*/
-		
 		double c = std::exp(real(z));
 		double y = imag(z);
 		dcomplex res(c * std::cos(y), c * std::sin(y));
@@ -150,6 +146,7 @@ namespace TMM {
 	}
 
 	inline dcomplex multSSE(dcomplex aa, dcomplex bb) {
+#ifdef TMM_USE_SSE3
 		const __m128d mask = _mm_set_pd(-0.0, 0.0);
 
 		// Load to registers
@@ -170,6 +167,12 @@ namespace TMM {
 		dcomplex res = 0.0;
 		_mm_storeu_pd((double*)&(res), ab);
 		return res;
+#else
+		// Portable scalar fallback for non-x86 platforms (e.g., ARM)
+		double ar = real(aa), ai = imag(aa);
+		double br = real(bb), bi = imag(bb);
+		return dcomplex(ar * br - ai * bi, ar * bi + ai * br);
+#endif
 	}
 
 
