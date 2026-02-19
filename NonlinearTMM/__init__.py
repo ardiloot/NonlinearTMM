@@ -1,20 +1,25 @@
+from . import _SecondOrderNLTMMCython  # @UnresolvedImport
+
 from ._Material import *
-from ._NonlinearTMM import *
-from ._SecondOrderNLTMM import *
+
+# Public aliases (previously in _NonlinearTMM.py and _SecondOrderNLTMM.py)
+TMM = _SecondOrderNLTMMCython.NonlinearTMM
+NonlinearTMM = _SecondOrderNLTMMCython.NonlinearTMM
+SecondOrderNLTMM = _SecondOrderNLTMMCython.SecondOrderNLTMM
 
 # Helper classes
-from ._SecondOrderNLTMMCython import _Chi2Tensor  # @UnresolvedImport
-from ._SecondOrderNLTMMCython import _Wave  # @UnresolvedImport
-from ._SecondOrderNLTMMCython import _Intensities  # @UnresolvedImport
-from ._SecondOrderNLTMMCython import _SweepResultNonlinearTMM  # @UnresolvedImport
-from ._SecondOrderNLTMMCython import _WaveSweepResultNonlinearTMM  # @UnresolvedImport
-from ._SecondOrderNLTMMCython import _FieldsZ  # @UnresolvedImport
-from ._SecondOrderNLTMMCython import _FieldsZX  # @UnresolvedImport
-from ._SecondOrderNLTMMCython import _HomogeneousWave  # @UnresolvedImport
-from ._SecondOrderNLTMMCython import _NonlinearLayer  # @UnresolvedImport
-from ._SecondOrderNLTMMCython import _SecondOrderNLIntensities  # @UnresolvedImport
-from ._SecondOrderNLTMMCython import _SweepResultSecondOrderNLTMM  # @UnresolvedImport
-from ._SecondOrderNLTMMCython import _WaveSweepResultSecondOrderNLTMM  # @UnresolvedImport
+_Chi2Tensor = _SecondOrderNLTMMCython._Chi2Tensor
+_Wave = _SecondOrderNLTMMCython._Wave
+_Intensities = _SecondOrderNLTMMCython._Intensities
+_SweepResultNonlinearTMM = _SecondOrderNLTMMCython._SweepResultNonlinearTMM
+_WaveSweepResultNonlinearTMM = _SecondOrderNLTMMCython._WaveSweepResultNonlinearTMM
+_FieldsZ = _SecondOrderNLTMMCython._FieldsZ
+_FieldsZX = _SecondOrderNLTMMCython._FieldsZX
+_HomogeneousWave = _SecondOrderNLTMMCython._HomogeneousWave
+_NonlinearLayer = _SecondOrderNLTMMCython._NonlinearLayer
+_SecondOrderNLIntensities = _SecondOrderNLTMMCython._SecondOrderNLIntensities
+_SweepResultSecondOrderNLTMM = _SecondOrderNLTMMCython._SweepResultSecondOrderNLTMM
+_WaveSweepResultSecondOrderNLTMM = _SecondOrderNLTMMCython._WaveSweepResultSecondOrderNLTMM
 
 if __name__ == "__main__":
     pass

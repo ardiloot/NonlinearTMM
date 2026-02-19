@@ -41,8 +41,8 @@ packages = ["NonlinearTMM"]
 [tool.setuptools.package-data]
 "NonlinearTMM" = [
     "src/*.pxd",
-    "src/NonlinearTMMCpp/NonlinearTMMCpp/*.h",
-    "src/NonlinearTMMCpp/NonlinearTMMCpp/*.cpp",
+    "src/cpp/*.h",
+    "src/cpp/*.cpp",
     "src/*.pyx",
 ]
 
