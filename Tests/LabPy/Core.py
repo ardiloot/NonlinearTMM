@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 import math
 from bisect import bisect_left, bisect_right
 from collections.abc import Callable
@@ -11,6 +12,8 @@ from typing import Any
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
 from scipy.integrate import quad
+
+logger = logging.getLogger(__name__)
 
 # ===============================================================================
 # Methods
@@ -160,14 +163,14 @@ def FindZeros(
         res = -integral / (2.0j * math.pi)
 
         if disp:
-            print("zeros in box", ax, bx, res)
-            print("time for box:", time() - start)
+            logger.debug("zeros in box %s %s %s", ax, bx, res)
+            logger.debug("time for box: %s", time() - start)
 
         return res
 
     def _DoSearch(a, b, depth=0):
         zerosRaw = _ZerosInBox(a, b).real
-        print("DoSearch", a, b, depth, "zeros", zerosRaw)
+        logger.debug("DoSearch %s %s %s zeros %s", a, b, depth, zerosRaw)
         zeros = int(round(zerosRaw))
         if zeros <= 0:
             return []
@@ -358,12 +361,11 @@ class ParamsBaseClass:
 
         """
         if asList:
-            res = []
-            for param, friendlyName in zip(self._params, self.friendlyNames):
-                res.append((param, friendlyName, getattr(self, param)))
+            res = [
+                (param, friendlyName, getattr(self, param))
+                for param, friendlyName in zip(self._params, self.friendlyNames, strict=True)
+            ]
 
         else:
-            res = {}
-            for param in self._params:
-                res[param] = getattr(self, param)
+            res = {param: getattr(self, param) for param in self._params}
         return res

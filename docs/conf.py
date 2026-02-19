@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 #
 # NonlinearTMM documentation build configuration file, created by
 # sphinx-quickstart on Thu Mar 16 11:48:15 2017.

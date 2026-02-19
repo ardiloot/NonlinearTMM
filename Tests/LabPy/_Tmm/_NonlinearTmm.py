@@ -41,7 +41,7 @@ class Chi2Tensor:
         self.phiZ = float(kwargs.pop("phiZ", self.phiZ))
 
         # d-values
-        for k in list(kwargs.keys()):
+        for k in list(kwargs):
             if (not k.startswith("d")) or (len(k) != 3):
                 continue
             i1, (i2, i3) = int(k[1]) - 1, self._dIndices[int(k[2]) - 1]
@@ -49,14 +49,14 @@ class Chi2Tensor:
             self._chi2[i1, i3, i2] = self._chi2[i1, i2, i3]
 
         # chi2-values
-        for k in list(kwargs.keys()):
+        for k in list(kwargs):
             if (not k.startswith("chi")) or (len(k) != 6):
                 continue
             i1, i2, i3 = int(k[3]) - 1, int(k[4]) - 1, int(k[5]) - 1
             self._chi2[i1, i2, i3] = kwargs.pop(k)
 
         # Errors
-        for k in list(kwargs.keys()):
+        for k in list(kwargs):
             raise ValueError(f"Unknown kwarg {k}")
 
     def GetChi2(self) -> NDArray:
@@ -236,7 +236,7 @@ class _InhomogeneosWave:
         if layer.d == math.inf:
             self.propMatrixNL = np.array([[0.0, 0.0]], dtype=complex).T
             if self.isNonlinear:
-                print(NotImplementedError("First and last medium must be linear.!"))
+                raise NotImplementedError("First and last medium must be linear.")
         else:
             if self.isNonlinear:
                 self.propMatrixNL = self.By * (np.exp(1.0j * self.kSz * layer.d) - np.exp(1.0j * layer.hw.kz * layer.d))
@@ -404,9 +404,9 @@ class _NonlinearTmm(Core.ParamsBaseClass):
 
         # Solve all layers
 
-        for i in range(len(self.layers)):
+        for i, layer in enumerate(self.layers):
             last = i == len(self.layers) - 1
-            self.layers[i].Solve(self.wl, self.beta, self.pol, last)
+            layer.Solve(self.wl, self.beta, self.pol, last)
 
         # Solve system matrix
 
@@ -576,10 +576,7 @@ class _NonlinearTmm(Core.ParamsBaseClass):
         return resE, resH
 
     def GetAbsorbedPower(self) -> float:
-        res = 0.0
-        for layer in self.layers:
-            res += layer.GetAbsorbedPower()
-        return res
+        return sum(layer.GetAbsorbedPower() for layer in self.layers)
 
     def __GetLayerIndexesAndDistances(self, zs: NDArray) -> list[tuple[int, float, int, int]]:
         layerDsIndexes = []
@@ -628,7 +625,9 @@ class SecondOrderNLTmm(Core.ParamsBaseClass):
         self.process = self.SFG
         super().__init__(**kwargs)
 
-    def AddLayer(self, d: float, n: object, chi2: Chi2Tensor = Chi2Tensor()) -> None:
+    def AddLayer(self, d: float, n: object, chi2: Chi2Tensor | None = None) -> None:
+        if chi2 is None:
+            chi2 = Chi2Tensor()
         self.layers.append((d, n, chi2))
 
     def Solve(self, **kwargs: Any) -> tuple:
@@ -653,8 +652,7 @@ class SecondOrderNLTmm(Core.ParamsBaseClass):
 
         self.tmmGen = _NonlinearTmm(wl=self.wlGen, pol=self.polGen, mode=_NonlinearTmm.MODE_NONLINEAR)
 
-        for i in range(len(self.layers)):
-            d, n, chi2 = self.layers[i]
+        for i, (d, n, chi2) in enumerate(self.layers):
             (E0P1F, E0P1B), _ = self.tmmP1.layers[i].GetAmplitudes()
             (E0P2F, E0P2B), _ = self.tmmP2.layers[i].GetAmplitudes()
             kzFP1, kzFP2 = self.tmmP1.layers[i].hw.kzF, self.tmmP2.layers[i].hw.kzF
@@ -698,18 +696,18 @@ class SecondOrderNLTmm(Core.ParamsBaseClass):
             res["enhP2"] = np.zeros((len(paramValues[0])))
 
         for i in range(len(paramValues[0])):
-            for j in range(len(paramNames)):
-                self.SetParams(**{paramNames[j]: paramValues[j][i]})
+            for name, values in zip(paramNames, paramValues):
+                self.SetParams(**{name: values[i]})
 
             rrP1, rrP2, rrGen = self.Solve()
             res["betasGen"][i] = self.tmmGen.beta.real
 
-            for j in range(len(keysP1)):
-                res[keysP1[j]][i] = rrP1[j]
-            for j in range(len(keysP2)):
-                res[keysP2[j]][i] = rrP2[j]
-            for j in range(len(keysGen)):
-                res[keysGen[j]][i] = rrGen[j]
+            for key, val in zip(keysP1, rrP1):
+                res[key][i] = val
+            for key, val in zip(keysP2, rrP2):
+                res[key][i] = val
+            for key, val in zip(keysGen, rrGen):
+                res[key][i] = val
 
             if enhpos is not None:
                 enhLayer, enhDist = enhpos

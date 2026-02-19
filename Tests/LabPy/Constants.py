@@ -222,26 +222,6 @@ def OmegaToEv(omega: ArrayLike) -> ArrayLike:
 # ===============================================================================
 
 
-def GetDistributionNames() -> list[str]:
-    res = ["DetlaDistribution", "NormalDistribution", "LogNormalDistribution", "LogNormalDistributionLocal"]
-    return res
-
-
-def Distribution(
-    name: str, **kwargs: Any
-) -> DetlaDistribution | NormalDistribution | LogNormalDistribution | LogNormalDistributionLocal:
-    if name == "DetlaDistribution":
-        return DetlaDistribution(**kwargs)
-    elif name == "NormalDistribution":
-        return NormalDistribution(**kwargs)
-    elif name == "LogNormalDistribution":
-        return LogNormalDistribution(**kwargs)
-    elif name == "LogNormalDistributionLocal":
-        return LogNormalDistributionLocal(**kwargs)
-    else:
-        raise ValueError("Unknown distribution name")
-
-
 class DetlaDistribution(Core.ParamsBaseClass):
     """This class presents delta function distribution.
 
@@ -450,3 +430,27 @@ class LogNormalDistributionLocal(Core.ParamsBaseClass):
 
         ws = self.__call__(xs)
         return xs, ws
+
+
+# ===============================================================================
+# Distribution factory
+# ===============================================================================
+
+_DISTRIBUTIONS: dict[str, type] = {
+    "DetlaDistribution": DetlaDistribution,
+    "NormalDistribution": NormalDistribution,
+    "LogNormalDistribution": LogNormalDistribution,
+    "LogNormalDistributionLocal": LogNormalDistributionLocal,
+}
+
+
+def GetDistributionNames() -> list[str]:
+    return list(_DISTRIBUTIONS)
+
+
+def Distribution(
+    name: str, **kwargs: Any
+) -> DetlaDistribution | NormalDistribution | LogNormalDistribution | LogNormalDistributionLocal:
+    if name not in _DISTRIBUTIONS:
+        raise ValueError(f"Unknown distribution name: {name}")
+    return _DISTRIBUTIONS[name](**kwargs)

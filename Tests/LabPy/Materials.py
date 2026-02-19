@@ -2,11 +2,10 @@ from __future__ import annotations
 
 import math
 import os
+from bisect import bisect_left, bisect_right
 from pathlib import Path
 from typing import Any
 
-import bisect
-import fnmatch
 import numpy as np
 import yaml
 from numpy.typing import ArrayLike, NDArray
@@ -35,11 +34,7 @@ def GetMaterialsList() -> list[str]:
 
     """
     res = ["Static"]
-    for root, _, files in os.walk(materialsDir):
-        root = root[len(str(materialsDir)) + 1 :]
-        files[:] = fnmatch.filter(files, "*.yml")
-        files = [str(Path(root) / fn)[:-4] for fn in files]
-        res.extend(files)
+    res.extend(str(p.relative_to(materialsDir).with_suffix("")) for p in sorted(materialsDir.rglob("*.yml")))
     return res
 
 
@@ -57,10 +52,7 @@ def SaveMaterialFile(
         data["REFERENCES"] = "e"
         data["COMMENTS"] = "f"
 
-        nkData = []
-        for wl, n in zip(wls, n):
-            nkData.append(f"{1e6 * wl} {n.real} {n.imag}")
-        nkData = "\n".join(nkData)
+        nkData = "\n".join(f"{1e6 * wl_val} {n_val.real} {n_val.imag}" for wl_val, n_val in zip(wls, n))
 
         class literal_unicode(str):
             pass
@@ -159,8 +151,8 @@ class Material(Core.ParamsBaseClass):
            tuple_of_arrays:  wavelength and complex refractive index arrays
 
         """
-        index1 = bisect.bisect_left(self.wlExp, wlFr)
-        index2 = bisect.bisect_right(self.wlExp, wlTo)
+        index1 = bisect_left(self.wlExp, wlFr)
+        index2 = bisect_right(self.wlExp, wlTo)
 
         wls = self.wlExp[index1:index2]
         n = self.nExp[index1:index2] + 1.0j * self.kExp[index1:index2]
@@ -177,22 +169,21 @@ class Material(Core.ParamsBaseClass):
 
         if dataType == "nk":
             data = np.zeros((len(dataStr), 3))
-        elif dataType == "n" or dataType == "k":
+        elif dataType in ("n", "k"):
             data = np.zeros((len(dataStr), 2))
         else:
             raise ValueError("Unknown data type.")
 
-        for i in range(len(dataStr)):
-            data[i, :] = np.array(list(map(float, dataStr[i].split())))
+        for i, line in enumerate(dataStr):
+            data[i, :] = np.array(list(map(float, line.split())))
 
-        if dataType == "nk":
-            self.wlExp, self.nExp, self.kExp = data.T
-        elif dataType == "n":
-            self.wlExp, self.nExp = data.T
-        elif dataType == "k":
-            self.wlExp, self.kExp = data.T
-        else:
-            raise ValueError("Unknown data type.")
+        match dataType:
+            case "nk":
+                self.wlExp, self.nExp, self.kExp = data.T
+            case "n":
+                self.wlExp, self.nExp = data.T
+            case "k":
+                self.wlExp, self.kExp = data.T
 
         # Convert wavelength to SI units
         self.wlExp *= 1e-6
@@ -210,27 +201,29 @@ class Material(Core.ParamsBaseClass):
             wlRange = 1e-6 * np.array(dataFormula["range"].split()).astype(float)
             dispType = dataFormula["type"]
             coefs = np.array(dataFormula["coefficients"].split()).astype(float)
-            if dispType == 4:
-                self.nFunc = lambda wl: _DispersionFunc4(wl, coefs)
-            elif dispType == 2:
-                self.nFunc = lambda wl: _DispersionFunc2(wl, coefs)
-            elif dispType == 1:
-                self.nFunc = lambda wl: _DispersionFunc1(wl, coefs)
-            else:
-                raise NotImplementedError()
+            match dispType:
+                case 4:
+                    self.nFunc = lambda wl: _DispersionFunc4(wl, coefs)
+                case 2:
+                    self.nFunc = lambda wl: _DispersionFunc2(wl, coefs)
+                case 1:
+                    self.nFunc = lambda wl: _DispersionFunc1(wl, coefs)
+                case _:
+                    raise NotImplementedError(f"Unsupported dispersion type: {dispType}")
             self.isFormula = True
             self.wlRange = wlRange
 
         if "DATA" in self.rawData and isinstance(self.rawData["DATA"], list):
             coefs = np.array(self.rawData["DATA"][0]["coefficients"].split()).astype(float)
-            if self.rawData["DATA"][0]["type"] == "formula 1":
-                self.nFunc = lambda wl: _DisperisonFuncFormula1(wl, coefs)
-            elif self.rawData["DATA"][0]["type"] == "formula 2":
-                self.nFunc = lambda wl: _DisperisonFuncFormula2(wl, coefs)
-            elif self.rawData["DATA"][0]["type"] == "formula 5":
-                self.nFunc = lambda wl: _DisperisonFuncFormula5(wl, coefs)
-            else:
-                raise NotImplementedError()
+            match self.rawData["DATA"][0]["type"]:
+                case "formula 1":
+                    self.nFunc = lambda wl: _DisperisonFuncFormula1(wl, coefs)
+                case "formula 2":
+                    self.nFunc = lambda wl: _DisperisonFuncFormula2(wl, coefs)
+                case "formula 5":
+                    self.nFunc = lambda wl: _DisperisonFuncFormula5(wl, coefs)
+                case _ as formula_type:
+                    raise NotImplementedError(f"Unsupported formula type: {formula_type}")
 
 
 # ===============================================================================
