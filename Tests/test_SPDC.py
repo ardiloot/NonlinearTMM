@@ -1,10 +1,27 @@
-import pytest
+from __future__ import annotations
+
+import math
+
 import numpy as np
+import pytest
 from LabPy import Constants
-from NonlinearTMM import SecondOrderNLTMM, Material
+
+from NonlinearTMM import Material, SecondOrderNLTMM
 
 
-def SpdcPowerQuantum(wlP1, wlP2, betaP1, betaP2, nF, chi2, crystalL, pwrP1, dwl, solidAngleSpdc, deltaThetaSpdc):
+def SpdcPowerQuantum(
+    wlP1: float,
+    wlP2: float,
+    betaP1: float,
+    betaP2: np.ndarray,
+    nF: object,
+    chi2: float,
+    crystalL: float,
+    pwrP1: float,
+    dwl: float,
+    solidAngleSpdc: float,
+    deltaThetaSpdc: float,
+) -> np.ndarray:
     wlGen = Constants.OmegaToWl(Constants.WlToOmega(wlP1) - Constants.WlToOmega(wlP2))
     betaGen = wlGen * (betaP1 / wlP1 - betaP2 / wlP2)
 
@@ -128,9 +145,9 @@ def tmmParams(crystalD, pwrP1, n1, n2):
     tmm.Gen.SetParams(pol=polGen)
 
     # Add layers
-    tmm.AddLayer(float("inf"), prism)
+    tmm.AddLayer(math.inf, prism)
     tmm.AddLayer(crystalD, crystal)
-    tmm.AddLayer(float("inf"), dielectric)
+    tmm.AddLayer(math.inf, dielectric)
 
     return tmm, prism, chi2, w0, Ly
 

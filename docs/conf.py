@@ -1,5 +1,5 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+from __future__ import annotations
+
 #
 # NonlinearTMM documentation build configuration file, created by
 # sphinx-quickstart on Thu Mar 16 11:48:15 2017.
@@ -12,16 +12,15 @@
 #
 # All configuration values have a default; values that are commented out
 # serve to show the default.
-
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-import os
-import sys
 import importlib.metadata
+import sys
+from pathlib import Path
 
-sys.path.insert(0, os.path.abspath(".."))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 # -- General configuration ------------------------------------------------
 
@@ -41,23 +40,7 @@ extensions = [
     "sphinx.ext.githubpages",
     "sphinx.ext.autosummary",
     "numpydoc",
-    #'sphinx.ext.napoleon'
 ]
-
-# sphinx.ext.linkcode
-
-# Napoleon settings
-napoleon_google_docstring = True
-napoleon_numpy_docstring = True
-napoleon_include_init_with_doc = False
-napoleon_include_private_with_doc = False
-napoleon_include_special_with_doc = True
-napoleon_use_admonition_for_examples = False
-napoleon_use_admonition_for_notes = False
-napoleon_use_admonition_for_references = False
-napoleon_use_ivar = False
-napoleon_use_param = True
-napoleon_use_rtype = True
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
@@ -68,12 +51,12 @@ templates_path = ["_templates"]
 # source_suffix = ['.rst', '.md']
 source_suffix = ".rst"
 
-# The master toctree document.
-master_doc = "index"
+# The root toctree document.
+root_doc = "index"
 
 # General information about the project.
 project = "NonlinearTMM"
-copyright = "2017, Ardi Loot"
+copyright = "2017-2025, Ardi Loot"
 author = "Ardi Loot"
 
 # The version info for the project you're documenting, acts as replacement for
@@ -156,7 +139,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, "NonlinearTMM.tex", "NonlinearTMM Documentation", "Ardi Loot", "manual"),
+    (root_doc, "NonlinearTMM.tex", "NonlinearTMM Documentation", "Ardi Loot", "manual"),
 ]
 
 
@@ -164,7 +147,7 @@ latex_documents = [
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [(master_doc, "nonlineartmm", "NonlinearTMM Documentation", [author], 1)]
+man_pages = [(root_doc, "nonlineartmm", "NonlinearTMM Documentation", [author], 1)]
 
 
 # -- Options for Texinfo output -------------------------------------------
@@ -174,7 +157,7 @@ man_pages = [(master_doc, "nonlineartmm", "NonlinearTMM Documentation", [author]
 #  dir menu entry, description, category)
 texinfo_documents = [
     (
-        master_doc,
+        root_doc,
         "NonlinearTMM",
         "NonlinearTMM Documentation",
         author,

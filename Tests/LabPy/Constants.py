@@ -11,9 +11,15 @@ Attributes:
 
 """
 
+from __future__ import annotations
+
 import math
+from typing import Any
+
 import numpy as np
-from LabPy import Core  # @UnresolvedImport
+from numpy.typing import ArrayLike
+
+from LabPy import Core
 
 # ===============================================================================
 # Definition of constants
@@ -35,7 +41,7 @@ kB = 1.38064852e-23
 # ===============================================================================
 
 
-def WlToJoule(wl):
+def WlToJoule(wl: ArrayLike) -> ArrayLike:
     """Converts wavelength (m) to photon energy (J).
 
     Args:
@@ -49,7 +55,7 @@ def WlToJoule(wl):
     return E
 
 
-def WlToEv(wl):
+def WlToEv(wl: ArrayLike) -> ArrayLike:
     """Converts wavelength (m) to energy (eV).
 
     Args:
@@ -63,7 +69,7 @@ def WlToEv(wl):
     return ev
 
 
-def WlToFreq(wl):
+def WlToFreq(wl: ArrayLike) -> ArrayLike:
     """Converts wavelength to frequency (Hz).
 
     Args:
@@ -77,7 +83,7 @@ def WlToFreq(wl):
     return freq
 
 
-def WlToOmega(wl):
+def WlToOmega(wl: ArrayLike) -> ArrayLike:
     """Converts wavelength to angular frequency (rad/s).
 
     Args:
@@ -96,7 +102,7 @@ def WlToOmega(wl):
 # ===============================================================================
 
 
-def JouleToWl(E):
+def JouleToWl(E: ArrayLike) -> ArrayLike:
     """Converts energy of a photon (J) to wavelength (m).
 
     Args:
@@ -110,7 +116,7 @@ def JouleToWl(E):
     return wl
 
 
-def EvToWl(ev):
+def EvToWl(ev: ArrayLike) -> ArrayLike:
     """Converts energy (eV) to wavelength (m).
 
     Args:
@@ -124,7 +130,7 @@ def EvToWl(ev):
     return wl
 
 
-def FreqToWl(freq):
+def FreqToWl(freq: ArrayLike) -> ArrayLike:
     """Converts frequency (1/s) to wavelength (m).
 
     Args:
@@ -138,7 +144,7 @@ def FreqToWl(freq):
     return wl
 
 
-def OmegaToWl(omega):
+def OmegaToWl(omega: ArrayLike) -> ArrayLike:
     """Converts angular frequency (rad/s) to wavelength (m).
 
     Args:
@@ -157,7 +163,7 @@ def OmegaToWl(omega):
 # ===============================================================================
 
 
-def EvToJoule(ev):
+def EvToJoule(ev: ArrayLike) -> ArrayLike:
     """Converts eV-s to joules.
 
     Args:
@@ -171,7 +177,7 @@ def EvToJoule(ev):
     return ev * qe
 
 
-def JouleToEv(E):
+def JouleToEv(E: ArrayLike) -> ArrayLike:
     """Converts joules to eV-s.
 
     Args:
@@ -185,7 +191,7 @@ def JouleToEv(E):
     return E / qe
 
 
-def EvToOmega(ev):
+def EvToOmega(ev: ArrayLike) -> ArrayLike:
     """Converts eV-s to angular frequency.
 
     Args:
@@ -198,7 +204,7 @@ def EvToOmega(ev):
     return 2.0 * math.pi * ev * qe / h
 
 
-def OmegaToEv(omega):
+def OmegaToEv(omega: ArrayLike) -> ArrayLike:
     """Converts angular frequency to eV-s.
 
     Args:
@@ -216,24 +222,6 @@ def OmegaToEv(omega):
 # ===============================================================================
 
 
-def GetDistributionNames():
-    res = ["DetlaDistribution", "NormalDistribution", "LogNormalDistribution", "LogNormalDistributionLocal"]
-    return res
-
-
-def Distribution(name, **kwargs):
-    if name == "DetlaDistribution":
-        return DetlaDistribution(**kwargs)
-    elif name == "NormalDistribution":
-        return NormalDistribution(**kwargs)
-    elif name == "LogNormalDistribution":
-        return LogNormalDistribution(**kwargs)
-    elif name == "LogNormalDistributionLocal":
-        return LogNormalDistributionLocal(**kwargs)
-    else:
-        raise ValueError("Unknown distribution name")
-
-
 class DetlaDistribution(Core.ParamsBaseClass):
     """This class presents delta function distribution.
 
@@ -244,13 +232,13 @@ class DetlaDistribution(Core.ParamsBaseClass):
 
     """
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs: Any) -> None:
         self._params = ["x0"]
         self.x0 = 0.0
 
-        super(DetlaDistribution, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
-    def __call__(self, x):
+    def __call__(self, x: float) -> float:
         """Returns distribution value at position x.
 
         Args:
@@ -265,7 +253,7 @@ class DetlaDistribution(Core.ParamsBaseClass):
         else:
             return 0.0
 
-    def GetDist(self):
+    def GetDist(self) -> tuple[np.ndarray, np.ndarray]:
         """Function returns (np.array([x0]), np.array([1.0])).
 
         Returns:
@@ -287,7 +275,7 @@ class NormalDistribution(Core.ParamsBaseClass):
 
     """
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs: Any) -> None:
         self._params = ["x0", "std", "nPoints", "rangeB", "rangeE"]
         self.x0 = 50e-9
         self.std = 10e-9
@@ -295,9 +283,9 @@ class NormalDistribution(Core.ParamsBaseClass):
         self.rangeB = 3.0
         self.rangeE = 3.0
 
-        super(NormalDistribution, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
-    def __call__(self, x):
+    def __call__(self, x: ArrayLike) -> ArrayLike:
         """Returns distribution value at position x.
 
         Args:
@@ -311,7 +299,7 @@ class NormalDistribution(Core.ParamsBaseClass):
 
         return res
 
-    def GetDist(self):
+    def GetDist(self) -> tuple[np.ndarray, np.ndarray]:
         """Function returns distribution at nPoints sampling points.
 
         The sampling range is from max(1e-16, x0 - rangeB * std) to \
@@ -339,10 +327,10 @@ class LogNormalDistribution(NormalDistribution):
 
     """
 
-    def __init__(self, **kwargs):
-        super(LogNormalDistribution, self).__init__(**kwargs)
+    def __init__(self, **kwargs: Any) -> None:
+        super().__init__(**kwargs)
 
-    def __call__(self, x):
+    def __call__(self, x: ArrayLike) -> ArrayLike:
         """Returns distribution value at position x.
 
         Args:
@@ -364,7 +352,7 @@ class LogNormalDistribution(NormalDistribution):
 
         return res
 
-    def GetDist(self):
+    def GetDist(self) -> tuple[np.ndarray, np.ndarray]:
         """Function returns distribution at nPoints sampling points.
 
         The sampling range is from max(1e-16, x0 - rangeB * std) to \
@@ -395,7 +383,7 @@ class LogNormalDistributionLocal(Core.ParamsBaseClass):
 
     """
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs: Any) -> None:
         self._params = ["xCoef", "xOffset", "mu", "sigma", "nPoints", "distB", "distE"]
         self.xCoef = 1.0
         self.xOffset = 0.0
@@ -405,9 +393,9 @@ class LogNormalDistributionLocal(Core.ParamsBaseClass):
         self.distB = 0.0
         self.distE = 3.0
 
-        super(LogNormalDistributionLocal, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
-    def __call__(self, x):
+    def __call__(self, x: ArrayLike) -> ArrayLike:
         """Returns distribution value at position x.
 
         Args:
@@ -428,7 +416,7 @@ class LogNormalDistributionLocal(Core.ParamsBaseClass):
 
         return res
 
-    def GetDist(self):
+    def GetDist(self) -> tuple[np.ndarray, np.ndarray]:
         """Function returns distribution at nPoints sampling points.
 
         The sampling range is from max(1e-16, distB) to \
@@ -444,14 +432,25 @@ class LogNormalDistributionLocal(Core.ParamsBaseClass):
         return xs, ws
 
 
-if __name__ == "__main__":
-    pass
-#     import pylab as plt
-#     dist = LogNormalDistribution(x0 = 10.0, std = 5.0)
-#     print dist.GetParams()
-#     xs, ws = dist.GetDist()
-#
-#     plt.figure()
-#     plt.plot(xs, ws, "x-")
-#     plt.show()
-#
+# ===============================================================================
+# Distribution factory
+# ===============================================================================
+
+_DISTRIBUTIONS: dict[str, type] = {
+    "DetlaDistribution": DetlaDistribution,
+    "NormalDistribution": NormalDistribution,
+    "LogNormalDistribution": LogNormalDistribution,
+    "LogNormalDistributionLocal": LogNormalDistributionLocal,
+}
+
+
+def GetDistributionNames() -> list[str]:
+    return list(_DISTRIBUTIONS)
+
+
+def Distribution(
+    name: str, **kwargs: Any
+) -> DetlaDistribution | NormalDistribution | LogNormalDistribution | LogNormalDistributionLocal:
+    if name not in _DISTRIBUTIONS:
+        raise ValueError(f"Unknown distribution name: {name}")
+    return _DISTRIBUTIONS[name](**kwargs)

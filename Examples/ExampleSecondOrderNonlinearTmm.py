@@ -1,6 +1,11 @@
+from __future__ import annotations
+
+import math
+
+import matplotlib.pyplot as plt
 import numpy as np
-import pylab as plt
-from NonlinearTMM import SecondOrderNLTMM, Material
+
+from NonlinearTMM import Material, SecondOrderNLTMM
 
 if __name__ == "__main__":
     # Define params
@@ -29,15 +34,15 @@ if __name__ == "__main__":
     tmm.Gen.SetParams(pol="s")
 
     # Add layers
-    tmm.AddLayer(float("inf"), prism)
+    tmm.AddLayer(math.inf, prism)
     tmm.AddLayer(crystalD, crystal)
-    tmm.AddLayer(float("inf"), dielectric)
+    tmm.AddLayer(math.inf, dielectric)
 
     # Sweep over beta = sin(th) * n_prism
     sr = tmm.Sweep("beta", betas, betas)
 
     # Plot generated reflection and transmission
-    plt.title("SHG generation from crystal (d = %.0f $\mu m$)" % (1e6 * crystalD))
+    plt.title(rf"SHG generation from crystal (d = {1e6 * crystalD:.0f} $\mu m$)")
     plt.plot(betas, sr.Gen.Ir, label="R")
     plt.plot(betas, sr.Gen.It, label="T")
     plt.legend()

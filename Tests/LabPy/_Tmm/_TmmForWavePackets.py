@@ -1,6 +1,15 @@
-import numpy as np
-from LabPy import Core, Constants
+from __future__ import annotations
+
+import logging
 from time import time
+from typing import Any
+
+import numpy as np
+from numpy.typing import NDArray
+
+from LabPy import Constants, Core
+
+logger = logging.getLogger(__name__)
 
 __all__ = ["PlaneWave", "GaussianWave", "GaussianWaveFFT", "TukeyWaveFFT", "TmmForWaves", "SecondOrderNLTmmForWaves"]
 
@@ -10,13 +19,13 @@ __all__ = ["PlaneWave", "GaussianWave", "GaussianWaveFFT", "TukeyWaveFFT", "TmmF
 
 
 class PlaneWave(Core.ParamsBaseClass):
-    def __init__(self, params=[], **kwargs):
+    def __init__(self, params: list[str] | None = None, **kwargs: Any) -> None:
         paramsThis = ["pwr", "overrideE0", "w0", "n", "Ly"]
         self.overrideE0 = None  # E0 specified in vacuum, not in first layer
         self.Ly = None
-        super(PlaneWave, self).__init__(params + paramsThis, **kwargs)
+        super().__init__((params or []) + paramsThis, **kwargs)
 
-    def Solve(self, wl, th0, **kwargs):
+    def Solve(self, wl: float, th0: float, **kwargs: Any) -> None:
         self.wl = wl
         self.th0 = th0
         self.SetParams(**kwargs)
@@ -24,20 +33,20 @@ class PlaneWave(Core.ParamsBaseClass):
         self._Precalc()
         self._Solve()
 
-    def _Precalc(self):
+    def _Precalc(self) -> None:
         if self.overrideE0 is None:
             self.I0 = self.pwr / (self.Ly * self.w0)
             self.E0 = np.sqrt(2.0 * Constants.mu0 * Constants.c * self.I0)
             # E0 in vacuum, not in 1st layer
-            print("E0 vacuum", self.E0)
+            logger.debug("E0 vacuum %s", self.E0)
         else:
             self.E0 = self.overrideE0
 
         self.k0 = 2.0 * np.pi / self.wl
         self.k = self.k0 * self.n(self.wl).real
-        print("_Precalc", self.E0)
+        logger.debug("_Precalc %s", self.E0)
 
-    def _Solve(self):
+    def _Solve(self) -> None:
         self.phis = np.array([0.0])
         self.kxs = np.array([self.k * np.sin(self.th0)])
         self.kzs = np.array([self.k * np.cos(self.th0)])
@@ -52,13 +61,13 @@ class PlaneWave(Core.ParamsBaseClass):
 
 
 class GaussianWave(PlaneWave):
-    def __init__(self, params=[], **kwargs):
+    def __init__(self, params: list[str] | None = None, **kwargs: Any) -> None:
         paramsThis = ["integCriteria", "nPointsInteg"]
         self.nPointsInteg = 30
         self.integCriteria = 1e-3
-        super(GaussianWave, self).__init__(params + paramsThis, **kwargs)
+        super().__init__((params or []) + paramsThis, **kwargs)
 
-    def _Solve(self):
+    def _Solve(self) -> None:
         self._phiLim = np.arcsin(2.0 / self.w0 * np.sqrt(-np.log(self.integCriteria)) / self.k)
         self.phis = np.linspace(-self._phiLim, self._phiLim, self.nPointsInteg)
 
@@ -79,17 +88,17 @@ class GaussianWave(PlaneWave):
 
 
 class WaveFFT(PlaneWave):
-    def __init__(self, params=[], **kwargs):
+    def __init__(self, params: list[str] | None = None, **kwargs: Any) -> None:
         paramsThis = ["nPointsInteg", "maxPhi", "integCriteria"]
         self.nPointsInteg = 30
         self.maxPhi = np.radians(0.5)
         self.integCriteria = 1e-3
-        PlaneWave.__init__(self, params + paramsThis, **kwargs)
+        super().__init__((params or []) + paramsThis, **kwargs)
 
-    def _FieldProfile(self, xs):
+    def _FieldProfile(self, xs: NDArray) -> NDArray:
         raise NotImplementedError()
 
-    def _Solve(self, maxPhiForce=None):
+    def _Solve(self, maxPhiForce: float | None = None) -> None:
         maxKxp = np.sin(self.maxPhi if maxPhiForce is None else maxPhiForce) * self.k
         dx = np.pi / maxKxp
         xs = np.arange(-0.5 * dx * self.nPointsInteg, 0.5 * dx * self.nPointsInteg, dx)
@@ -110,7 +119,7 @@ class WaveFFT(PlaneWave):
 
             if index > 0:
                 newMaxPhi = abs(self.phis[max(index - 5, 0)])
-                print("newMaxPhi", np.degrees(newMaxPhi), cumSpectra[index])
+                logger.debug("newMaxPhi %s %s", np.degrees(newMaxPhi), cumSpectra[index])
                 self._Solve(newMaxPhi)
                 return
 
@@ -132,11 +141,11 @@ class WaveFFT(PlaneWave):
 
 
 class GaussianWaveFFT(WaveFFT):
-    def __init__(self, params=[], **kwargs):
-        paramsThis = []
-        WaveFFT.__init__(self, params + paramsThis, **kwargs)
+    def __init__(self, params: list[str] | None = None, **kwargs: Any) -> None:
+        paramsThis: list[str] = []
+        super().__init__((params or []) + paramsThis, **kwargs)
 
-    def _FieldProfile(self, xs):
+    def _FieldProfile(self, xs: NDArray) -> NDArray:
         res = self.E0 * np.exp(-(xs**2.0) / self.w0**2.0)
         return res
 
@@ -147,13 +156,13 @@ class GaussianWaveFFT(WaveFFT):
 
 
 class TukeyWaveFFT(WaveFFT):
-    def __init__(self, params=[], **kwargs):
+    def __init__(self, params: list[str] | None = None, **kwargs: Any) -> None:
         paramsThis = ["a"]
         self.a = 0.5
-        WaveFFT.__init__(self, params + paramsThis, **kwargs)
+        super().__init__((params or []) + paramsThis, **kwargs)
 
     @staticmethod
-    def TukeyFunc(xs, w0, a):
+    def TukeyFunc(xs: NDArray, w0: float, a: float) -> NDArray:
         lowering = 0.5 * np.cos(np.pi / (w0 * (1.0 - a)) * (xs - 0.5 * a * w0)) + 0.5
         raising = 0.5 * np.cos(np.pi / (w0 * (1.0 - a)) * (xs + 0.5 * (2.0 - a) * w0) + np.pi) + 0.5
 
@@ -164,7 +173,7 @@ class TukeyWaveFFT(WaveFFT):
         res[xs < -0.5 * w0 * (2.0 - a)] = 0.0
         return res
 
-    def _FieldProfile(self, xs):
+    def _FieldProfile(self, xs: NDArray) -> NDArray:
         res = self.E0 * self.TukeyFunc(xs, self.w0, self.a)
         return res
 
@@ -174,7 +183,10 @@ class TukeyWaveFFT(WaveFFT):
 # ===============================================================================
 
 
-def WavesIntegrator1D(wave, fieldsFunc):
+def WavesIntegrator1D(
+    wave: PlaneWave,
+    fieldsFunc: Any,
+) -> tuple[NDArray, NDArray]:
     resE, resH = None, None
     lastE, lastH = None, None
     dPhis = wave.phis[1:] - wave.phis[:-1]
@@ -197,13 +209,17 @@ def WavesIntegrator1D(wave, fieldsFunc):
     return resE, resH
 
 
-def WavesIntegrator2D(wave1, wave2, fieldsFunc):
+def WavesIntegrator2D(
+    wave1: PlaneWave,
+    wave2: PlaneWave,
+    fieldsFunc: Any,
+) -> tuple[NDArray, NDArray]:
     resE, resH = None, None
     lastE, lastH = None, None
     dPhis = wave1.phis[1:] - wave1.phis[:-1]
 
     for i in range(len(wave1.betas)):
-        fieldsFunc2 = lambda w, nr: fieldsFunc(wave1, i, w, nr)
+        fieldsFunc2 = lambda w, nr, _i=i: fieldsFunc(wave1, _i, w, nr)
         fieldsE, fieldsH = WavesIntegrator1D(wave2, fieldsFunc2)
 
         if len(wave1.betas) == 1:
@@ -228,15 +244,15 @@ def WavesIntegrator2D(wave1, wave2, fieldsFunc):
 
 
 class TmmForWaves(Core.ParamsBaseClass):
-    def __init__(self, tmm, wave, **kwargs):
+    def __init__(self, tmm: object, wave: PlaneWave, **kwargs: Any) -> None:
         self._params = ["th0", "pol"]
         self.wave = wave
         self.tmm = tmm
         self.th0 = None
         self.pol = None
-        super(TmmForWaves, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
-    def CalcFields2d(self, xs, ys, **kwargs):
+    def CalcFields2d(self, xs: NDArray, ys: NDArray, **kwargs: Any) -> tuple[NDArray, NDArray]:
 
         def IntegFunc(wave, nr):
             self.tmm.SetParam(beta=wave.betas[nr])
@@ -260,7 +276,7 @@ class TmmForWaves(Core.ParamsBaseClass):
 
 
 class SecondOrderNLTmmForWaves(Core.ParamsBaseClass):
-    def __init__(self, tmmNL, wave1, wave2, **kwargs):
+    def __init__(self, tmmNL: object, wave1: PlaneWave, wave2: PlaneWave, **kwargs: Any) -> None:
         self._params = ["thP1", "thP2"]
         self.tmmNL = tmmNL
         self.wave1 = wave1
@@ -268,37 +284,37 @@ class SecondOrderNLTmmForWaves(Core.ParamsBaseClass):
         self.thP1 = None
         self.thP2 = None
 
-        super(SecondOrderNLTmmForWaves, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     # Powers (porks only in linear media!)
 
-    def CalcPowersP1(self, layerNr, x0, x1, z, **kwargs):
+    def CalcPowersP1(self, layerNr: int, x0: float, x1: float, z: float, **kwargs: Any) -> tuple[float, float]:
         self.SetParams(**kwargs)
         res = self._CalcPowersPump(self.tmmNL.tmmP1, self.thP1, self.wave1, layerNr, x0, x1, z)
         return res
 
-    def CalcPowersP2(self, x0, x1, z, **kwargs):
+    def CalcPowersP2(self, x0: float, x1: float, z: float, **kwargs: Any) -> tuple[float, float]:
         self.SetParams(**kwargs)
         res = self._CalcPowersPump(self.tmmNL.tmmP2, self.thP2, self.wave2, x0, x1, z)
         return res
 
-    def CalcPowersGen(self, layerNr, x0, x1, z, **kwargs):
+    def CalcPowersGen(self, layerNr: int, x0: float, x1: float, z: float, **kwargs: Any) -> tuple[float, float]:
         self.SetParams(**kwargs)
 
         # Solve wave
         starttime = time()
         self.wave1.Solve(self.tmmNL.wlP1, self.thP1, n=self.tmmNL.layers[0][1])
         self.wave2.Solve(self.tmmNL.wlP2, self.thP2, n=self.tmmNL.layers[0][1])
-        print("wave.Solve", time() - starttime)
+        logger.debug("wave.Solve %s", time() - starttime)
 
         # Init variables
         starttime = time()
-        kxs = np.zeros((len(self.wave1.kxs) * len(self.wave2.kxs)))
+        kxs = np.zeros(len(self.wave1.kxs) * len(self.wave2.kxs))
         UsF = np.zeros_like(kxs, dtype=complex)
         UsB = np.zeros_like(kxs, dtype=complex)
         kzsF = np.zeros_like(kxs, dtype=complex)
         kzsB = np.zeros_like(kxs, dtype=complex)
-        print("init variables", time() - starttime)
+        logger.debug("init variables %s", time() - starttime)
 
         # Solve system for every beta
         starttime = time()
@@ -318,7 +334,7 @@ class SecondOrderNLTmmForWaves(Core.ParamsBaseClass):
                 UsF[nr], UsB[nr] = U[0, 0], U[1, 0]
                 kzsF[nr] = self.tmmNL.tmmGen.layers[layerNr].hw.kzF
                 kzsB[nr] = self.tmmNL.tmmGen.layers[layerNr].hw.kzB
-        print("solve system", time() - starttime)
+        logger.debug("solve system %s", time() - starttime)
 
         # Sort by kx
         starttime = time()
@@ -328,7 +344,7 @@ class SecondOrderNLTmmForWaves(Core.ParamsBaseClass):
         UsB = UsB[sortP]
         kzsF = kzsF[sortP]
         kzsB = kzsB[sortP]
-        print("sorting", time() - starttime)
+        logger.debug("sorting %s", time() - starttime)
 
         Ly = self.wave1.Ly
         if self.wave2.Ly != Ly:
@@ -340,17 +356,17 @@ class SecondOrderNLTmmForWaves(Core.ParamsBaseClass):
 
     # Fields
 
-    def CalcFields2dP1(self, zs, xs, **kwargs):
+    def CalcFields2dP1(self, zs: NDArray, xs: NDArray, **kwargs: Any) -> tuple[NDArray, NDArray]:
         self.SetParams(**kwargs)
         res = self._CalcFields2dPump(self.tmmNL.tmmP1, self.thP1, self.wave1, zs, xs)
         return res
 
-    def CalcFields2dP2(self, zs, xs, **kwargs):
+    def CalcFields2dP2(self, zs: NDArray, xs: NDArray, **kwargs: Any) -> tuple[NDArray, NDArray]:
         self.SetParams(**kwargs)
         res = self._CalcFields2dPump(self.tmmNL.tmmP2, self.thP2, self.wave2, zs, xs)
         return res
 
-    def CalcFields2dGen(self, zs, xs, **kwargs):
+    def CalcFields2dGen(self, zs: NDArray, xs: NDArray, **kwargs: Any) -> tuple[NDArray, NDArray]:
         def IntegFunc(wave1, nr1, wave2, nr2):
             self.tmmNL.SetParams(
                 betaP1=wave1.betas[nr1],
@@ -370,7 +386,9 @@ class SecondOrderNLTmmForWaves(Core.ParamsBaseClass):
 
     # Private methods
 
-    def _CalcFields2dPump(self, tmmP, thP, wave, zs, xs):
+    def _CalcFields2dPump(
+        self, tmmP: object, thP: float, wave: PlaneWave, zs: NDArray, xs: NDArray
+    ) -> tuple[NDArray, NDArray]:
         def IntegFunc(wave, nr):
             tmmP.SetParams(beta=wave.betas[nr], overrideE0=wave.expansionCoefsPhi[nr])
             tmmP.Solve()
@@ -381,11 +399,13 @@ class SecondOrderNLTmmForWaves(Core.ParamsBaseClass):
         ESum, HSum = WavesIntegrator1D(wave, IntegFunc)
         return ESum, HSum
 
-    def _CalcPowersPump(self, tmmP, thP, wave, layerNr, x0, x1, z):
+    def _CalcPowersPump(
+        self, tmmP: object, thP: float, wave: PlaneWave, layerNr: int, x0: float, x1: float, z: float
+    ) -> tuple[float, float]:
         # Solve wave
         starttime = time()
         wave.Solve(tmmP.wl, thP, n=tmmP.layers[0].n)
-        print("wave.Solve", time() - starttime)
+        logger.debug("wave.Solve %s", time() - starttime)
 
         # Init variables
         starttime = time()
@@ -394,7 +414,7 @@ class SecondOrderNLTmmForWaves(Core.ParamsBaseClass):
         UsB = np.zeros_like(kxs, dtype=complex)
         kzsF = np.zeros_like(kxs, dtype=complex)
         kzsB = np.zeros_like(kxs, dtype=complex)
-        print("init variables", time() - starttime)
+        logger.debug("init variables %s", time() - starttime)
 
         # Solve system for every beta
         starttime = time()
@@ -405,18 +425,27 @@ class SecondOrderNLTmmForWaves(Core.ParamsBaseClass):
             UsF[nr], UsB[nr] = U[0, 0], U[1, 0]
             kzsF[nr] = tmmP.layers[layerNr].hw.kzF
             kzsB[nr] = tmmP.layers[layerNr].hw.kzB
-        print("solve system", time() - starttime)
+        logger.debug("solve system %s", time() - starttime)
 
         PF = self._IntegrateWavePower(tmmP, UsF, kxs, kzsF, layerNr, x0, x1, z, wave.Ly)
         PB = -self._IntegrateWavePower(tmmP, UsB, kxs, kzsB, layerNr, x0, x1, z, wave.Ly)
         return PF, PB
 
-    def _Integrate(self, xs, values):
-        dxs = xs[1:] - xs[:-1]
-        res = np.sum(dxs * 0.5 * (values[1:] + values[:-1]))
-        return res
+    def _Integrate(self, xs: NDArray, values: NDArray) -> complex:
+        return np.trapezoid(values, xs)
 
-    def _IntegrateWavePower(self, tmm, Us, kxs, kzs, layerNr, x0, x1, z, Ly):
+    def _IntegrateWavePower(
+        self,
+        tmm: object,
+        Us: NDArray,
+        kxs: NDArray,
+        kzs: NDArray,
+        layerNr: int,
+        x0: float,
+        x1: float,
+        z: float,
+        Ly: float,
+    ) -> float:
         # Integrate wave
         starttime = time()
 
@@ -451,10 +480,6 @@ class SecondOrderNLTmmForWaves(Core.ParamsBaseClass):
             P = Ly / (2.0 * omega * Constants.mu0) * (integ2d).real
         else:
             raise NotImplementedError()
-        print("integration", time() - starttime)
+        logger.debug("integration %s", time() - starttime)
 
         return P
-
-
-if __name__ == "__main__":
-    pass

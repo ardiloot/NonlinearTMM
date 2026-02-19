@@ -1,6 +1,13 @@
+from __future__ import annotations
+
+import math
+from typing import Any
+
 import numpy as np
+from numpy.typing import NDArray
+
 from LabPy import Constants, Core
-from LabPy.Constants import WlToOmega, OmegaToWl
+from LabPy.Constants import OmegaToWl, WlToOmega
 
 __all__ = ["Chi2Tensor", "SecondOrderNLTmm"]
 
@@ -13,8 +20,8 @@ Z = 2
 # ===============================================================================
 
 
-class Chi2Tensor(object):
-    def __init__(self, dtype=complex, distinctFields=True, **kwargs):
+class Chi2Tensor:
+    def __init__(self, dtype: type = complex, distinctFields: bool = True, **kwargs: Any) -> None:
         self._dIndices = [(0, 0), (1, 1), (2, 2), (1, 2), (0, 2), (0, 1)]
         self._chi2 = np.zeros((3, 3, 3), dtype=dtype)
         self._chi2Rotated = None
@@ -27,14 +34,14 @@ class Chi2Tensor(object):
 
         self.Update(**kwargs)
 
-    def Update(self, **kwargs):
+    def Update(self, **kwargs: Any) -> None:
         self._chi2RotatedChanged = True
         self.phiX = float(kwargs.pop("phiX", self.phiX))
         self.phiY = float(kwargs.pop("phiY", self.phiY))
         self.phiZ = float(kwargs.pop("phiZ", self.phiZ))
 
         # d-values
-        for k in list(kwargs.keys()):
+        for k in list(kwargs):
             if (not k.startswith("d")) or (len(k) != 3):
                 continue
             i1, (i2, i3) = int(k[1]) - 1, self._dIndices[int(k[2]) - 1]
@@ -42,17 +49,17 @@ class Chi2Tensor(object):
             self._chi2[i1, i3, i2] = self._chi2[i1, i2, i3]
 
         # chi2-values
-        for k in list(kwargs.keys()):
+        for k in list(kwargs):
             if (not k.startswith("chi")) or (len(k) != 6):
                 continue
             i1, i2, i3 = int(k[3]) - 1, int(k[4]) - 1, int(k[5]) - 1
             self._chi2[i1, i2, i3] = kwargs.pop(k)
 
         # Errors
-        for k in list(kwargs.keys()):
-            raise ValueError("Unknown kwarg %s" % (k))
+        for k in list(kwargs):
+            raise ValueError(f"Unknown kwarg {k}")
 
-    def GetChi2(self):
+    def GetChi2(self) -> NDArray:
         if not self._chi2RotatedChanged:
             return self._chi2Rotated
 
@@ -61,7 +68,7 @@ class Chi2Tensor(object):
         self._chi2RotatedChanged = False
         return self._chi2Rotated
 
-    def GetD(self):
+    def GetD(self) -> NDArray:
         res = np.zeros((3, 6), dtype=self._chi2.dtype)
         chi2 = self.GetChi2()
 
@@ -69,12 +76,12 @@ class Chi2Tensor(object):
             for j in range(6):
                 a, b = self._dIndices[j]
                 if abs(chi2[i, a, b] - chi2[i, b, a]) > 1e-20:
-                    raise ValueError("Not equal elements %s, %s" % ((i, a, b), (i, b, a)))
+                    raise ValueError(f"Not equal elements {(i, a, b)}, {(i, b, a)}")
 
                 res[i, j] = chi2[i, a, b]
         return res
 
-    def GetNonlinearPolarization(self, E1, E2):
+    def GetNonlinearPolarization(self, E1: NDArray, E2: NDArray) -> NDArray:
         chi2 = self.GetChi2()
         fieldTensor = np.outer(E1, E2)
         res = Constants.eps0 * np.tensordot(chi2, fieldTensor).flatten()
@@ -83,7 +90,7 @@ class Chi2Tensor(object):
             res *= 2.0
         return res
 
-    def GetChi2Eff(self, E1, E2, E3):
+    def GetChi2Eff(self, E1: NDArray, E2: NDArray, E3: NDArray) -> complex:
         E1Norm = (E1 / np.linalg.norm(E1)).flatten()
         E2Norm = (E2 / np.linalg.norm(E2)).flatten()
         E3Norm = (E3 / np.linalg.norm(E3)).flatten()
@@ -94,15 +101,20 @@ class Chi2Tensor(object):
             res *= 2.0
         return res
 
-    def GetDEff(self, E1, E2, E3):
+    def GetDEff(self, E1: NDArray, E2: NDArray, E3: NDArray) -> complex:
         chi2Eff = self.GetChi2Eff(E1, E2, E3)
         res = chi2Eff / 2.0
         return res
 
     @staticmethod
-    def _RotateTensorO3(tensor, phiX=0.0, phiY=0.0, phiZ=0.0):
+    def _RotateTensorO3(
+        tensor: NDArray,
+        phiX: float = 0.0,
+        phiY: float = 0.0,
+        phiZ: float = 0.0,
+    ) -> NDArray:
 
-        def ApplyRotationMatrix(inp, R):
+        def ApplyRotationMatrix(inp: NDArray, R: NDArray) -> NDArray:
             res = np.zeros_like(inp)
             for i1 in range(3):
                 for i2 in range(3):
@@ -130,11 +142,11 @@ class Chi2Tensor(object):
 # ===============================================================================
 
 
-class _HomogeneousWave(object):
-    def __init__(self, layer):
+class _HomogeneousWave:
+    def __init__(self, layer: _NonlinearLayer) -> None:
         self.layer = layer
 
-    def Solve(self, kx):
+    def Solve(self, kx: complex) -> None:
         layer = self.layer
 
         self.kx = kx
@@ -144,17 +156,17 @@ class _HomogeneousWave(object):
         self.kz = np.array([[self.kzF, self.kzB]]).T
 
         if self.kzF.imag < 0.0:
-            raise ValueError("kzF imaginary part negative %s" % (self.kzF))
+            raise ValueError(f"kzF imaginary part negative {self.kzF}")
 
         # Propagation matrix
 
-        if layer.d == float("inf"):
+        if layer.d == math.inf:
             self.propMatrix = np.identity(2, dtype=complex)
         else:
             phase = np.exp(1.0j * self.kzF * layer.d)
             self.propMatrix = np.array([[phase, 0.0], [0.0, 1.0 / phase]], dtype=complex)
 
-    def GetMainFields(self, zs):
+    def GetMainFields(self, zs: NDArray) -> NDArray:
         U0 = np.array([[self.layer.fieldAmps[0, 0], self.layer.fieldAmps[1, 0]]]).T
         U = U0 * np.exp(1.0j * self.kz * zs)
         return U
@@ -165,13 +177,13 @@ class _HomogeneousWave(object):
 # ===============================================================================
 
 
-class _InhomogeneosWave(object):
-    def __init__(self, layer):
+class _InhomogeneosWave:
+    def __init__(self, layer: _NonlinearLayer) -> None:
         self.layer = layer
 
-    def Solve(self, kx, kpS):
+    def Solve(self, kx: complex, kpS: tuple | None) -> None:
         layer = self.layer
-        kSzF, pF, pB = [0.0, [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]] if kpS == None else kpS
+        kSzF, pF, pB = [0.0, [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]] if kpS is None else kpS
 
         self.kx = kx
         self.kSzF = kSzF
@@ -221,17 +233,17 @@ class _InhomogeneosWave(object):
 
         # Propagation Matrix NL
 
-        if layer.d == float("inf"):
+        if layer.d == math.inf:
             self.propMatrixNL = np.array([[0.0, 0.0]], dtype=complex).T
             if self.isNonlinear:
-                print(NotImplementedError("First and last medium must be linear.!"))
+                raise NotImplementedError("First and last medium must be linear.")
         else:
             if self.isNonlinear:
                 self.propMatrixNL = self.By * (np.exp(1.0j * self.kSz * layer.d) - np.exp(1.0j * layer.hw.kz * layer.d))
             else:
                 self.propMatrixNL = np.array([[0.0, 0.0]], dtype=complex).T
 
-    def GetMainFields(self, zs):
+    def GetMainFields(self, zs: NDArray) -> NDArray:
         U = self.By * (np.exp(1.0j * self.kSz * zs) - np.exp(1.0j * self.layer.hw.kz * zs))
         return U
 
@@ -242,7 +254,7 @@ class _InhomogeneosWave(object):
 
 
 class _NonlinearLayer(Core.ParamsBaseClass):
-    def __init__(self, d, n, **kwargs):
+    def __init__(self, d: float, n: object, **kwargs: Any) -> None:
         self._params = ["d", "n", "kpS", "kpA"]
         self.d = d
         self.n = n
@@ -253,9 +265,9 @@ class _NonlinearLayer(Core.ParamsBaseClass):
         self.iws = _InhomogeneosWave(self)
         self.iwa = _InhomogeneosWave(self)
 
-        super(_NonlinearLayer, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
-    def Solve(self, wl, beta, pol, lastLayer=False):
+    def Solve(self, wl: float, beta: float, pol: str, lastLayer: bool = False) -> None:
         self.wl = wl
         self.beta = beta
         self.pol = pol
@@ -280,10 +292,10 @@ class _NonlinearLayer(Core.ParamsBaseClass):
         self.propMatrix = self.hw.propMatrix
         self.propMatrixNL = self.iws.propMatrixNL + self.iwa.propMatrixNL
 
-    def GetMainFields(self, zs):
+    def GetMainFields(self, zs: NDArray) -> NDArray:
         return self.hw.GetMainFields(zs) + self.iws.GetMainFields(zs) + self.iwa.GetMainFields(zs)
 
-    def GetFields(self, zs, outBackAndForward=False):
+    def GetFields(self, zs: NDArray, outBackAndForward: bool = False) -> tuple[NDArray, NDArray]:
         E = np.zeros((2, len(zs), 3), dtype=complex)
         H = np.zeros((2, len(zs), 3), dtype=complex)
 
@@ -321,20 +333,20 @@ class _NonlinearLayer(Core.ParamsBaseClass):
         else:
             return (E[0, :, :] + E[1, :, :]), (H[0, :, :] + H[1, :, :])
 
-    def GetAmplitudes(self, z=0.0):
+    def GetAmplitudes(self, z: float = 0.0) -> tuple[tuple[NDArray, NDArray], tuple[NDArray, NDArray]]:
         (E0FTemp, E0BTemp), (H0FTemp, H0BTemp) = self.GetFields(np.array([z]), outBackAndForward=True)
 
         E0F, E0B = E0FTemp[0, :], E0BTemp[0, :]
         H0F, H0B = H0FTemp[0, :], H0BTemp[0, :]
         return (E0F, E0B), (H0F, H0B)
 
-    def GetPowerFlow(self, z):
+    def GetPowerFlow(self, z: float) -> float:
         (E0F, E0B), (H0F, H0B) = self.GetAmplitudes(z=z)
         E, H = E0F + E0B, H0F + H0B
         Sz = 0.5 * (E[0] * np.conj(H[1]) - E[1] * np.conj(H[0])).real
         return Sz
 
-    def GetAbsorbedPower(self):
+    def GetAbsorbedPower(self) -> float:
         if self.eps.imag == 0.0:
             # If layer is not absorbing
             return 0.0
@@ -356,9 +368,9 @@ class _NonlinearLayer(Core.ParamsBaseClass):
         res = 0.5 * Constants.eps0 * self.eps.imag * self.omega * intValue
         return res.real
 
-    def GetSrcPower(self):
+    def GetSrcPower(self) -> float:
         absorbed = self.GetAbsorbedPower()
-        if self.d == float("inf"):
+        if self.d == math.inf:
             deltaS = 0.0
         else:
             deltaS = self.GetPowerFlow(self.d) - self.GetPowerFlow(0.0)
@@ -376,25 +388,26 @@ class _NonlinearTmm(Core.ParamsBaseClass):
     MODE_INCIDENT = "incident"
     MODE_NONLINEAR = "nonlinear"
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs: Any) -> None:
         self._params = ["wl", "beta", "pol", "I0", "overrideE0", "mode"]
         self.I0 = 1e10
         self.overrideE0 = None  # E0 specified in vacuum, not in first layer
-        self.layers = []
+        self.layers: list[_NonlinearLayer] = []
 
-        super(_NonlinearTmm, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
-    def AddLayer(self, *args, **kwargs):
+    def AddLayer(self, *args: Any, **kwargs: Any) -> None:
         self.layers.append(_NonlinearLayer(*args, **kwargs))
 
-    def Solve(self, **kwargs):
+    def Solve(self, **kwargs: Any) -> tuple:
         self.SetParams(**kwargs)
 
         # Solve all layers
 
-        for i in range(len(self.layers)):
+        for i, layer in enumerate(self.layers):
             last = i == len(self.layers) - 1
-            self.layers[i].Solve(self.wl, self.beta, self.pol, last)
+            layer.Solve(self.wl, self.beta, self.pol, last)
+
         # Solve system matrix
 
         mSysL, mSysNL = self.__SystemMatrix(len(self.layers))
@@ -460,11 +473,11 @@ class _NonlinearTmm(Core.ParamsBaseClass):
 
         return inc, r, t, I, R, T, A
 
-    def __TransferMatrix(self, layerNr):
+    def __TransferMatrix(self, layerNr: int) -> tuple[NDArray, NDArray]:
 
-        def TransferMatrixNL(w1, w2):
-            exp1F = np.exp(1.0j * w1.kSzF * l1.d) if l1.d != float("inf") else 0.0
-            exp1B = np.exp(-1.0j * w1.kSzF * l1.d) if l1.d != float("inf") else 0.0
+        def TransferMatrixNL(w1: _InhomogeneosWave, w2: _InhomogeneosWave) -> NDArray:
+            exp1F = np.exp(1.0j * w1.kSzF * l1.d) if l1.d != math.inf else 0.0
+            exp1B = np.exp(-1.0j * w1.kSzF * l1.d) if l1.d != math.inf else 0.0
             # exp1B = 1.0 / exp1F if l1.d != float("inf") else 0.0
 
             f1 = (w1.kSzF - l1.hw.kzF) * (w1.ByF * exp1F - w1.ByB * exp1B)
@@ -498,7 +511,7 @@ class _NonlinearTmm(Core.ParamsBaseClass):
 
         return transferMatrix, transferMatrixNL
 
-    def __SystemMatrix(self, nLayers):
+    def __SystemMatrix(self, nLayers: int) -> tuple[NDArray, NDArray]:
         # Independent of polarization
 
         mSysL = np.identity(2, dtype=complex)
@@ -516,7 +529,7 @@ class _NonlinearTmm(Core.ParamsBaseClass):
 
         return mSysL, mSysNL
 
-    def GetFields(self, zs, outBackAndForward=False):
+    def GetFields(self, zs: NDArray, outBackAndForward: bool = False) -> tuple[NDArray, NDArray]:
         if not outBackAndForward:
             resE = np.zeros((len(zs), 3), dtype=complex)
             resH = np.zeros((len(zs), 3), dtype=complex)
@@ -539,7 +552,7 @@ class _NonlinearTmm(Core.ParamsBaseClass):
 
         return resE, resH
 
-    def GetFields2D(self, zs, xs, outBackAndForward=False):
+    def GetFields2D(self, zs: NDArray, xs: NDArray, outBackAndForward: bool = False) -> tuple[NDArray, NDArray]:
         E1D, H1D = self.GetFields(zs, outBackAndForward=outBackAndForward)
         phaseX = np.exp(1.0j * 2.0 * np.pi / self.wl * self.beta * xs)
 
@@ -562,13 +575,10 @@ class _NonlinearTmm(Core.ParamsBaseClass):
 
         return resE, resH
 
-    def GetAbsorbedPower(self):
-        res = 0.0
-        for layer in self.layers:
-            res += layer.GetAbsorbedPower()
-        return res
+    def GetAbsorbedPower(self) -> float:
+        return sum(layer.GetAbsorbedPower() for layer in self.layers)
 
-    def __GetLayerIndexesAndDistances(self, zs):
+    def __GetLayerIndexesAndDistances(self, zs: NDArray) -> list[tuple[int, float, int, int]]:
         layerDsIndexes = []
         curLayer, curDist, layerDist, beginIndex = 0, 0.0, 0.0, 0
         for i in range(len(zs) + 1):
@@ -592,7 +602,7 @@ class SecondOrderNLTmm(Core.ParamsBaseClass):
     SFG = "sfg"
     DFG = "dfg"
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs: Any) -> None:
         self._params = [
             "I0P1",
             "wlP1",
@@ -607,18 +617,20 @@ class SecondOrderNLTmm(Core.ParamsBaseClass):
             "polGen",
             "process",
         ]
-        self.layers = []
+        self.layers: list[tuple] = []
         self.I0P1 = 1e10
         self.I0P2 = 1e10
         self.overrideE0P1 = None
         self.overrideE0P2 = None
         self.process = self.SFG
-        super(self.__class__, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
-    def AddLayer(self, d, n, chi2=Chi2Tensor()):
+    def AddLayer(self, d: float, n: object, chi2: Chi2Tensor | None = None) -> None:
+        if chi2 is None:
+            chi2 = Chi2Tensor()
         self.layers.append((d, n, chi2))
 
-    def Solve(self, **kwargs):
+    def Solve(self, **kwargs: Any) -> tuple:
         self.SetParams(**kwargs)
 
         self._SolveFundamentalFields()
@@ -636,12 +648,11 @@ class SecondOrderNLTmm(Core.ParamsBaseClass):
             kAzFunc = lambda kzFP1, kzFP2: kzFP1 + np.conj(kzFP2)
             pFunc = lambda chi2, E1, E2: chi2.GetNonlinearPolarization(E1, np.conj(E2))
         else:
-            raise ValueError("Unknown process: %s" % (self.process))
+            raise ValueError(f"Unknown process: {self.process}")
 
         self.tmmGen = _NonlinearTmm(wl=self.wlGen, pol=self.polGen, mode=_NonlinearTmm.MODE_NONLINEAR)
 
-        for i in range(len(self.layers)):
-            d, n, chi2 = self.layers[i]
+        for i, (d, n, chi2) in enumerate(self.layers):
             (E0P1F, E0P1B), _ = self.tmmP1.layers[i].GetAmplitudes()
             (E0P2F, E0P2B), _ = self.tmmP2.layers[i].GetAmplitudes()
             kzFP1, kzFP2 = self.tmmP1.layers[i].hw.kzF, self.tmmP2.layers[i].hw.kzF
@@ -664,34 +675,39 @@ class SecondOrderNLTmm(Core.ParamsBaseClass):
 
         return self.resP1, self.resP2, self.resGen
 
-    def Sweep(self, paramNames, paramValues, enhpos=None):
+    def Sweep(
+        self,
+        paramNames: list[str],
+        paramValues: list[NDArray],
+        enhpos: tuple[int, float] | None = None,
+    ) -> dict[str, NDArray]:
         keysP1 = ["iP1", "rP1", "tP1", "IP1", "RP1", "TP1", "AP1"]
         keysP2 = ["iP2", "rP2", "tP2", "IP2", "RP2", "TP2", "AP2"]
         keysGen = ["iGen", "rGen", "tGen", "IGen", "RGen", "TGen", "AGen"]
         res = {}
 
-        res["betasGen"] = np.zeros((len(paramValues[0])))
+        res["betasGen"] = np.zeros(len(paramValues[0]))
 
         for k in keysP1 + keysP2 + keysGen:
             res[k] = np.zeros((len(paramValues[0])), dtype=complex)
 
         if enhpos is not None:
-            res["enhP1"] = np.zeros((len(paramValues[0])))
-            res["enhP2"] = np.zeros((len(paramValues[0])))
+            res["enhP1"] = np.zeros(len(paramValues[0]))
+            res["enhP2"] = np.zeros(len(paramValues[0]))
 
-        for i in np.arange(len(paramValues[0])):
-            for j in range(len(paramNames)):
-                self.SetParams(**{paramNames[j]: paramValues[j][i]})
+        for i in range(len(paramValues[0])):
+            for name, values in zip(paramNames, paramValues):
+                self.SetParams(**{name: values[i]})
 
             rrP1, rrP2, rrGen = self.Solve()
             res["betasGen"][i] = self.tmmGen.beta.real
 
-            for j in np.arange(len(keysP1)):
-                res[keysP1[j]][i] = rrP1[j]
-            for j in np.arange(len(keysP2)):
-                res[keysP2[j]][i] = rrP2[j]
-            for j in np.arange(len(keysGen)):
-                res[keysGen[j]][i] = rrGen[j]
+            for key, val in zip(keysP1, rrP1):
+                res[key][i] = val
+            for key, val in zip(keysP2, rrP2):
+                res[key][i] = val
+            for key, val in zip(keysGen, rrGen):
+                res[key][i] = val
 
             if enhpos is not None:
                 enhLayer, enhDist = enhpos
@@ -712,7 +728,7 @@ class SecondOrderNLTmm(Core.ParamsBaseClass):
 
         return res
 
-    def _SolveFundamentalFields(self):
+    def _SolveFundamentalFields(self) -> None:
         # Solve fundametal field 1
         self.tmmP1 = _NonlinearTmm(
             I0=self.I0P1, overrideE0=self.overrideE0P1, wl=self.wlP1, pol=self.polP1, mode=_NonlinearTmm.MODE_INCIDENT
@@ -730,7 +746,3 @@ class SecondOrderNLTmm(Core.ParamsBaseClass):
         for d, n, _ in self.layers:
             self.tmmP2.AddLayer(d, n)
         self.resP2 = self.tmmP2.Solve(beta=self.betaP2)
-
-
-if __name__ == "__main__":
-    pass

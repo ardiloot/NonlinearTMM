@@ -1,26 +1,32 @@
-import numpy as np
-from os import path
-from scipy.interpolate import interp1d
-import fnmatch
-import yaml
-import bisect
-import os
-from LabPy import Core  # @UnresolvedImport
+from __future__ import annotations
 
-materialsDir = path.join(path.dirname(path.realpath(__file__)), r"../materials")
-if not path.isdir(materialsDir):
-    materialsDir = os.environ["PYLAB_MATERIALS_DIR"]
+import math
+import os
+from bisect import bisect_left, bisect_right
+from pathlib import Path
+from typing import Any
+
+import numpy as np
+import yaml
+from numpy.typing import ArrayLike, NDArray
+from scipy.interpolate import interp1d
+
+from LabPy import Core
+
+materialsDir = Path(__file__).resolve().parent / "../materials"
+if not materialsDir.is_dir():
+    materialsDir = Path(os.environ["PYLAB_MATERIALS_DIR"])
 
 # ===============================================================================
 # Methods
 # ===============================================================================
 
 
-def literal_unicode_representer(dumper, data):
+def literal_unicode_representer(dumper: yaml.Dumper, data: str) -> Any:
     return dumper.represent_scalar("tag:yaml.org,2002:str", data, style="|")
 
 
-def GetMaterialsList():
+def GetMaterialsList() -> list[str]:
     """Generates list of all materials in database.
 
     Returns:
@@ -28,44 +34,38 @@ def GetMaterialsList():
 
     """
     res = ["Static"]
-    for root, _, files in os.walk(materialsDir):
-        root = root[len(materialsDir) + 1 :]
-        files[:] = fnmatch.filter(files, "*.yml")
-        files = [path.join(root, fn)[:-4] for fn in files]
-        res.extend(files)
+    res.extend(str(p.relative_to(materialsDir).with_suffix("")) for p in sorted(materialsDir.rglob("*.yml")))
     return res
 
 
-def SaveMaterialFile(filename, wls, n):
-    stream = open(filename, "w")
+def SaveMaterialFile(
+    filename: str | Path,
+    wls: NDArray[np.floating],
+    n: NDArray[np.complexfloating],
+) -> None:
+    with open(filename, "w") as stream:
+        data: dict[str, Any] = {}
+        data["BOOK"] = "a"
+        data["BOOK LONG"] = "b"
+        data["PAGE"] = "c"
+        data["PAGE LONG"] = "d"
+        data["REFERENCES"] = "e"
+        data["COMMENTS"] = "f"
 
-    data = {}
-    data["BOOK"] = "a"
-    data["BOOK LONG"] = "b"
-    data["PAGE"] = "c"
-    data["PAGE LONG"] = "d"
-    data["REFERENCES"] = "e"
-    data["COMMENTS"] = "f"
+        nkData = "\n".join(f"{1e6 * wl_val} {n_val.real} {n_val.imag}" for wl_val, n_val in zip(wls, n))
 
-    nkData = []
-    for wl, n in zip(wls, n):
-        nkData.append("%s %s %s" % (1e6 * wl, n.real, n.imag))
-    nkData = "\n".join(nkData)
+        class literal_unicode(str):
+            pass
 
-    class literal_unicode(str):
-        pass
+        yaml.add_representer(literal_unicode, literal_unicode_representer)
+        data["DATA"] = {"type": "nk", "data": literal_unicode(nkData)}
 
-    yaml.add_representer(literal_unicode, literal_unicode_representer)
-    data["DATA"] = {"type": "nk", "data": literal_unicode(nkData)}
-
-    yaml.dump(data, stream, default_flow_style=False)
-    stream.close()
+        yaml.dump(data, stream, default_flow_style=False)
 
 
-def MaterialFromConf(conf):
+def MaterialFromConf(conf: tuple[str, dict[str, Any]]) -> Material:
     param, kwargParams = conf
-    res = Material(param, **kwargParams)
-    return res
+    return Material(param, **kwargParams)
 
 
 # ===============================================================================
@@ -87,7 +87,7 @@ class Material(Core.ParamsBaseClass):
 
     """
 
-    def __init__(self, materialFile, boundsError=True, **kwargs):
+    def __init__(self, materialFile: str, boundsError: bool = True, **kwargs: Any) -> None:
         self._params = ["kAdditional"]
         self.materialFile = materialFile
         self.wlExp = None
@@ -106,13 +106,13 @@ class Material(Core.ParamsBaseClass):
         else:
             self._LoadFromFile(materialFile)
 
-        super(Material, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
-    def _LoadFromFile(self, materialFile):
-        self.filename = path.join(materialsDir, "%s.yml" % (materialFile))
+    def _LoadFromFile(self, materialFile: str) -> None:
+        self.filename = materialsDir / f"{materialFile}.yml"
 
-        stream = open(self.filename, "r")
-        self.rawData = yaml.safe_load(stream)
+        with open(self.filename) as stream:
+            self.rawData = yaml.safe_load(stream)
 
         self.nFunc = None
         self.kFunc = lambda wl: 0.0
@@ -127,7 +127,7 @@ class Material(Core.ParamsBaseClass):
         self._ReadDatapoints()
         self._ReadFormulas()
 
-    def __call__(self, wl):
+    def __call__(self, wl: ArrayLike) -> NDArray[np.complexfloating]:
         """Returns (interpolates if needed) complex refractive index at wavelength wl.
 
         Args:
@@ -140,7 +140,7 @@ class Material(Core.ParamsBaseClass):
         res = self.nFunc(wl) + 1.0j * self.kFunc(wl) + 1.0j * self.kAdditional
         return res
 
-    def GetN(self, wlFr=-float("inf"), wlTo=-float("inf")):
+    def GetN(self, wlFr: float = -math.inf, wlTo: float = -math.inf) -> tuple[NDArray, NDArray]:
         """Returns complex refractive index datapoints in range wlFr - wlTo.
 
         Args:
@@ -151,8 +151,8 @@ class Material(Core.ParamsBaseClass):
            tuple_of_arrays:  wavelength and complex refractive index arrays
 
         """
-        index1 = bisect.bisect_left(self.wlExp, wlFr)
-        index2 = bisect.bisect_right(self.wlExp, wlTo)
+        index1 = bisect_left(self.wlExp, wlFr)
+        index2 = bisect_right(self.wlExp, wlTo)
 
         wls = self.wlExp[index1:index2]
         n = self.nExp[index1:index2] + 1.0j * self.kExp[index1:index2]
@@ -160,7 +160,7 @@ class Material(Core.ParamsBaseClass):
 
     # Private methods
 
-    def _ReadDatapoints(self):
+    def _ReadDatapoints(self) -> None:
         if "DATA" not in self.rawData or "data" not in self.rawData["DATA"]:
             return
 
@@ -169,22 +169,21 @@ class Material(Core.ParamsBaseClass):
 
         if dataType == "nk":
             data = np.zeros((len(dataStr), 3))
-        elif dataType == "n" or dataType == "k":
+        elif dataType in ("n", "k"):
             data = np.zeros((len(dataStr), 2))
         else:
             raise ValueError("Unknown data type.")
 
-        for i in np.arange(len(dataStr)):
-            data[i, :] = np.array(list(map(float, dataStr[i].split())))
+        for i, line in enumerate(dataStr):
+            data[i, :] = np.array(list(map(float, line.split())))
 
-        if dataType == "nk":
-            self.wlExp, self.nExp, self.kExp = data.T
-        elif dataType == "n":
-            self.wlExp, self.nExp = data.T
-        elif dataType == "k":
-            self.wlExp, self.kExp = data.T
-        else:
-            raise ValueError("Unknown data type.")
+        match dataType:
+            case "nk":
+                self.wlExp, self.nExp, self.kExp = data.T
+            case "n":
+                self.wlExp, self.nExp = data.T
+            case "k":
+                self.wlExp, self.kExp = data.T
 
         # Convert wavelength to SI units
         self.wlExp *= 1e-6
@@ -196,33 +195,35 @@ class Material(Core.ParamsBaseClass):
         if self.kExp is not None:
             self.kFunc = interp1d(self.wlExp, self.kExp, bounds_error=self.boundsError)
 
-    def _ReadFormulas(self):
+    def _ReadFormulas(self) -> None:
         if "FORMULA" in self.rawData:
             dataFormula = self.rawData["FORMULA"]
             wlRange = 1e-6 * np.array(dataFormula["range"].split()).astype(float)
             dispType = dataFormula["type"]
             coefs = np.array(dataFormula["coefficients"].split()).astype(float)
-            if dispType == 4:
-                self.nFunc = lambda wl: _DispersionFunc4(wl, coefs)
-            elif dispType == 2:
-                self.nFunc = lambda wl: _DispersionFunc2(wl, coefs)
-            elif dispType == 1:
-                self.nFunc = lambda wl: _DispersionFunc1(wl, coefs)
-            else:
-                raise NotImplementedError()
+            match dispType:
+                case 4:
+                    self.nFunc = lambda wl: _DispersionFunc4(wl, coefs)
+                case 2:
+                    self.nFunc = lambda wl: _DispersionFunc2(wl, coefs)
+                case 1:
+                    self.nFunc = lambda wl: _DispersionFunc1(wl, coefs)
+                case _:
+                    raise NotImplementedError(f"Unsupported dispersion type: {dispType}")
             self.isFormula = True
             self.wlRange = wlRange
 
-        if "DATA" in self.rawData and type(self.rawData["DATA"]) == list:
+        if "DATA" in self.rawData and isinstance(self.rawData["DATA"], list):
             coefs = np.array(self.rawData["DATA"][0]["coefficients"].split()).astype(float)
-            if self.rawData["DATA"][0]["type"] == "formula 1":
-                self.nFunc = lambda wl: _DisperisonFuncFormula1(wl, coefs)
-            elif self.rawData["DATA"][0]["type"] == "formula 2":
-                self.nFunc = lambda wl: _DisperisonFuncFormula2(wl, coefs)
-            elif self.rawData["DATA"][0]["type"] == "formula 5":
-                self.nFunc = lambda wl: _DisperisonFuncFormula5(wl, coefs)
-            else:
-                raise NotImplementedError()
+            match self.rawData["DATA"][0]["type"]:
+                case "formula 1":
+                    self.nFunc = lambda wl: _DisperisonFuncFormula1(wl, coefs)
+                case "formula 2":
+                    self.nFunc = lambda wl: _DisperisonFuncFormula2(wl, coefs)
+                case "formula 5":
+                    self.nFunc = lambda wl: _DisperisonFuncFormula5(wl, coefs)
+                case _ as formula_type:
+                    raise NotImplementedError(f"Unsupported formula type: {formula_type}")
 
 
 # ===============================================================================
@@ -230,7 +231,7 @@ class Material(Core.ParamsBaseClass):
 # ===============================================================================
 
 
-def _DispersionFunc4(wl, coefs):
+def _DispersionFunc4(wl: ArrayLike, coefs: NDArray[np.floating]) -> NDArray[np.floating]:
     wl = wl * 1e6
     n2 = coefs[0]
 
@@ -242,7 +243,7 @@ def _DispersionFunc4(wl, coefs):
     return np.sqrt(n2)
 
 
-def _DispersionFunc1(wl, coefs):
+def _DispersionFunc1(wl: ArrayLike, coefs: NDArray[np.floating]) -> NDArray[np.floating]:
     wl = wl * 1e6
 
     n2MinOne = coefs[0]
@@ -251,7 +252,7 @@ def _DispersionFunc1(wl, coefs):
     return np.sqrt(n2MinOne + 1.0)
 
 
-def _DispersionFunc2(wl, coefs):
+def _DispersionFunc2(wl: ArrayLike, coefs: NDArray[np.floating]) -> NDArray[np.floating]:
     wl = wl * 1e6
 
     n2MinOne = coefs[0]
@@ -260,7 +261,7 @@ def _DispersionFunc2(wl, coefs):
     return np.sqrt(n2MinOne + 1.0)
 
 
-def _DisperisonFuncFormula1(wl, coefs):
+def _DisperisonFuncFormula1(wl: ArrayLike, coefs: NDArray[np.floating]) -> NDArray[np.floating]:
     wl = wl * 1e6
     n2 = coefs[0] + 1.0
     for i in range(1, len(coefs), 2):
@@ -268,7 +269,7 @@ def _DisperisonFuncFormula1(wl, coefs):
     return np.sqrt(n2)
 
 
-def _DisperisonFuncFormula2(wl, coefs):
+def _DisperisonFuncFormula2(wl: ArrayLike, coefs: NDArray[np.floating]) -> NDArray[np.floating]:
     wl = wl * 1e6
     n2 = coefs[0] + 1.0
     for i in range(1, len(coefs), 2):
@@ -276,14 +277,9 @@ def _DisperisonFuncFormula2(wl, coefs):
     return np.sqrt(n2)
 
 
-def _DisperisonFuncFormula5(wl, coefs):
+def _DisperisonFuncFormula5(wl: ArrayLike, coefs: NDArray[np.floating]) -> NDArray[np.floating]:
     wl = wl * 1e6
     n = coefs[0]
     for i in range(1, len(coefs), 2):
         n += coefs[i] * (wl ** coefs[i + 1])
     return n
-
-
-if __name__ == "__main__":
-    test = Material(r"special/TiO2 S-1-13")
-    print(test(np.linspace(400e-9, 600e-9, 5)))

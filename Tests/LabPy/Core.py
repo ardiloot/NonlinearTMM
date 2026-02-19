@@ -1,18 +1,26 @@
 """This module contains low-level methods and classes for LabPy package."""
 
-from bisect import bisect_left, bisect_right
-import numpy as np
-import scipy
+from __future__ import annotations
+
+import logging
 import math
+from bisect import bisect_left, bisect_right
+from collections.abc import Callable
 from time import time
+from typing import Any
+
+import numpy as np
+from numpy.typing import ArrayLike, NDArray
 from scipy.integrate import quad
+
+logger = logging.getLogger(__name__)
 
 # ===============================================================================
 # Methods
 # ===============================================================================
 
 
-def Norm(vector):
+def Norm(vector: NDArray[np.complexfloating]) -> NDArray[np.floating] | np.floating:
     """Calculates vector 2nd order norm
 
     Args:
@@ -24,17 +32,22 @@ def Norm(vector):
     """
     if len(vector.shape) > 1:
         if vector.shape[1] != 3:
-            raise Exception("Only vectors with length 3 supported.")
+            raise ValueError("Only vectors with length 3 supported.")
         return np.sqrt(
             abs(vector[:, 0]) ** 2.0 + abs(vector[:, 1]) ** 2.0 + abs(vector[:, 2]) ** 2.0, dtype=complex
         ).real
     else:
         if len(vector) != 3:
-            raise Exception("Only vectors with length 3 supported.")
+            raise ValueError("Only vectors with length 3 supported.")
         return np.sqrt(abs(vector[0]) ** 2.0 + abs(vector[1]) ** 2.0 + abs(vector[2]) ** 2.0, dtype=complex).real
 
 
-def PickPoints(x, n, fr=float("-inf"), to=float("inf")):
+def PickPoints(
+    x: ArrayLike,
+    n: int,
+    fr: float = -math.inf,
+    to: float = math.inf,
+) -> NDArray[np.intp]:
     """Picks n points from array x, where fr <= x <= to
 
     Args:
@@ -63,7 +76,7 @@ def PickPoints(x, n, fr=float("-inf"), to=float("inf")):
     res[0] = indexFr
     pointsSel = 1
 
-    pointsDensity = n / float(pointsTotal)
+    pointsDensity = n / pointsTotal
 
     for i in range(indexFr + 1, indexTo):
         shouldBeSelected = (i - indexFr + 1) * pointsDensity
@@ -76,7 +89,12 @@ def PickPoints(x, n, fr=float("-inf"), to=float("inf")):
     return res
 
 
-def complex_quadrature(func, a, b, **kwargs):
+def complex_quadrature(
+    func: Callable[[float], complex],
+    a: float,
+    b: float,
+    **kwargs: Any,
+) -> tuple[complex, tuple[Any, ...], tuple[Any, ...]]:
     """Integrates complex function func from a to b
 
     Args:
@@ -90,18 +108,26 @@ def complex_quadrature(func, a, b, **kwargs):
 
     """
 
-    def real_func(x):
-        return scipy.real(func(x))
+    def real_func(x: float) -> float:
+        return np.real(func(x))
 
-    def imag_func(x):
-        return scipy.imag(func(x))
+    def imag_func(x: float) -> float:
+        return np.imag(func(x))
 
     real_integral = quad(real_func, a, b, **kwargs)
     imag_integral = quad(imag_func, a, b, **kwargs)
     return (real_integral[0] + 1j * imag_integral[0], real_integral[1:], imag_integral[1:])
 
 
-def FindZeros(func, dfunc, a, b, zerosMaxDepth=5, disp=True, **kwargs):
+def FindZeros(
+    func: Callable[[complex], complex],
+    dfunc: Callable[[complex], complex],
+    a: complex,
+    b: complex,
+    zerosMaxDepth: int = 5,
+    disp: bool = True,
+    **kwargs: Any,
+) -> list[complex]:
     """Finds all zeros of function (in range a to b) by argument principle method
 
     Args:
@@ -137,14 +163,14 @@ def FindZeros(func, dfunc, a, b, zerosMaxDepth=5, disp=True, **kwargs):
         res = -integral / (2.0j * math.pi)
 
         if disp:
-            print("zeros in box", ax, bx, res)
-            print("time for box:", time() - start)
+            logger.debug("zeros in box %s %s %s", ax, bx, res)
+            logger.debug("time for box: %s", time() - start)
 
         return res
 
     def _DoSearch(a, b, depth=0):
         zerosRaw = _ZerosInBox(a, b).real
-        print("DoSearch", a, b, depth, "zeros", zerosRaw)
+        logger.debug("DoSearch %s %s %s zeros %s", a, b, depth, zerosRaw)
         zeros = int(round(zerosRaw))
         if zeros <= 0:
             return []
@@ -168,7 +194,7 @@ def FindZeros(func, dfunc, a, b, zerosMaxDepth=5, disp=True, **kwargs):
     return res
 
 
-def ExtraInterpolate(xs, ys, x):
+def ExtraInterpolate(xs: ArrayLike, ys: ArrayLike, x: float) -> float:
     if len(xs) == 1:
         return ys[0]
     elif len(xs) == 2:
@@ -187,10 +213,10 @@ def ExtraInterpolate(xs, ys, x):
             / (xs[0] - xs[1])
         )
     else:
-        raise NotImplementedError("len = %d" % (len(xs)))
+        raise NotImplementedError(f"len = {len(xs)}")
 
 
-def RotationMatrixX(phi):
+def RotationMatrixX(phi: float) -> NDArray[np.floating]:
     """Rotation matrix around X-axis
 
     Args:
@@ -204,7 +230,7 @@ def RotationMatrixX(phi):
     return res
 
 
-def RotationMatrixY(phi):
+def RotationMatrixY(phi: float) -> NDArray[np.floating]:
     """Rotation matrix around Y-axis
 
     Args:
@@ -218,7 +244,7 @@ def RotationMatrixY(phi):
     return res
 
 
-def RotationMatrixZ(phi):
+def RotationMatrixZ(phi: float) -> NDArray[np.floating]:
     """Rotation matrix around Z-axis
 
     Args:
@@ -232,7 +258,10 @@ def RotationMatrixZ(phi):
     return res
 
 
-def CartesianProduct(arrays, out=None):
+def CartesianProduct(
+    arrays: list[ArrayLike],
+    out: NDArray | None = None,
+) -> NDArray:
     """
     Generate a cartesian product of input arrays.
 
@@ -274,10 +303,10 @@ def CartesianProduct(arrays, out=None):
     if out is None:
         out = np.zeros([n, len(arrays)], dtype=dtype)
 
-    m = n / arrays[0].size
+    m = n // arrays[0].size
     out[:, 0] = np.repeat(arrays[0], m)
     if arrays[1:]:
-        cartesian(arrays[1:], out=out[0:m, 1:])
+        CartesianProduct(arrays[1:], out=out[0:m, 1:])
         for j in range(1, arrays[0].size):
             out[j * m : (j + 1) * m, 1:] = out[0:m, 1:]
     return out
@@ -288,7 +317,7 @@ def CartesianProduct(arrays, out=None):
 # ===============================================================================
 
 
-class ParamsBaseClass(object):
+class ParamsBaseClass:
     """Inheritance of this class will provide SetParams and GetParams methods.
 
     Args:
@@ -296,7 +325,7 @@ class ParamsBaseClass(object):
 
     """
 
-    def __init__(self, params=None, **kwargs):
+    def __init__(self, params: list[str] | None = None, **kwargs: Any) -> None:
         if params is not None:
             self._params = params
 
@@ -305,7 +334,7 @@ class ParamsBaseClass(object):
 
         self.SetParams(**kwargs)
 
-    def SetParams(self, **kwargs):
+    def SetParams(self, **kwargs: Any) -> None:
         """Sets parameters from kwargs dictionary.
 
         Args:
@@ -318,35 +347,25 @@ class ParamsBaseClass(object):
 
         for k, v in kwargs.items():
             if k not in self._params:
-                raise ValueError("Unknown kwargs: %s" % str(k))
+                raise ValueError(f"Unknown kwargs: {k}")
             setattr(self, k, v)
 
-    def GetParams(self, asList=False):
+    def GetParams(self, asList: bool = False) -> dict[str, Any] | list[tuple[str, str, Any]]:
         """Returns values of parameters in _params.
 
         Args:
             asList (bool, optional = False): Whether return params as list or as dict.
 
         Returns:
-            dixt: dictionary of parameters and values
+            dict: dictionary of parameters and values
 
         """
         if asList:
-            res = []
-            for param, friendlyName in zip(self._params, self.friendlyNames):
-                res.append((param, friendlyName, getattr(self, param)))
+            res = [
+                (param, friendlyName, getattr(self, param))
+                for param, friendlyName in zip(self._params, self.friendlyNames, strict=True)
+            ]
 
         else:
-            res = {}
-            for param in self._params:
-                res[param] = getattr(self, param)
+            res = {param: getattr(self, param) for param in self._params}
         return res
-
-
-if __name__ == "__main__":
-    for c1 in np.arange(1, 1000, 1):
-        a = np.linspace(0.0, 100.0, c1)
-        for c2 in np.arange(1, c1, 1):
-            newa = PickPoints(a, c2)
-
-    # newa = PickPoints(range(39), 31)

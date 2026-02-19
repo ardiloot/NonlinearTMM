@@ -1,6 +1,11 @@
-import pytest
-import numpy as np
+from __future__ import annotations
+
+import math
+
 import LabPy
+import numpy as np
+import pytest
+
 from NonlinearTMM import TMM, Material
 
 
@@ -114,7 +119,16 @@ def test_Fields2D(tmms2, betaTest):
 # ------------------------------------------------------------------------------
 
 
-def GetTMMs(wl, pol, I0, prism, metal, dielectric, metalD, overrideE0):
+def GetTMMs(
+    wl: float,
+    pol: str,
+    I0: float,
+    prism: LabPy.Material,
+    metal: LabPy.Material,
+    dielectric: LabPy.Material,
+    metalD: float,
+    overrideE0: complex | None,
+) -> tuple[TMM, object]:
     # C++ TMM
     tmmCpp = TMM()
     tmmCpp.SetParams(wl=wl, pol=pol, I0=I0)
@@ -122,34 +136,32 @@ def GetTMMs(wl, pol, I0, prism, metal, dielectric, metalD, overrideE0):
     if overrideE0 is not None:
         tmmCpp.SetParams(overrideE0=True, E0=overrideE0)
 
-    tmmCpp.AddLayer(float("inf"), Material.FromLabPy(prism))
+    tmmCpp.AddLayer(math.inf, Material.FromLabPy(prism))
     tmmCpp.AddLayer(metalD, Material.FromLabPy(metal))
-    tmmCpp.AddLayer(float("inf"), Material.FromLabPy(dielectric))
+    tmmCpp.AddLayer(math.inf, Material.FromLabPy(dielectric))
 
     # Python TMM
-    tmmPy = LabPy._Tmm._NonlinearTmm._NonlinearTmm(
-        wl=wl, pol=pol, I0=I0, mode="incident", overrideE0=overrideE0
-    )  # @UndefinedVariable
-    tmmPy.AddLayer(float("inf"), prism)
+    tmmPy = LabPy._Tmm._NonlinearTmm._NonlinearTmm(wl=wl, pol=pol, I0=I0, mode="incident", overrideE0=overrideE0)
+    tmmPy.AddLayer(math.inf, prism)
     tmmPy.AddLayer(metalD, metal)
-    tmmPy.AddLayer(float("inf"), dielectric)
+    tmmPy.AddLayer(math.inf, dielectric)
     tmmPy.SetParams(beta=0.0)
 
     return tmmCpp, tmmPy
 
 
-def TestPowerFlows(tmms):
+def TestPowerFlows(tmms: tuple[TMM, object]) -> None:
     tmmCpp, tmmPy = tmms
 
     betas = np.linspace(0.0, 1.49, 20)
     sr = tmmCpp.Sweep("beta", betas)
     sweepFunc = np.vectorize(lambda beta: tmmPy.Solve(beta=beta))
-    inc, r, t, I, R, T, _ = sweepFunc(betas)
+    inc, r, t, Ii, R, T, _ = sweepFunc(betas)
 
     # Comparison
     np.testing.assert_allclose(sr.inc, inc)
     np.testing.assert_allclose(sr.r, r)
     np.testing.assert_allclose(sr.t, t)
-    np.testing.assert_allclose(sr.Ii, I)
+    np.testing.assert_allclose(sr.Ii, Ii)
     np.testing.assert_allclose(sr.Ir, R)
-    np.testing.assert_allclose(sr.It, T, atol=1e-9 * np.mean(I))
+    np.testing.assert_allclose(sr.It, T, atol=1e-9 * np.mean(Ii))

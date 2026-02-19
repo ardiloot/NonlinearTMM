@@ -1,6 +1,11 @@
-import pytest
+from __future__ import annotations
+
+import math
+
 import numpy as np
-from NonlinearTMM import SecondOrderNLTMM, Material
+import pytest
+
+from NonlinearTMM import Material, SecondOrderNLTMM
 
 
 @pytest.fixture()
@@ -33,9 +38,9 @@ def tmm():
     tmm.Gen.SetParams(pol=polGen)
 
     # Add layers
-    tmm.AddLayer(float("inf"), prism)
+    tmm.AddLayer(math.inf, prism)
     tmm.AddLayer(crystalD, crystal)
-    tmm.AddLayer(float("inf"), dielectric)
+    tmm.AddLayer(math.inf, dielectric)
 
     # Init waves
     waveP1Params = {

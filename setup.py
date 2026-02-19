@@ -1,13 +1,12 @@
+import glob
 import platform
 import sys
-import glob
 
 import eigency
 import numpy as np
 from Cython.Build import cythonize
 from setuptools import setup
 from setuptools.extension import Extension
-
 
 extra_compile_args = []
 extra_link_args = []
