@@ -22,7 +22,7 @@
 *.vcxproj   text eol=crlf
 
 # Vendored / generated (GitHub linguist)
-NonlinearTMM/src/eigen-3.4.0/** linguist-vendored
+third_party/eigen/** linguist-vendored
 NonlinearTMM/src/SecondOrderNLTMM.cpp linguist-generated
 docs/** linguist-documentation
 

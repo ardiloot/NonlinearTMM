@@ -40,7 +40,6 @@ packages = ["NonlinearTMM"]
 
 [tool.setuptools.package-data]
 "NonlinearTMM" = [
-    "src/eigen-3.4.0/**/*",
     "src/*.pxd",
     "src/NonlinearTMMCpp/NonlinearTMMCpp/*.h",
     "src/NonlinearTMMCpp/NonlinearTMMCpp/*.cpp",
@@ -55,7 +54,7 @@ line-length = 120
 exclude = [
     "NonlinearTMM/src/*.pyx",
     "NonlinearTMM/src/*.pxd",
-    "NonlinearTMM/src/eigen-3.4.0",
+    "third_party/eigen",
 ]
 
 [tool.ruff.lint.per-file-ignores]
