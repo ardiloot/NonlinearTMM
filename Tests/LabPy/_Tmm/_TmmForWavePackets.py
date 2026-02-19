@@ -288,17 +288,17 @@ class SecondOrderNLTmmForWaves(Core.ParamsBaseClass):
 
     # Powers (porks only in linear media!)
 
-    def CalcPowersP1(self, layerNr, x0, x1, z, **kwargs):
+    def CalcPowersP1(self, layerNr: int, x0: float, x1: float, z: float, **kwargs: Any) -> tuple[float, float]:
         self.SetParams(**kwargs)
         res = self._CalcPowersPump(self.tmmNL.tmmP1, self.thP1, self.wave1, layerNr, x0, x1, z)
         return res
 
-    def CalcPowersP2(self, x0, x1, z, **kwargs):
+    def CalcPowersP2(self, x0: float, x1: float, z: float, **kwargs: Any) -> tuple[float, float]:
         self.SetParams(**kwargs)
         res = self._CalcPowersPump(self.tmmNL.tmmP2, self.thP2, self.wave2, x0, x1, z)
         return res
 
-    def CalcPowersGen(self, layerNr, x0, x1, z, **kwargs):
+    def CalcPowersGen(self, layerNr: int, x0: float, x1: float, z: float, **kwargs: Any) -> tuple[float, float]:
         self.SetParams(**kwargs)
 
         # Solve wave
@@ -356,17 +356,17 @@ class SecondOrderNLTmmForWaves(Core.ParamsBaseClass):
 
     # Fields
 
-    def CalcFields2dP1(self, zs, xs, **kwargs):
+    def CalcFields2dP1(self, zs: NDArray, xs: NDArray, **kwargs: Any) -> tuple[NDArray, NDArray]:
         self.SetParams(**kwargs)
         res = self._CalcFields2dPump(self.tmmNL.tmmP1, self.thP1, self.wave1, zs, xs)
         return res
 
-    def CalcFields2dP2(self, zs, xs, **kwargs):
+    def CalcFields2dP2(self, zs: NDArray, xs: NDArray, **kwargs: Any) -> tuple[NDArray, NDArray]:
         self.SetParams(**kwargs)
         res = self._CalcFields2dPump(self.tmmNL.tmmP2, self.thP2, self.wave2, zs, xs)
         return res
 
-    def CalcFields2dGen(self, zs, xs, **kwargs):
+    def CalcFields2dGen(self, zs: NDArray, xs: NDArray, **kwargs: Any) -> tuple[NDArray, NDArray]:
         def IntegFunc(wave1, nr1, wave2, nr2):
             self.tmmNL.SetParams(
                 betaP1=wave1.betas[nr1],
@@ -386,7 +386,9 @@ class SecondOrderNLTmmForWaves(Core.ParamsBaseClass):
 
     # Private methods
 
-    def _CalcFields2dPump(self, tmmP, thP, wave, zs, xs):
+    def _CalcFields2dPump(
+        self, tmmP: object, thP: float, wave: PlaneWave, zs: NDArray, xs: NDArray
+    ) -> tuple[NDArray, NDArray]:
         def IntegFunc(wave, nr):
             tmmP.SetParams(beta=wave.betas[nr], overrideE0=wave.expansionCoefsPhi[nr])
             tmmP.Solve()
@@ -397,7 +399,9 @@ class SecondOrderNLTmmForWaves(Core.ParamsBaseClass):
         ESum, HSum = WavesIntegrator1D(wave, IntegFunc)
         return ESum, HSum
 
-    def _CalcPowersPump(self, tmmP, thP, wave, layerNr, x0, x1, z):
+    def _CalcPowersPump(
+        self, tmmP: object, thP: float, wave: PlaneWave, layerNr: int, x0: float, x1: float, z: float
+    ) -> tuple[float, float]:
         # Solve wave
         starttime = time()
         wave.Solve(tmmP.wl, thP, n=tmmP.layers[0].n)
@@ -430,7 +434,18 @@ class SecondOrderNLTmmForWaves(Core.ParamsBaseClass):
     def _Integrate(self, xs: NDArray, values: NDArray) -> complex:
         return np.trapezoid(values, xs)
 
-    def _IntegrateWavePower(self, tmm, Us, kxs, kzs, layerNr, x0, x1, z, Ly):
+    def _IntegrateWavePower(
+        self,
+        tmm: object,
+        Us: NDArray,
+        kxs: NDArray,
+        kzs: NDArray,
+        layerNr: int,
+        x0: float,
+        x1: float,
+        z: float,
+        Ly: float,
+    ) -> float:
         # Integrate wave
         starttime = time()
 

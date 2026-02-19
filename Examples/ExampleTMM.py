@@ -8,7 +8,7 @@ import numpy as np
 from NonlinearTMM import TMM, Material
 
 
-def CalcSpp():
+def CalcSpp() -> None:
     # Parameters
     # ---------------------------------------------------------------------------
     wl = 532e-9  # Wavelength

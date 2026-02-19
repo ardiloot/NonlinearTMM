@@ -119,7 +119,16 @@ def test_Fields2D(tmms2, betaTest):
 # ------------------------------------------------------------------------------
 
 
-def GetTMMs(wl, pol, I0, prism, metal, dielectric, metalD, overrideE0):
+def GetTMMs(
+    wl: float,
+    pol: str,
+    I0: float,
+    prism: LabPy.Material,
+    metal: LabPy.Material,
+    dielectric: LabPy.Material,
+    metalD: float,
+    overrideE0: complex | None,
+) -> tuple[TMM, object]:
     # C++ TMM
     tmmCpp = TMM()
     tmmCpp.SetParams(wl=wl, pol=pol, I0=I0)
@@ -141,7 +150,7 @@ def GetTMMs(wl, pol, I0, prism, metal, dielectric, metalD, overrideE0):
     return tmmCpp, tmmPy
 
 
-def TestPowerFlows(tmms):
+def TestPowerFlows(tmms: tuple[TMM, object]) -> None:
     tmmCpp, tmmPy = tmms
 
     betas = np.linspace(0.0, 1.49, 20)
