@@ -22,5 +22,5 @@ repos:
     rev: v21.1.8
     hooks:
       - id: clang-format
-        files: ^NonlinearTMM/src/NonlinearTMMCpp/
+        files: ^NonlinearTMM/src/cpp/
         types_or: [c++]
