@@ -1,6 +1,11 @@
+from __future__ import annotations
+
+from typing import Any
+
 import numpy as np
-from LabPy import Core, Constants
-from time import time
+from numpy.typing import NDArray
+
+from LabPy import Constants, Core
 
 __all__ = ["PlaneWave", "GaussianWave", "GaussianWaveFFT", "TukeyWaveFFT", "TmmForWaves", "SecondOrderNLTmmForWaves"]
 
@@ -10,13 +15,13 @@ __all__ = ["PlaneWave", "GaussianWave", "GaussianWaveFFT", "TukeyWaveFFT", "TmmF
 
 
 class PlaneWave(Core.ParamsBaseClass):
-    def __init__(self, params=[], **kwargs):
+    def __init__(self, params: list[str] | None = None, **kwargs: Any) -> None:
         paramsThis = ["pwr", "overrideE0", "w0", "n", "Ly"]
         self.overrideE0 = None  # E0 specified in vacuum, not in first layer
         self.Ly = None
-        super(PlaneWave, self).__init__(params + paramsThis, **kwargs)
+        super().__init__((params or []) + paramsThis, **kwargs)
 
-    def Solve(self, wl, th0, **kwargs):
+    def Solve(self, wl: float, th0: float, **kwargs: Any) -> None:
         self.wl = wl
         self.th0 = th0
         self.SetParams(**kwargs)
@@ -24,7 +29,7 @@ class PlaneWave(Core.ParamsBaseClass):
         self._Precalc()
         self._Solve()
 
-    def _Precalc(self):
+    def _Precalc(self) -> None:
         if self.overrideE0 is None:
             self.I0 = self.pwr / (self.Ly * self.w0)
             self.E0 = np.sqrt(2.0 * Constants.mu0 * Constants.c * self.I0)
@@ -37,7 +42,7 @@ class PlaneWave(Core.ParamsBaseClass):
         self.k = self.k0 * self.n(self.wl).real
         print("_Precalc", self.E0)
 
-    def _Solve(self):
+    def _Solve(self) -> None:
         self.phis = np.array([0.0])
         self.kxs = np.array([self.k * np.sin(self.th0)])
         self.kzs = np.array([self.k * np.cos(self.th0)])
@@ -52,13 +57,13 @@ class PlaneWave(Core.ParamsBaseClass):
 
 
 class GaussianWave(PlaneWave):
-    def __init__(self, params=[], **kwargs):
+    def __init__(self, params: list[str] | None = None, **kwargs: Any) -> None:
         paramsThis = ["integCriteria", "nPointsInteg"]
         self.nPointsInteg = 30
         self.integCriteria = 1e-3
-        super(GaussianWave, self).__init__(params + paramsThis, **kwargs)
+        super().__init__((params or []) + paramsThis, **kwargs)
 
-    def _Solve(self):
+    def _Solve(self) -> None:
         self._phiLim = np.arcsin(2.0 / self.w0 * np.sqrt(-np.log(self.integCriteria)) / self.k)
         self.phis = np.linspace(-self._phiLim, self._phiLim, self.nPointsInteg)
 
@@ -79,17 +84,17 @@ class GaussianWave(PlaneWave):
 
 
 class WaveFFT(PlaneWave):
-    def __init__(self, params=[], **kwargs):
+    def __init__(self, params: list[str] | None = None, **kwargs: Any) -> None:
         paramsThis = ["nPointsInteg", "maxPhi", "integCriteria"]
         self.nPointsInteg = 30
         self.maxPhi = np.radians(0.5)
         self.integCriteria = 1e-3
-        PlaneWave.__init__(self, params + paramsThis, **kwargs)
+        super().__init__((params or []) + paramsThis, **kwargs)
 
-    def _FieldProfile(self, xs):
+    def _FieldProfile(self, xs: NDArray) -> NDArray:
         raise NotImplementedError()
 
-    def _Solve(self, maxPhiForce=None):
+    def _Solve(self, maxPhiForce: float | None = None) -> None:
         maxKxp = np.sin(self.maxPhi if maxPhiForce is None else maxPhiForce) * self.k
         dx = np.pi / maxKxp
         xs = np.arange(-0.5 * dx * self.nPointsInteg, 0.5 * dx * self.nPointsInteg, dx)
@@ -132,11 +137,11 @@ class WaveFFT(PlaneWave):
 
 
 class GaussianWaveFFT(WaveFFT):
-    def __init__(self, params=[], **kwargs):
-        paramsThis = []
-        WaveFFT.__init__(self, params + paramsThis, **kwargs)
+    def __init__(self, params: list[str] | None = None, **kwargs: Any) -> None:
+        paramsThis: list[str] = []
+        super().__init__((params or []) + paramsThis, **kwargs)
 
-    def _FieldProfile(self, xs):
+    def _FieldProfile(self, xs: NDArray) -> NDArray:
         res = self.E0 * np.exp(-(xs**2.0) / self.w0**2.0)
         return res
 
@@ -147,13 +152,13 @@ class GaussianWaveFFT(WaveFFT):
 
 
 class TukeyWaveFFT(WaveFFT):
-    def __init__(self, params=[], **kwargs):
+    def __init__(self, params: list[str] | None = None, **kwargs: Any) -> None:
         paramsThis = ["a"]
         self.a = 0.5
-        WaveFFT.__init__(self, params + paramsThis, **kwargs)
+        super().__init__((params or []) + paramsThis, **kwargs)
 
     @staticmethod
-    def TukeyFunc(xs, w0, a):
+    def TukeyFunc(xs: NDArray, w0: float, a: float) -> NDArray:
         lowering = 0.5 * np.cos(np.pi / (w0 * (1.0 - a)) * (xs - 0.5 * a * w0)) + 0.5
         raising = 0.5 * np.cos(np.pi / (w0 * (1.0 - a)) * (xs + 0.5 * (2.0 - a) * w0) + np.pi) + 0.5
 
@@ -164,7 +169,7 @@ class TukeyWaveFFT(WaveFFT):
         res[xs < -0.5 * w0 * (2.0 - a)] = 0.0
         return res
 
-    def _FieldProfile(self, xs):
+    def _FieldProfile(self, xs: NDArray) -> NDArray:
         res = self.E0 * self.TukeyFunc(xs, self.w0, self.a)
         return res
 
@@ -174,7 +179,10 @@ class TukeyWaveFFT(WaveFFT):
 # ===============================================================================
 
 
-def WavesIntegrator1D(wave, fieldsFunc):
+def WavesIntegrator1D(
+    wave: PlaneWave,
+    fieldsFunc: Any,
+) -> tuple[NDArray, NDArray]:
     resE, resH = None, None
     lastE, lastH = None, None
     dPhis = wave.phis[1:] - wave.phis[:-1]
@@ -197,7 +205,11 @@ def WavesIntegrator1D(wave, fieldsFunc):
     return resE, resH
 
 
-def WavesIntegrator2D(wave1, wave2, fieldsFunc):
+def WavesIntegrator2D(
+    wave1: PlaneWave,
+    wave2: PlaneWave,
+    fieldsFunc: Any,
+) -> tuple[NDArray, NDArray]:
     resE, resH = None, None
     lastE, lastH = None, None
     dPhis = wave1.phis[1:] - wave1.phis[:-1]
@@ -228,15 +240,15 @@ def WavesIntegrator2D(wave1, wave2, fieldsFunc):
 
 
 class TmmForWaves(Core.ParamsBaseClass):
-    def __init__(self, tmm, wave, **kwargs):
+    def __init__(self, tmm: object, wave: PlaneWave, **kwargs: Any) -> None:
         self._params = ["th0", "pol"]
         self.wave = wave
         self.tmm = tmm
         self.th0 = None
         self.pol = None
-        super(TmmForWaves, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
-    def CalcFields2d(self, xs, ys, **kwargs):
+    def CalcFields2d(self, xs: NDArray, ys: NDArray, **kwargs: Any) -> tuple[NDArray, NDArray]:
 
         def IntegFunc(wave, nr):
             self.tmm.SetParam(beta=wave.betas[nr])
@@ -260,7 +272,7 @@ class TmmForWaves(Core.ParamsBaseClass):
 
 
 class SecondOrderNLTmmForWaves(Core.ParamsBaseClass):
-    def __init__(self, tmmNL, wave1, wave2, **kwargs):
+    def __init__(self, tmmNL: object, wave1: PlaneWave, wave2: PlaneWave, **kwargs: Any) -> None:
         self._params = ["thP1", "thP2"]
         self.tmmNL = tmmNL
         self.wave1 = wave1
@@ -268,7 +280,7 @@ class SecondOrderNLTmmForWaves(Core.ParamsBaseClass):
         self.thP1 = None
         self.thP2 = None
 
-        super(SecondOrderNLTmmForWaves, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     # Powers (porks only in linear media!)
 
@@ -454,7 +466,3 @@ class SecondOrderNLTmmForWaves(Core.ParamsBaseClass):
         print("integration", time() - starttime)
 
         return P
-
-
-if __name__ == "__main__":
-    pass

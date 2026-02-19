@@ -64,3 +64,10 @@ exclude = [
 
 [tool.pytest.ini_options]
 testpaths = ["Tests"]
+
+[tool.pyright]
+typeCheckingMode = "standard"
+venvPath = "."
+venv = ".venv"
+include = ["NonlinearTMM", "Examples", "Tests"]
+exclude = ["NonlinearTMM/src"]

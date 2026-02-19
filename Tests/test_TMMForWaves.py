@@ -1,5 +1,8 @@
-import pytest
+import math
+
 import numpy as np
+import pytest
+
 from NonlinearTMM import TMM, Material
 
 
@@ -13,9 +16,9 @@ def tmm():
     dielectric = Material.Static(1.0)
 
     res = TMM(wl=wl)
-    res.AddLayer(float("inf"), prism)
+    res.AddLayer(math.inf, prism)
     res.AddLayer(metalD, metal)
-    res.AddLayer(float("inf"), dielectric)
+    res.AddLayer(math.inf, dielectric)
 
     return res
 

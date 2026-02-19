@@ -1,5 +1,8 @@
+import math
+
+import matplotlib.pyplot as plt
 import numpy as np
-import pylab as plt
+
 from NonlinearTMM import TMM, Material
 
 
@@ -27,9 +30,9 @@ def CalcSppGaussianBeam():
     # Init TMM
     # ---------------------------------------------------------------------------
     tmm = TMM(wl=wl, pol=pol, I0=I0)
-    tmm.AddLayer(float("inf"), prism)
+    tmm.AddLayer(math.inf, prism)
     tmm.AddLayer(metalD, ag)
-    tmm.AddLayer(float("inf"), dielectric)
+    tmm.AddLayer(math.inf, dielectric)
 
     # Init wave params
     tmm.wave.SetParams(waveType=waveType, w0=w0, pwr=pwr, dynamicMaxX=False, maxX=xs[-1])

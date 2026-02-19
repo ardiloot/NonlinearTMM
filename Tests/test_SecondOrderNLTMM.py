@@ -1,5 +1,8 @@
+import math
+
 import numpy as np
 import pytest
+
 import LabPy
 from NonlinearTMM import Material, SecondOrderNLTMM
 
@@ -44,10 +47,10 @@ def tmms(polP1, polP2, polGen, process):
         wlP1=wlP1, wlP2=wlP2, polP1=polP1, polP2=polP2, polGen=polGen, I0P1=I0P1, I0P2=I0P2, process=process
     )
 
-    tmmPy.AddLayer(float("inf"), prism)
+    tmmPy.AddLayer(math.inf, prism)
     tmmPy.AddLayer(metalD, metal)
     tmmPy.AddLayer(crystalD, crystal, chi2)
-    tmmPy.AddLayer(float("inf"), dielectric)
+    tmmPy.AddLayer(math.inf, dielectric)
 
     # C++
     prismCpp = Material.FromLabPy(prism)
@@ -61,10 +64,10 @@ def tmms(polP1, polP2, polGen, process):
     tmmCpp.P2.SetParams(wl=wlP2, pol=polP2, I0=I0P2)
     tmmCpp.Gen.SetParams(pol=polGen)
 
-    tmmCpp.AddLayer(float("inf"), prismCpp)
+    tmmCpp.AddLayer(math.inf, prismCpp)
     tmmCpp.AddLayer(metalD, metalCpp)
     tmmCpp.AddLayer(crystalD, crystalCpp)
-    tmmCpp.AddLayer(float("inf"), dielectricCpp)
+    tmmCpp.AddLayer(math.inf, dielectricCpp)
 
     return tmmPy, tmmCpp
 

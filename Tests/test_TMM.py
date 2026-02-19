@@ -1,5 +1,8 @@
-import pytest
+import math
+
 import numpy as np
+import pytest
+
 import LabPy
 from NonlinearTMM import TMM, Material
 
@@ -122,17 +125,15 @@ def GetTMMs(wl, pol, I0, prism, metal, dielectric, metalD, overrideE0):
     if overrideE0 is not None:
         tmmCpp.SetParams(overrideE0=True, E0=overrideE0)
 
-    tmmCpp.AddLayer(float("inf"), Material.FromLabPy(prism))
+    tmmCpp.AddLayer(math.inf, Material.FromLabPy(prism))
     tmmCpp.AddLayer(metalD, Material.FromLabPy(metal))
-    tmmCpp.AddLayer(float("inf"), Material.FromLabPy(dielectric))
+    tmmCpp.AddLayer(math.inf, Material.FromLabPy(dielectric))
 
     # Python TMM
-    tmmPy = LabPy._Tmm._NonlinearTmm._NonlinearTmm(
-        wl=wl, pol=pol, I0=I0, mode="incident", overrideE0=overrideE0
-    )  # @UndefinedVariable
-    tmmPy.AddLayer(float("inf"), prism)
+    tmmPy = LabPy._Tmm._NonlinearTmm._NonlinearTmm(wl=wl, pol=pol, I0=I0, mode="incident", overrideE0=overrideE0)
+    tmmPy.AddLayer(math.inf, prism)
     tmmPy.AddLayer(metalD, metal)
-    tmmPy.AddLayer(float("inf"), dielectric)
+    tmmPy.AddLayer(math.inf, dielectric)
     tmmPy.SetParams(beta=0.0)
 
     return tmmCpp, tmmPy

@@ -1,6 +1,12 @@
-from . import _SecondOrderNLTMMCython  # @UnresolvedImport
+from . import _SecondOrderNLTMMCython
+from ._Material import Material
 
-from ._Material import *
+__all__ = [
+    "Material",
+    "TMM",
+    "NonlinearTMM",
+    "SecondOrderNLTMM",
+]
 
 # Public aliases (previously in _NonlinearTMM.py and _SecondOrderNLTMM.py)
 TMM = _SecondOrderNLTMMCython.NonlinearTMM
@@ -20,6 +26,3 @@ _NonlinearLayer = _SecondOrderNLTMMCython._NonlinearLayer
 _SecondOrderNLIntensities = _SecondOrderNLTMMCython._SecondOrderNLIntensities
 _SweepResultSecondOrderNLTMM = _SecondOrderNLTMMCython._SweepResultSecondOrderNLTMM
 _WaveSweepResultSecondOrderNLTMM = _SecondOrderNLTMMCython._WaveSweepResultSecondOrderNLTMM
-
-if __name__ == "__main__":
-    pass

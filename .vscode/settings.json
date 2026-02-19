@@ -1,0 +1,32 @@
+{
+    "cSpell.words": [
+        "arcsin",
+        "ascontiguousarray",
+        "axvline",
+        "coefs",
+        "colorbar",
+        "Cython",
+        "cythonize",
+        "eigen",
+        "eigency",
+        "fftfreq",
+        "fftshift",
+        "fopenmp",
+        "ifftshift",
+        "integ",
+        "interp",
+        "matplotlib",
+        "NLTMM",
+        "numpy",
+        "numpydoc",
+        "pcolormesh",
+        "pytest",
+        "pyyaml",
+        "scipy",
+        "setuptools",
+        "testpaths",
+        "venv",
+        "xlabel",
+        "ylabel"
+    ]
+}
