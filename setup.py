@@ -36,7 +36,7 @@ extensions = cythonize(
             include_dirs=[
                 np.get_include(),
                 "NonlinearTMM/src/NonlinearTMMCpp/NonlinearTMMCpp",
-                "NonlinearTMM/src/eigen-3.4.0",
+                "third_party/eigen",
             ]
             + eigency.get_includes(include_eigen=False),
             language="c++",

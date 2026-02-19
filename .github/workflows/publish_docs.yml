@@ -9,6 +9,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
+        with:
+          submodules: true
       - name: Set up uv
         uses: astral-sh/setup-uv@v7
       - name: Build and install
