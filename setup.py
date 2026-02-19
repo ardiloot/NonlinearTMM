@@ -9,10 +9,6 @@ from setuptools import setup
 from setuptools.extension import Extension
 
 
-def _remove_main(files):
-    return [f for f in files if "Main.cpp" not in f]
-
-
 extra_compile_args = []
 extra_link_args = []
 
@@ -24,7 +20,7 @@ if sys.platform in ("linux", "darwin"):
 elif sys.platform == "win32":
     extra_compile_args.extend(["/std:c++17", "/openmp"])
 
-sources = ["NonlinearTMM/src/SecondOrderNLTMM.pyx"] + _remove_main(glob.glob("NonlinearTMM/src/cpp/*.cpp"))
+sources = ["NonlinearTMM/src/SecondOrderNLTMM.pyx"] + glob.glob("NonlinearTMM/src/cpp/*.cpp")
 
 extensions = cythonize(
     [

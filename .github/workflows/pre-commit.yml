@@ -14,5 +14,5 @@ jobs:
         with:
           submodules: true
       - uses: astral-sh/setup-uv@v7
-      - run: uv python install 3.13
-      - uses: pre-commit/action@v3.0.1
+      - run: uv tool install pre-commit --with pre-commit-uv
+      - run: pre-commit run --all-files
