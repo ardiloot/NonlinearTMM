@@ -309,7 +309,7 @@ class SecondOrderNLTmmForWaves(Core.ParamsBaseClass):
 
         # Init variables
         starttime = time()
-        kxs = np.zeros((len(self.wave1.kxs) * len(self.wave2.kxs)))
+        kxs = np.zeros(len(self.wave1.kxs) * len(self.wave2.kxs))
         UsF = np.zeros_like(kxs, dtype=complex)
         UsB = np.zeros_like(kxs, dtype=complex)
         kzsF = np.zeros_like(kxs, dtype=complex)

@@ -23,6 +23,6 @@ jobs:
       - name: Setup Python ${{ matrix.python }}
         run: uv python install ${{ matrix.python }}
       - name: Build and install
-        run: uv sync --extra test
+        run: uv sync --group dev
       - name: Test with pytest
         run: uv run pytest

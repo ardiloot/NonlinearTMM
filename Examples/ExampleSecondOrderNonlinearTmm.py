@@ -42,7 +42,7 @@ if __name__ == "__main__":
     sr = tmm.Sweep("beta", betas, betas)
 
     # Plot generated reflection and transmission
-    plt.title(f"SHG generation from crystal (d = {1e6 * crystalD:.0f} $\mu m$)")
+    plt.title(rf"SHG generation from crystal (d = {1e6 * crystalD:.0f} $\mu m$)")
     plt.plot(betas, sr.Gen.Ir, label="R")
     plt.plot(betas, sr.Gen.It, label="T")
     plt.legend()

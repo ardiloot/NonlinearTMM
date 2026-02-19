@@ -686,14 +686,14 @@ class SecondOrderNLTmm(Core.ParamsBaseClass):
         keysGen = ["iGen", "rGen", "tGen", "IGen", "RGen", "TGen", "AGen"]
         res = {}
 
-        res["betasGen"] = np.zeros((len(paramValues[0])))
+        res["betasGen"] = np.zeros(len(paramValues[0]))
 
         for k in keysP1 + keysP2 + keysGen:
             res[k] = np.zeros((len(paramValues[0])), dtype=complex)
 
         if enhpos is not None:
-            res["enhP1"] = np.zeros((len(paramValues[0])))
-            res["enhP2"] = np.zeros((len(paramValues[0])))
+            res["enhP1"] = np.zeros(len(paramValues[0]))
+            res["enhP2"] = np.zeros(len(paramValues[0]))
 
         for i in range(len(paramValues[0])):
             for name, values in zip(paramNames, paramValues):

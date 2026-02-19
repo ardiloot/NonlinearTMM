@@ -2,10 +2,10 @@ from __future__ import annotations
 
 import math
 
+import LabPy
 import numpy as np
 import pytest
 
-import LabPy
 from NonlinearTMM import Material, SecondOrderNLTMM
 
 

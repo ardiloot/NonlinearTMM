@@ -4,8 +4,8 @@ import math
 
 import numpy as np
 import pytest
-
 from LabPy import Constants
+
 from NonlinearTMM import Material, SecondOrderNLTMM
 
 

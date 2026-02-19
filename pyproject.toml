@@ -24,11 +24,8 @@ dependencies = [
     "eigency>=3.4.0.0",
 ]
 
-[project.optional-dependencies]
-test = ["pyyaml", "pytest"]
-
 [dependency-groups]
-dev = ["pyyaml", "pytest", "matplotlib", "sphinx", "numpydoc"]
+dev = ["pyyaml", "pytest", "pre-commit", "pyright", "matplotlib", "sphinx", "numpydoc"]
 
 [project.urls]
 Homepage = "https://github.com/ardiloot/NonlinearTMM"
@@ -40,6 +37,8 @@ packages = ["NonlinearTMM"]
 
 [tool.setuptools.package-data]
 "NonlinearTMM" = [
+    "py.typed",
+    "*.pyi",
     "src/*.pxd",
     "src/cpp/*.h",
     "src/cpp/*.cpp",
@@ -57,17 +56,16 @@ exclude = [
     "third_party/eigen",
 ]
 
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B"]
+
 [tool.ruff.lint.per-file-ignores]
-"__init__.py" = ["F401", "F403"]
-"Tests/LabPy/**" = ["E701", "E711", "E721", "E731", "E741", "F821"]
-"Tests/test_*.py" = ["E741"]
+"Tests/LabPy/**" = ["B905", "E731", "E741", "F401", "F403"]
 
 [tool.pytest.ini_options]
 testpaths = ["Tests"]
 
 [tool.pyright]
 typeCheckingMode = "standard"
-venvPath = "."
-venv = ".venv"
 include = ["NonlinearTMM", "Examples", "Tests"]
 exclude = ["NonlinearTMM/src"]

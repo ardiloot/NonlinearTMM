@@ -2,10 +2,10 @@ from __future__ import annotations
 
 import math
 
+import LabPy
 import numpy as np
 import pytest
 
-import LabPy
 from NonlinearTMM import TMM, Material
 
 
@@ -156,12 +156,12 @@ def TestPowerFlows(tmms: tuple[TMM, object]) -> None:
     betas = np.linspace(0.0, 1.49, 20)
     sr = tmmCpp.Sweep("beta", betas)
     sweepFunc = np.vectorize(lambda beta: tmmPy.Solve(beta=beta))
-    inc, r, t, I, R, T, _ = sweepFunc(betas)
+    inc, r, t, Ii, R, T, _ = sweepFunc(betas)
 
     # Comparison
     np.testing.assert_allclose(sr.inc, inc)
     np.testing.assert_allclose(sr.r, r)
     np.testing.assert_allclose(sr.t, t)
-    np.testing.assert_allclose(sr.Ii, I)
+    np.testing.assert_allclose(sr.Ii, Ii)
     np.testing.assert_allclose(sr.Ir, R)
-    np.testing.assert_allclose(sr.It, T, atol=1e-9 * np.mean(I))
+    np.testing.assert_allclose(sr.It, T, atol=1e-9 * np.mean(Ii))
