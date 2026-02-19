@@ -28,27 +28,27 @@ Helper classes
    :members:
    :inherited-members:
    :show-inheritance:
-   
+
 .. autoclass:: NonlinearTMM._WaveSweepResultNonlinearTMM
    :members:
    :inherited-members:
-   :show-inheritance:   
-   
+   :show-inheritance:
+
 .. autoclass:: NonlinearTMM._FieldsZ
    :members:
    :inherited-members:
    :show-inheritance:
-   
+
 .. autoclass:: NonlinearTMM._FieldsZX
    :members:
    :inherited-members:
    :show-inheritance:
-   
+
 .. autoclass:: NonlinearTMM._HomogeneousWave
    :members:
    :inherited-members:
    :show-inheritance:
-   
+
 .. autoclass:: NonlinearTMM._NonlinearLayer
    :members:
    :inherited-members:
