@@ -5,88 +5,96 @@
 
 namespace TMM {
 
-	class SecondOrderNLTMM;
+class SecondOrderNLTMM;
 
-	//---------------------------------------------------------------
-	// SecondOrderNLIntensities
-	//---------------------------------------------------------------
+//---------------------------------------------------------------
+// SecondOrderNLIntensities
+//---------------------------------------------------------------
 
-	class SecondOrderNLIntensities {
-	private:
-	public:
-		Intensities P1, P2, Gen;
-	};
+class SecondOrderNLIntensities {
+private:
+public:
+    Intensities P1, P2, Gen;
+};
 
-	//---------------------------------------------------------------
-	// SweepResultSecondOrderNLTMM
-	//---------------------------------------------------------------
+//---------------------------------------------------------------
+// SweepResultSecondOrderNLTMM
+//---------------------------------------------------------------
 
-	class SweepResultSecondOrderNLTMM {
-	private:
-		int outmask;
-	public:
-		SweepResultNonlinearTMM P1, P2, Gen;
-		ArrayXd wlsGen, betasGen;
-		SweepResultSecondOrderNLTMM(int n, int outmask, int layerNr_, double layerZ_);
-		void SetValues(int nr, SecondOrderNLTMM &tmm);
-	};
+class SweepResultSecondOrderNLTMM {
+private:
+    int outmask;
 
-	//---------------------------------------------------------------
-	// WaveSweepResultSecondOrderNLTMM
-	//---------------------------------------------------------------
+public:
+    SweepResultNonlinearTMM P1, P2, Gen;
+    ArrayXd wlsGen, betasGen;
+    SweepResultSecondOrderNLTMM(int n, int outmask, int layerNr_, double layerZ_);
+    void SetValues(int nr, SecondOrderNLTMM& tmm);
+};
 
-	class WaveSweepResultSecondOrderNLTMM {
-	private:
-		int outmask;
-	public:
-		WaveSweepResultNonlinearTMM P1, P2, Gen;
-		ArrayXd wlsGen, betasGen;
-		WaveSweepResultSecondOrderNLTMM(int n, int outmask_, int layerNr_, double layerZ_);
-		void SetValues(int nr, SecondOrderNLTMM &tmm);
-	};
+//---------------------------------------------------------------
+// WaveSweepResultSecondOrderNLTMM
+//---------------------------------------------------------------
 
-	//---------------------------------------------------------------
-	// SecondOrderNLTMM
-	//---------------------------------------------------------------
+class WaveSweepResultSecondOrderNLTMM {
+private:
+    int outmask;
 
-	class SecondOrderNLTMM {
-	private:
-		double wlGen, betaGen;
-		double deltaWlSpdc, solidAngleSpdc, deltaThetaSpdc;
-		NonlinearProcess process;
-		NonlinearTMM tmmP1, tmmP2, tmmGen;
+public:
+    WaveSweepResultNonlinearTMM P1, P2, Gen;
+    ArrayXd wlsGen, betasGen;
+    WaveSweepResultSecondOrderNLTMM(int n, int outmask_, int layerNr_, double layerZ_);
+    void SetValues(int nr, SecondOrderNLTMM& tmm);
+};
 
-		void CalcInhomogeneosWaveParams(int layerNr, Material *material, InhomogeneosWaveParams *kpS, InhomogeneosWaveParams *kpA);
-		void SolveFundamentalFields();
-		void SolveGeneratedField();
-		void SolveWaves(ArrayXd *betasP1, ArrayXcd *E0sP1, ArrayXd *betasP2, ArrayXcd *E0sP2);
+//---------------------------------------------------------------
+// SecondOrderNLTMM
+//---------------------------------------------------------------
 
-	public:
-		SecondOrderNLTMM();
-		void SetProcess(NonlinearProcess process_);
-		void SetDeltaWlSpdc(double value);
-		void SetSolidAngleSpdc(double value);
-		void SetDeltaThetaSpdc(double value);
-		void AddLayer(double d_, Material *material_);
-		[[nodiscard]] NonlinearTMM* GetP1() noexcept;
-		[[nodiscard]] NonlinearTMM* GetP2() noexcept;
-		[[nodiscard]] NonlinearTMM* GetGen() noexcept;
-		[[nodiscard]] double GetDeltaWlSpdc() const noexcept;
-		[[nodiscard]] double GetSolidAngleSpdc() const noexcept;
-		[[nodiscard]] double GetDeltaThetaSpdc() const noexcept;
+class SecondOrderNLTMM {
+private:
+    double wlGen, betaGen;
+    double deltaWlSpdc, solidAngleSpdc, deltaThetaSpdc;
+    NonlinearProcess process;
+    NonlinearTMM tmmP1, tmmP2, tmmGen;
 
-		void CheckPrerequisites(TMMParam toIgnore = TMMParam::PARAM_NOT_DEFINED);
-		void UpdateGenParams();
-		
-		// Planewaves
-		void Solve();
-		[[nodiscard]] SecondOrderNLIntensities GetIntensities() const;
-		[[nodiscard]] std::unique_ptr<SweepResultSecondOrderNLTMM> Sweep(TMMParam param, const Eigen::Map<ArrayXd> &valuesP1, const Eigen::Map<ArrayXd> &valuesP2, int outmask = SWEEP_ALL_WAVE_PWRS, int paramLayer = -1, int layerNr = 0, double layerZ = 0.0);
+    void CalcInhomogeneosWaveParams(int layerNr, Material* material, InhomogeneosWaveParams* kpS,
+                                    InhomogeneosWaveParams* kpA);
+    void SolveFundamentalFields();
+    void SolveGeneratedField();
+    void SolveWaves(ArrayXd* betasP1, ArrayXcd* E0sP1, ArrayXd* betasP2, ArrayXcd* E0sP2);
 
-		// Waves
-		[[nodiscard]] pairdd WaveGetPowerFlows(int layerNr, double x0 = constNAN, double x1 = constNAN, double z = 0.0);
-		[[nodiscard]] std::unique_ptr<WaveSweepResultSecondOrderNLTMM> WaveSweep(TMMParam param, const Eigen::Map<ArrayXd>& valuesP1, const Eigen::Map<ArrayXd>& valuesP2, int outmask = SWEEP_ALL_WAVE_PWRS, int paramLayer = -1, int layerNr = 0, double layerZ = 0.0);
-		[[nodiscard]] std::unique_ptr<FieldsZX> WaveGetFields2D(const Eigen::Map<ArrayXd> &zs, const Eigen::Map<ArrayXd> &xs, WaveDirection dir = WaveDirection::TOT);
-		
-	};
-}
+public:
+    SecondOrderNLTMM();
+    void SetProcess(NonlinearProcess process_);
+    void SetDeltaWlSpdc(double value);
+    void SetSolidAngleSpdc(double value);
+    void SetDeltaThetaSpdc(double value);
+    void AddLayer(double d_, Material* material_);
+    [[nodiscard]] NonlinearTMM* GetP1() noexcept;
+    [[nodiscard]] NonlinearTMM* GetP2() noexcept;
+    [[nodiscard]] NonlinearTMM* GetGen() noexcept;
+    [[nodiscard]] double GetDeltaWlSpdc() const noexcept;
+    [[nodiscard]] double GetSolidAngleSpdc() const noexcept;
+    [[nodiscard]] double GetDeltaThetaSpdc() const noexcept;
+
+    void CheckPrerequisites(TMMParam toIgnore = TMMParam::PARAM_NOT_DEFINED);
+    void UpdateGenParams();
+
+    // Planewaves
+    void Solve();
+    [[nodiscard]] SecondOrderNLIntensities GetIntensities() const;
+    [[nodiscard]] std::unique_ptr<SweepResultSecondOrderNLTMM>
+    Sweep(TMMParam param, const Eigen::Map<ArrayXd>& valuesP1, const Eigen::Map<ArrayXd>& valuesP2,
+          int outmask = SWEEP_ALL_WAVE_PWRS, int paramLayer = -1, int layerNr = 0, double layerZ = 0.0);
+
+    // Waves
+    [[nodiscard]] pairdd WaveGetPowerFlows(int layerNr, double x0 = constNAN, double x1 = constNAN, double z = 0.0);
+    [[nodiscard]] std::unique_ptr<WaveSweepResultSecondOrderNLTMM>
+    WaveSweep(TMMParam param, const Eigen::Map<ArrayXd>& valuesP1, const Eigen::Map<ArrayXd>& valuesP2,
+              int outmask = SWEEP_ALL_WAVE_PWRS, int paramLayer = -1, int layerNr = 0, double layerZ = 0.0);
+    [[nodiscard]] std::unique_ptr<FieldsZX> WaveGetFields2D(const Eigen::Map<ArrayXd>& zs,
+                                                            const Eigen::Map<ArrayXd>& xs,
+                                                            WaveDirection dir = WaveDirection::TOT);
+};
+} // namespace TMM

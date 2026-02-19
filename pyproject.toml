@@ -25,10 +25,10 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-test = ["pyyaml", "pytest", "ruff"]
+test = ["pyyaml", "pytest"]
 
 [dependency-groups]
-dev = ["pyyaml", "pytest", "ruff", "matplotlib", "sphinx", "numpydoc"]
+dev = ["pyyaml", "pytest", "matplotlib", "sphinx", "numpydoc"]
 
 [project.urls]
 Homepage = "https://github.com/ardiloot/NonlinearTMM"
@@ -60,7 +60,7 @@ exclude = [
 
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["F401", "F403"]
-"Tests/LabPy/**" = ["E701", "E721", "E731", "E741", "F821"]
+"Tests/LabPy/**" = ["E701", "E711", "E721", "E731", "E741", "F821"]
 "Tests/test_*.py" = ["E741"]
 
 [tool.pytest.ini_options]
