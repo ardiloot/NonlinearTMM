@@ -11,7 +11,7 @@ code.
 
 Requirements:
 
-* `Python >= 3.6 <https://www.python.org/>`_
+* `Python >= 3.10 <https://www.python.org/>`_
 
 Dependencies:
 
@@ -23,7 +23,7 @@ Installation through pip is done like:
 
 	pip install NonlinearTMM
 
-Alternatively, it is possible to install the package form the source code by
+Alternatively, it is possible to install the package from the source code by
 
 .. code-block:: bash
 
@@ -41,30 +41,30 @@ The package has three main classes:
 * :class:`TMM`
 * :class:`SecondOrderNLTMM`
 
-Class :class:`Material` is responsible to represent the properties of optical
-material. Mainly wavelength dependent refractive indices and second-order
-suceptibility tensor for nonlinear processes.
+Class :class:`Material` is responsible for representing the properties of optical
+material, mainly wavelength-dependent refractive indices and second-order
+susceptibility tensor for nonlinear processes.
 
-Class :class:`TMM` (alias of :class:`NonlinearTMM`) is has all the standard TMM features:
+Class :class:`TMM` (alias of :class:`NonlinearTMM`) has all the standard TMM features:
 
 * Both p- and s-polarization
-* Arbritarty angle of incidence
+* Arbitrary angle of incidence
 * Calculation of reflection, transmission and absorption of plane waves (:any:`GetIntensities <NonlinearTMM.GetIntensities>` and :any:`GetAbsorbedIntensity <NonlinearTMM.GetAbsorbedIntensity>`)
-* Calculaion of electric and magnetic fields inside structure (:any:`GetFields <NonlinearTMM.GetFields>` and :any:`GetFields2D <NonlinearTMM.GetFields2D>`)
+* Calculation of electric and magnetic fields inside structure (:any:`GetFields <NonlinearTMM.GetFields>` and :any:`GetFields2D <NonlinearTMM.GetFields2D>`)
 * Calculation of field enhancement (:any:`GetEnhancement <NonlinearTMM.GetEnhancement>`)
 * Sweep over any parameter (:any:`Sweep <NonlinearTMM.Sweep>`)
 
 In addition to those standard features, the class has similar functionality to
-work with waves with arbritarty profile (e.g. Gaussian beam). The configuration
+work with waves with arbitrary profile (e.g. Gaussian beam). The configuration
 of the beam is done through attribute :any:`wave <NonlinearTMM.wave>` (see class :any:`_Wave`).
-The interface for the calculations with arbritarty beams is similar to standard TMM:
+The interface for the calculations with arbitrary beams is similar to standard TMM:
 
 * Calculation of reflection, transmission and absorption of beams (:any:`WaveGetPowerFlows <NonlinearTMM.WaveGetPowerFlows>`)
-* Calculaion of electric and magnetic fields inside structure (:any:`WaveGetFields2D <NonlinearTMM.WaveGetFields2D>`)
+* Calculation of electric and magnetic fields inside structure (:any:`WaveGetFields2D <NonlinearTMM.WaveGetFields2D>`)
 * Calculation of field enhancement (:any:`WaveGetEnhancement <NonlinearTMM.WaveGetEnhancement>`)
 * Sweep over any parameter (:any:`WaveSweep <NonlinearTMM.WaveSweep>`)
 
-Finally, :class:`SecondOrderNLTMM` class ic capable of calculating second-order
+Finally, :class:`SecondOrderNLTMM` class is capable of calculating second-order
 nonlinear processes like second-harmonic generation, sum-frequency generation and
 difference frequency generation. This has similar interface as :any:`TMM` - it
 supports both the plane waves and beams.
@@ -78,20 +78,20 @@ Plane waves example
 As an example three layer structure consisting of a prism (z < 0), 50 nm thick silver
 film and air is studied. Such kind of structure supports surface plasmon
 resonance (SPP) if excited by p-polarized light and is named Kretschmann
-configuration. The example code is shown bellow and could be divided into
+configuration. The example code is shown below and could be divided into
 following steps:
 
 1. Specifying materials refractive indices.
 2. Initializing :class:`TMM`, setting params and adding layers.
-3. By using :any:`Sweep <NonlinearTMM.Sweep>` calculate the dependence of reflection, transmission and enhancment factor on the angle of incidence.
-4. Find the plasmonic resonance by maximum enhancment.
+3. By using :any:`Sweep <NonlinearTMM.Sweep>` calculate the dependence of reflection, transmission and enhancement factor on the angle of incidence.
+4. Find the plasmonic resonance by maximum enhancement.
 5. Calculate 1D fields at plasmonic resonance by :any:`GetFields <NonlinearTMM.GetFields>`.
 6. Calculate 2D fields at plasmonic resonance by :any:`GetFields2D <NonlinearTMM.GetFields2D>`.
 7. Plot all results
 
 .. literalinclude:: ../Examples/ExampleTMM.py
 
-The results of the calculations are shown bellow. Indeed there is a sharrp dip
+The results of the calculations are shown below. Indeed there is a sharp dip
 in the reflection (R) near the angle of incidence ca 44 degrees. At the same angle
 the field enhancement factor is maximum and is more than 12 times. In the second
 the results of the fields calculations at plasmonic resonance is presented. Indeed,
@@ -111,14 +111,14 @@ to 10 μm.
 
 .. literalinclude:: ../Examples/ExampleTMMForWaves.py
 
-The results of those calculations are bellow. Despite the fact, that the structure
+The results of those calculations are below. Despite the fact, that the structure
 is the same, the dip in the reflection is different. The reason for this behaviour
 is that as the resonances of SPPs are narrow, they also require well collimated
-beam to excite them. Also field enhancment is ca 3 times lower, as expected. On
+beam to excite them. Also field enhancement is ca 3 times lower, as expected. On
 the right side, the electrical field norm is shown. It is clearly visible, that
-Gaussian beam is incident form the left, and it gets reflected from the metal film (z = 0).
+Gaussian beam is incident from the left, and it gets reflected from the metal film (z = 0).
 Part of the energy is transmitted to excite SPPs at the metal-air interface. The
-excited SPPs are propagating on the metal film and are absorbe after ca 20 μm of
+excited SPPs are propagating on the metal film and are absorbed after ca 20 μm of
 propagation.
 
 .. image:: images/TMMForWaves-example.png
@@ -129,9 +129,7 @@ Second-order nonlinear TMM
 Plane waves example
 ===================
 
-Will be added in near future.
+As an example, second-harmonic generation (SHG) in a nonlinear crystal is
+calculated. The example code is shown below.
 
-Gaussian wave example
-=====================
-
-Will be added in near future.
+.. literalinclude:: ../Examples/ExampleSecondOrderNonlinearTmm.py
