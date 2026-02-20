@@ -80,7 +80,7 @@ jobs:
       - name: Verify release is from master branch
         run: |
           TARGET="${{ github.event.release.target_commitish }}"
-          # If target_commitish is a branch name, check it's master
+          # If target_commitish is a branch name (local or remote), check it's master
           if git rev-parse --verify "refs/heads/$TARGET" >/dev/null 2>&1 || \
              git rev-parse --verify "refs/remotes/origin/$TARGET" >/dev/null 2>&1; then
             # It's a branch name
@@ -96,12 +96,15 @@ jobs:
             fi
           fi
 
-      - uses: actions/download-artifact@v6
+      - uses: actions/download-artifact@v7
         with:
           path: dist
           merge-multiple: true
 
       - uses: pypa/gh-action-pypi-publish@v1.13.0
+        with:
+          user: __token__
+          password: ${{ secrets.PYPI_API_TOKEN }}
 
   upload_testpypi:
     if: ${{ github.event.release.prerelease }}
@@ -110,7 +113,7 @@ jobs:
     permissions:
       id-token: write
     steps:
-      - uses: actions/download-artifact@v6
+      - uses: actions/download-artifact@v7
         with:
           path: dist
           merge-multiple: true
@@ -118,3 +121,5 @@ jobs:
       - uses: pypa/gh-action-pypi-publish@v1.13.0
         with:
           repository-url: https://test.pypi.org/legacy/
+          user: __token__
+          password: ${{ secrets.TEST_PYPI_API_TOKEN }}
