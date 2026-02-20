@@ -25,7 +25,7 @@ dependencies = [
 ]
 
 [dependency-groups]
-dev = ["pyyaml", "pytest", "pre-commit", "pyright", "matplotlib", "sphinx", "numpydoc"]
+dev = ["pyyaml", "pytest", "pre-commit", "ty", "matplotlib", "sphinx", "numpydoc"]
 
 [project.urls]
 Homepage = "https://github.com/ardiloot/NonlinearTMM"
@@ -69,3 +69,13 @@ testpaths = ["Tests"]
 typeCheckingMode = "standard"
 include = ["NonlinearTMM", "Examples", "Tests"]
 exclude = ["NonlinearTMM/src", "Tests/LabPy"]
+
+[tool.ty.src]
+include = ["NonlinearTMM", "Examples", "Tests"]
+exclude = ["NonlinearTMM/src", "Tests/LabPy", "third_party"]
+
+[tool.ty.environment]
+python-version = "3.10"
+
+[tool.ty.analysis]
+allowed-unresolved-imports = ["Cython.**", "setuptools.**"]
