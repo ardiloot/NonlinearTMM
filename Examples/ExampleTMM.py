@@ -82,6 +82,7 @@ def CalcSpp() -> None:
 
     # Fields 2D
     plt.subplot(224)
+    assert fields2D.Ez is not None
     plt.pcolormesh(1e6 * zs, 1e6 * xs, fields2D.Ez.real.T, rasterized=True)
     plt.xlabel(r"z (μm)")
     plt.ylabel(r"x (μm)")

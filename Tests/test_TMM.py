@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import math
+from typing import Any
 
 import LabPy
 import numpy as np
@@ -128,7 +129,7 @@ def GetTMMs(
     dielectric: LabPy.Material,
     metalD: float,
     overrideE0: complex | None,
-) -> tuple[TMM, object]:
+) -> tuple[TMM, Any]:
     # C++ TMM
     tmmCpp = TMM()
     tmmCpp.SetParams(wl=wl, pol=pol, I0=I0)
@@ -150,7 +151,7 @@ def GetTMMs(
     return tmmCpp, tmmPy
 
 
-def TestPowerFlows(tmms: tuple[TMM, object]) -> None:
+def TestPowerFlows(tmms: tuple[TMM, Any]) -> None:
     tmmCpp, tmmPy = tmms
 
     betas = np.linspace(0.0, 1.49, 20)

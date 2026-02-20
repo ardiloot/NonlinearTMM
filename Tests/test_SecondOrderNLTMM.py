@@ -37,7 +37,7 @@ def tmms(polP1, polP2, polGen, process):
     I0P2 = 2.0
     dValues = {"d11": 1e-12, "d22": 2e-12, "d33": 3e-12, "d12": 4e-12, "d23": 5e-12}
 
-    chi2 = LabPy.Chi2Tensor(**dValues)
+    chi2 = LabPy.Chi2Tensor(**dValues)  # type: ignore[reportArgumentType]
     prism = LabPy.Material("Static", n=1.5)
     metal = LabPy.Material("main/Ag/Johnson")
     crystal = LabPy.Material("special/gaussian_test")

@@ -14,12 +14,14 @@ Attributes:
 from __future__ import annotations
 
 import math
-from typing import Any
+from typing import Any, TypeAlias
 
 import numpy as np
-from numpy.typing import ArrayLike
+from numpy.typing import ArrayLike, NDArray
 
 from LabPy import Core
+
+ScalarOrArray: TypeAlias = float | NDArray[np.floating[Any]]
 
 # ===============================================================================
 # Definition of constants
@@ -41,7 +43,7 @@ kB = 1.38064852e-23
 # ===============================================================================
 
 
-def WlToJoule(wl: ArrayLike) -> ArrayLike:
+def WlToJoule(wl: ArrayLike) -> ScalarOrArray:
     """Converts wavelength (m) to photon energy (J).
 
     Args:
@@ -55,7 +57,7 @@ def WlToJoule(wl: ArrayLike) -> ArrayLike:
     return E
 
 
-def WlToEv(wl: ArrayLike) -> ArrayLike:
+def WlToEv(wl: ArrayLike) -> ScalarOrArray:
     """Converts wavelength (m) to energy (eV).
 
     Args:
@@ -69,7 +71,7 @@ def WlToEv(wl: ArrayLike) -> ArrayLike:
     return ev
 
 
-def WlToFreq(wl: ArrayLike) -> ArrayLike:
+def WlToFreq(wl: ArrayLike) -> ScalarOrArray:
     """Converts wavelength to frequency (Hz).
 
     Args:
@@ -83,7 +85,7 @@ def WlToFreq(wl: ArrayLike) -> ArrayLike:
     return freq
 
 
-def WlToOmega(wl: ArrayLike) -> ArrayLike:
+def WlToOmega(wl: ArrayLike) -> ScalarOrArray:
     """Converts wavelength to angular frequency (rad/s).
 
     Args:
@@ -102,7 +104,7 @@ def WlToOmega(wl: ArrayLike) -> ArrayLike:
 # ===============================================================================
 
 
-def JouleToWl(E: ArrayLike) -> ArrayLike:
+def JouleToWl(E: ArrayLike) -> ScalarOrArray:
     """Converts energy of a photon (J) to wavelength (m).
 
     Args:
@@ -116,7 +118,7 @@ def JouleToWl(E: ArrayLike) -> ArrayLike:
     return wl
 
 
-def EvToWl(ev: ArrayLike) -> ArrayLike:
+def EvToWl(ev: ArrayLike) -> ScalarOrArray:
     """Converts energy (eV) to wavelength (m).
 
     Args:
@@ -130,7 +132,7 @@ def EvToWl(ev: ArrayLike) -> ArrayLike:
     return wl
 
 
-def FreqToWl(freq: ArrayLike) -> ArrayLike:
+def FreqToWl(freq: ArrayLike) -> ScalarOrArray:
     """Converts frequency (1/s) to wavelength (m).
 
     Args:
@@ -144,7 +146,7 @@ def FreqToWl(freq: ArrayLike) -> ArrayLike:
     return wl
 
 
-def OmegaToWl(omega: ArrayLike) -> ArrayLike:
+def OmegaToWl(omega: ArrayLike) -> ScalarOrArray:
     """Converts angular frequency (rad/s) to wavelength (m).
 
     Args:
@@ -163,7 +165,7 @@ def OmegaToWl(omega: ArrayLike) -> ArrayLike:
 # ===============================================================================
 
 
-def EvToJoule(ev: ArrayLike) -> ArrayLike:
+def EvToJoule(ev: ArrayLike) -> ScalarOrArray:
     """Converts eV-s to joules.
 
     Args:
@@ -177,7 +179,7 @@ def EvToJoule(ev: ArrayLike) -> ArrayLike:
     return ev * qe
 
 
-def JouleToEv(E: ArrayLike) -> ArrayLike:
+def JouleToEv(E: ArrayLike) -> ScalarOrArray:
     """Converts joules to eV-s.
 
     Args:
@@ -191,7 +193,7 @@ def JouleToEv(E: ArrayLike) -> ArrayLike:
     return E / qe
 
 
-def EvToOmega(ev: ArrayLike) -> ArrayLike:
+def EvToOmega(ev: ArrayLike) -> ScalarOrArray:
     """Converts eV-s to angular frequency.
 
     Args:
@@ -204,7 +206,7 @@ def EvToOmega(ev: ArrayLike) -> ArrayLike:
     return 2.0 * math.pi * ev * qe / h
 
 
-def OmegaToEv(omega: ArrayLike) -> ArrayLike:
+def OmegaToEv(omega: ArrayLike) -> ScalarOrArray:
     """Converts angular frequency to eV-s.
 
     Args:
@@ -285,7 +287,7 @@ class NormalDistribution(Core.ParamsBaseClass):
 
         super().__init__(**kwargs)
 
-    def __call__(self, x: ArrayLike) -> ArrayLike:
+    def __call__(self, x: ArrayLike) -> ScalarOrArray:
         """Returns distribution value at position x.
 
         Args:
@@ -330,7 +332,7 @@ class LogNormalDistribution(NormalDistribution):
     def __init__(self, **kwargs: Any) -> None:
         super().__init__(**kwargs)
 
-    def __call__(self, x: ArrayLike) -> ArrayLike:
+    def __call__(self, x: ArrayLike) -> ScalarOrArray:
         """Returns distribution value at position x.
 
         Args:
@@ -395,7 +397,7 @@ class LogNormalDistributionLocal(Core.ParamsBaseClass):
 
         super().__init__(**kwargs)
 
-    def __call__(self, x: ArrayLike) -> ArrayLike:
+    def __call__(self, x: ArrayLike) -> ScalarOrArray:
         """Returns distribution value at position x.
 
         Args:
