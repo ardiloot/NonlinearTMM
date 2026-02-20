@@ -90,14 +90,12 @@ void HomogeneousWave::Solve(NonlinearLayer* layer_) {
     }
 
     if (imag(kz(iF)) < 0.0) {
-        // Shold not hapen, checking
-        std::cerr << "kzF imaginary part negative" << std::endl;
+        // Should not happen, checking
         throw std::runtime_error("kzF imaginary part negative");
     }
 
     if (real(kz(iF)) < 0.0) {
-        // Shold not hapen, checking
-        std::cerr << "kzF real part negative" << std::endl;
+        // Should not happen, checking
         throw std::runtime_error("kzF real part negative");
     }
 

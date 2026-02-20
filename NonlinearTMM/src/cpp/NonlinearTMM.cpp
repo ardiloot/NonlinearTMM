@@ -93,7 +93,6 @@ void OuterProductGoodEigenComplexAdd(const ArrayXcd& X, const ArrayXcd& Y, Matri
 
 void ThreadSafeMatrixAddNorm(MatrixXcd& mat, const MatrixXcd& toAdd) {
     if (mat.rows() != toAdd.rows() || mat.cols() != toAdd.cols()) {
-        std::cerr << "mat and toAdd must be the same size." << std::endl;
         throw std::invalid_argument("mat and toAdd must be the same size.");
     }
 
@@ -308,27 +307,22 @@ void NonlinearTMM::CheckPrerequisites(TMMParam toIgnore) {
 
     if (mode == NonlinearTmmMode::MODE_VACUUM_FLUCTUATIONS) {
         if (std::isnan(deltaWlSpdc)) {
-            std::cerr << "No value for deltaWlSpdc" << std::endl;
             throw std::invalid_argument("No value for deltaWlSpdc");
         }
 
         if (std::isnan(solidAngleSpdc)) {
-            std::cerr << "No value for solidAngleSpdc" << std::endl;
             throw std::invalid_argument("No value for solidAngleSpdc");
         }
 
         if (std::isnan(deltaThetaSpdc)) {
-            std::cerr << "No value for deltaThetaSpdc" << std::endl;
             throw std::invalid_argument("No value for deltaThetaSpdc");
         }
 
         if (std::isnan(wlP1Spdc)) {
-            std::cerr << "No value for wlP1Spdc" << std::endl;
             throw std::invalid_argument("No value for wlP1Spdc");
         }
 
         if (std::isnan(betaP1Spdc)) {
-            std::cerr << "No value for betaP1Spdc" << std::endl;
             throw std::invalid_argument("No value for betaP1Spdc");
         }
     }
@@ -513,7 +507,7 @@ double NonlinearTMM::CalcVacFuctuationsE0() {
 }
 
 double NonlinearTMM::CalcDeltaKxSpdc() {
-    // TODO: restrict ublic usage
+    // NOTE: intended for internal use only (called via Cython layer)
 
     // Calc deltaKx
     if (wave.GetWaveType() == WaveType::SPDCWAVE) {
@@ -590,7 +584,6 @@ void NonlinearTMM::Solve() {
 
     // Check first layer
     if (beta >= real(layers[0].n)) {
-        std::cerr << "Light cannot propagate in the first medium." << std::endl;
         throw std::invalid_argument("Light cannot propagate in the first medium.");
     }
 
@@ -871,7 +864,6 @@ Wave* NonlinearTMM::GetWave() noexcept {
 pairdd NonlinearTMM::WaveGetPowerFlows(int layerNr, double x0, double x1, double z) {
     CheckPrerequisites();
     if (mode == NonlinearTmmMode::MODE_NONLINEAR) {
-        std::cerr << "For nonlinear mode use the method of SecondOrderNLTMM" << std::endl;
         throw std::runtime_error("For nonlinear mode use the method of SecondOrderNLTMM");
     }
 
