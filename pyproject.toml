@@ -68,4 +68,4 @@ testpaths = ["Tests"]
 [tool.pyright]
 typeCheckingMode = "standard"
 include = ["NonlinearTMM", "Examples", "Tests"]
-exclude = ["NonlinearTMM/src"]
+exclude = ["NonlinearTMM/src", "Tests/LabPy"]

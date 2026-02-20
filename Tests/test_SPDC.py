@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import math
+from collections.abc import Callable
 
 import numpy as np
 import pytest
@@ -14,7 +15,7 @@ def SpdcPowerQuantum(
     wlP2: float,
     betaP1: float,
     betaP2: np.ndarray,
-    nF: object,
+    nF: Callable[[float], complex],
     chi2: float,
     crystalL: float,
     pwrP1: float,
@@ -22,7 +23,7 @@ def SpdcPowerQuantum(
     solidAngleSpdc: float,
     deltaThetaSpdc: float,
 ) -> np.ndarray:
-    wlGen = Constants.OmegaToWl(Constants.WlToOmega(wlP1) - Constants.WlToOmega(wlP2))
+    wlGen = float(Constants.OmegaToWl(Constants.WlToOmega(wlP1) - Constants.WlToOmega(wlP2)))
     betaGen = wlGen * (betaP1 / wlP1 - betaP2 / wlP2)
 
     # Omegas

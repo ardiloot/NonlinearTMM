@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Any
+
 import numpy as np
 
 from NonlinearTMM import _SecondOrderNLTMMCython
@@ -35,7 +37,7 @@ class Material(_SecondOrderNLTMMCython.Material):
         return Material(wls, ns)
 
     @staticmethod
-    def FromLabPy(materialLabPy: object) -> Material:
+    def FromLabPy(materialLabPy: Any) -> Material:
         """Create a Material from a LabPy Material instance.
 
         Parameters
@@ -63,5 +65,5 @@ class Material(_SecondOrderNLTMMCython.Material):
                 ns = np.ascontiguousarray(materialLabPy.nExp + 1.0j * materialLabPy.kExp)
             ns += 1.0j * materialLabPy.kAdditional
         res = Material(wls, ns)
-        res._materialLabPy = materialLabPy
+        res._materialLabPy = materialLabPy  # type: ignore[reportAttributeAccessIssue]
         return res
