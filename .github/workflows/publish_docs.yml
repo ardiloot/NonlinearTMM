@@ -2,15 +2,20 @@ name: Build and publish docs
 
 on:
   release:
-    types: [created]
+    types: [published]
+
+permissions:
+  contents: write
 
 jobs:
   build:
+    if: ${{ !github.event.release.prerelease }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
         with:
           submodules: true
+          fetch-depth: 0
       - name: Set up uv
         uses: astral-sh/setup-uv@v7
       - name: Build and install
