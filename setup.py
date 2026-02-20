@@ -11,11 +11,16 @@ from setuptools.extension import Extension
 extra_compile_args = []
 extra_link_args = []
 
-if sys.platform in ("linux", "darwin"):
+if sys.platform == "linux":
     extra_compile_args.extend(["-std=c++17", "-fopenmp"])
     if platform.machine() in ("x86_64", "AMD64", "i686", "i386"):
         extra_compile_args.append("-msse3")
     extra_link_args.extend(["-lgomp", "-fopenmp"])
+elif sys.platform == "darwin":
+    extra_compile_args.extend(["-std=c++17", "-Xpreprocessor", "-fopenmp"])
+    if platform.machine() in ("x86_64", "AMD64", "i686", "i386"):
+        extra_compile_args.append("-msse3")
+    extra_link_args.append("-lomp")
 elif sys.platform == "win32":
     extra_compile_args.extend(["/std:c++17", "/openmp"])
 

@@ -11,7 +11,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        os: [ubuntu-latest, windows-latest, macos-latest]
         python: ["3.10", "3.11", "3.12", "3.13", "3.14"]
     runs-on: ${{ matrix.os }}
     steps:
@@ -20,6 +20,9 @@ jobs:
           submodules: true
       - name: Set up uv
         uses: astral-sh/setup-uv@v7
+      - name: Install libomp (macOS)
+        if: runner.os == 'macOS'
+        run: brew install libomp
       - name: Setup Python ${{ matrix.python }}
         run: uv python install ${{ matrix.python }}
       - name: Build and install
