@@ -40,7 +40,6 @@ void Wave::SolvePlaneWave() {
 
 void Wave::SolveFFTWave() {
     if (nPointsInteg < 2) {
-        std::cerr << "nPointsInteg too small" << std::endl;
         throw std::runtime_error("nPointsInteg too small");
     }
 
@@ -82,7 +81,6 @@ void Wave::SolveFFTWave() {
 
     // Check for backward-propagating waves
     if (phis.maxCoeff() + thLayer0 >= PI / 2.0) {
-        std::cerr << "Phi larger than 90 deg." << std::endl;
         throw std::runtime_error("Phi larger than 90 deg.");
     }
 
@@ -96,7 +94,6 @@ void Wave::SolveFFTWave() {
 void Wave::SolveSpdcWave() {
     // Checks
     if (std::isnan(deltaKxSpdc)) {
-        std::cerr << "SPDC wave can only be used through SecondOrderNLTMM" << std::endl;
         throw std::runtime_error("SPDC wave can only be used through SecondOrderNLTMM");
     }
     maxXThis = (0.5 * w0 / std::cos(thLayer0));
@@ -307,7 +304,6 @@ double Wave::GetDouble(TMMParam param) const {
 
 pairdd Wave::GetXRange() const {
     if (!solved) {
-        std::cerr << "Wave must be solved first." << std::endl;
         throw std::runtime_error("Wave must be solved first.");
     }
     return pairdd(-maxXThis, maxXThis);
@@ -315,7 +311,6 @@ pairdd Wave::GetXRange() const {
 
 ArrayXd Wave::GetBetas() const {
     if (!solved) {
-        std::cerr << "Wave must be solved first." << std::endl;
         throw std::runtime_error("Wave must be solved first.");
     }
     return kxs / k0;
@@ -327,7 +322,6 @@ ArrayXd Wave::GetPhis() const noexcept {
 
 ArrayXd Wave::GetKxs() const {
     if (!solved) {
-        std::cerr << "Wave must be solved first." << std::endl;
         throw std::runtime_error("Wave must be solved first.");
     }
     return kxs;
@@ -335,7 +329,6 @@ ArrayXd Wave::GetKxs() const {
 
 ArrayXd Wave::GetKzs() const {
     if (!solved) {
-        std::cerr << "Wave must be solved first." << std::endl;
         throw std::runtime_error("Wave must be solved first.");
     }
     return kzs;
@@ -343,7 +336,6 @@ ArrayXd Wave::GetKzs() const {
 
 ArrayXd Wave::GetFieldProfileXs() const {
     if (!solved) {
-        std::cerr << "Wave must be solved first." << std::endl;
         throw std::runtime_error("Wave must be solved first.");
     }
     return fieldProfileXs;
@@ -351,7 +343,6 @@ ArrayXd Wave::GetFieldProfileXs() const {
 
 ArrayXd Wave::GetFieldProfile() const {
     if (!solved) {
-        std::cerr << "Wave must be solved first." << std::endl;
         throw std::runtime_error("Wave must be solved first.");
     }
     return fieldProfile;
@@ -359,7 +350,6 @@ ArrayXd Wave::GetFieldProfile() const {
 
 ArrayXcd Wave::GetExpansionCoefsKx() const {
     if (!solved) {
-        std::cerr << "Wave must be solved first." << std::endl;
         throw std::runtime_error("Wave must be solved first.");
     }
     return expansionCoefsKx;
@@ -367,7 +357,6 @@ ArrayXcd Wave::GetExpansionCoefsKx() const {
 
 double Wave::GetBeamArea() const {
     if (!solved) {
-        std::cerr << "Wave must be solved first." << std::endl;
         throw std::runtime_error("Wave must be solved first.");
     }
     return beamArea;

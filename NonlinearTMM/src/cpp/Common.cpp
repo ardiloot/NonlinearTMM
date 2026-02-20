@@ -16,7 +16,6 @@ TMMParamType GetParamType(TMMParam param) {
     case TMMParam::PARAM_LAYER_D:
         return TMMParamType::PTYPE_NONLINEAR_LAYER;
     default:
-        std::cerr << "Param has no type" << std::endl;
         throw std::invalid_argument("Param has no type");
     }
 }
@@ -251,7 +250,6 @@ pairdd IntegrateWavePower([[maybe_unused]] int layerNr, Polarization pol, double
                           const Eigen::MatrixX2cd& Us, const ArrayXd& kxs, const Eigen::MatrixX2cd& kzs, double x0,
                           double x1, double z, double Ly) {
     if (x0 != -x1 || z != 0) {
-        std::cerr << "Currently only x0 = -x1, z = 0 supported." << std::endl;
         throw std::invalid_argument("Currently only x0 = -x1, z = 0 supported.");
     }
 
@@ -338,7 +336,6 @@ pairdd IntegrateWavePower([[maybe_unused]] int layerNr, Polarization pol, double
         resF = Ly / (2.0 * omega * constMu0) * real(integValue2dF);
         resB = -Ly / (2.0 * omega * constMu0) * real(integValue2dB);
     } else {
-        std::cerr << "Unknown polarization." << std::endl;
         throw std::invalid_argument("Unknown polarization.");
     }
 
@@ -356,7 +353,6 @@ WaveDirection GetWaveDirection(dcomplex kzF, dcomplex eps, Polarization pol) {
         break;
     default:
 #pragma omp critical
-        std::cerr << "Unknown polarization." << std::endl;
         throw std::invalid_argument("Unknown polarization.");
     }
 
@@ -374,7 +370,6 @@ WaveDirection GetWaveDirection(dcomplex kzF, dcomplex eps, Polarization pol) {
         } else {
 // Only if kz = 0.0
 #pragma omp critical
-            std::cerr << "kzF = 0: " << kzF << " " << eps << ": " << pwrFlow << std::endl;
             throw std::runtime_error("Could not determine wave direction.");
         }
     }

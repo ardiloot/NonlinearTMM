@@ -59,7 +59,6 @@ void SecondOrderNLTMM::UpdateGenParams() {
     }
 
     if (wlGen <= 0.0) {
-        std::cerr << "Wavelength cannot be negative." << std::endl;
         throw std::runtime_error("Wavelength cannot be negative.");
     }
 
@@ -271,7 +270,8 @@ std::unique_ptr<SweepResultSecondOrderNLTMM> SecondOrderNLTMM::Sweep(TMMParam pa
             nlTMMCopy.GetP1()->SetParam(param, valuesP1(i), paramLayer);
             nlTMMCopy.GetP2()->SetParam(param, valuesP2(i), paramLayer);
             if (GetParamType(param) == TMMParamType::PTYPE_NONLINEAR_LAYER) {
-                // TODO
+                // NB: Gen param is set from P2 value; a more accurate approach
+                // would recompute Gen from both P1 and P2 (e.g. for layer-d sweeps).
                 nlTMMCopy.GetGen()->SetParam(param, valuesP2(i), paramLayer);
             }
 
@@ -365,7 +365,6 @@ std::unique_ptr<FieldsZX> SecondOrderNLTMM::WaveGetFields2D(const Eigen::Map<Arr
         }
         res->TakeSqrt();
     } else {
-        std::cerr << "Only P2 can be incoherent." << std::endl;
         throw std::invalid_argument("Only P2 can be incoherent.");
     }
 
@@ -375,7 +374,6 @@ std::unique_ptr<FieldsZX> SecondOrderNLTMM::WaveGetFields2D(const Eigen::Map<Arr
 pairdd SecondOrderNLTMM::WaveGetPowerFlows(int layerNr, double x0, double x1, double z) {
     // Do checking
     if (layerNr < 0 || layerNr > tmmP1.LayersCount()) {
-        std::cerr << "Invalid layer index." << std::endl;
         throw std::invalid_argument("Invalid layer index.");
     }
     UpdateGenParams();
@@ -390,13 +388,13 @@ pairdd SecondOrderNLTMM::WaveGetPowerFlows(int layerNr, double x0, double x1, do
     double LyP1 = tmmP1.GetWave()->GetLy();
     double LyP2 = waveP2->GetLy();
 
-    // TODO
+    // Wider P2 is required so that the integration x-range derived from P1
+    // is fully covered by P2.  Relaxing this would need separate x-ranges.
     if (waveP1->GetW0() > waveP2->GetW0()) {
-        std::cerr << "Currently P2 must be at least as wide as P1." << std::endl;
         throw std::invalid_argument("Currently P2 must be at least as wide as P1.");
     }
 
-    // X-range (TODO)
+    // Default x-range is derived from P1 beam extent
     auto [xMinP1, xMaxP1] = waveP1->GetXRange();
     if (std::isnan(x0)) {
         x0 = xMinP1;
@@ -407,7 +405,6 @@ pairdd SecondOrderNLTMM::WaveGetPowerFlows(int layerNr, double x0, double x1, do
 
     // Ly
     if (LyP1 != LyP2) {
-        std::cerr << "Both pump waves must have the same Ly." << std::endl;
         throw std::invalid_argument("Both pump waves must have the same Ly.");
     }
 
@@ -496,7 +493,6 @@ pairdd SecondOrderNLTMM::WaveGetPowerFlows(int layerNr, double x0, double x1, do
             res.second += rBwd * dkxP2;
         }
     } else {
-        std::cerr << "Only P2 is allowed to be incoherent." << std::endl;
         throw std::invalid_argument("Only P2 is allowed to be incoherent.");
     }
 
@@ -528,7 +524,8 @@ SecondOrderNLTMM::WaveSweep(TMMParam param, const Eigen::Map<ArrayXd>& valuesP1,
             nlTMMCopy.GetP1()->SetParam(param, valuesP1(i), paramLayer);
             nlTMMCopy.GetP2()->SetParam(param, valuesP2(i), paramLayer);
             if (GetParamType(param) == TMMParamType::PTYPE_NONLINEAR_LAYER) {
-                // TODO
+                // NB: Gen param is set from P2 value; a more accurate approach
+                // would recompute Gen from both P1 and P2 (e.g. for layer-d sweeps).
                 nlTMMCopy.GetGen()->SetParam(param, valuesP2(i), paramLayer);
             }
             nlTMMCopy.UpdateGenParams();
