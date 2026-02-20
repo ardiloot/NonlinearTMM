@@ -81,6 +81,7 @@ def CalcSppGaussianBeam() -> None:
     plt.colorbar(cm, label=r"$‖E‖$ (kV/m)")
 
     plt.tight_layout()
+    plt.savefig("docs/images/TMMForWaves-example.png", dpi=100)
     plt.show()
 
 

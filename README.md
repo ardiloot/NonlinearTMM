@@ -44,7 +44,7 @@ A Python library for optical simulations of **multilayer structures** using the 
 - **Second-order nonlinear processes** — SHG, SFG, DFG in multilayer structures
 - **Wavelength-dependent materials** — interpolated from measured optical data (YAML format)
 - **High performance** — C++ core (Eigen) with Cython bindings, OpenMP parallelization
-- **Cross-platform wheels** — Linux (x86_64), Windows (x64, ARM64), macOS (ARM64); Python 3.10–3.13
+- **Cross-platform wheels** — Linux (x86_64), Windows (x64, ARM64), macOS (ARM64); Python 3.10–3.14
 
 ## Installation
 
@@ -62,7 +62,6 @@ The library exposes three main classes: `Material`, `TMM`, and `SecondOrderNLTMM
 |---|---|
 | `Material(wls, ns)` | Wavelength-dependent material from arrays of λ and complex n |
 | `Material.Static(n)` | Constant refractive index (shortcut) |
-| `Material.FromFile(path)` | Load material from a YAML data file |
 | `TMM(wl=…, pol=…, I0=…)` | Create a solver; `wl` = wavelength (m), `pol` = `"p"` or `"s"` |
 | `tmm.AddLayer(d, mat)` | Append layer (`d` in m, `inf` for semi-infinite) |
 | `tmm.Sweep(param, values)` | Solve for an array of values of any parameter |
@@ -111,7 +110,7 @@ result = tmm.Sweep("beta", betas, outEnh=True, layerNr=2)
 
 ### Gaussian Beam Excitation — [ExampleTMMForWaves.py](Examples/ExampleTMMForWaves.py)
 
-Same Kretschmann structure excited by a 10 mW Gaussian beam (waist 10 μm).
+The same Kretschmann structure excited by a 10 mW Gaussian beam (waist 10 μm).
 Shows how finite beam width affects resonance depth and field enhancement.
 
 <p align="center">
@@ -120,8 +119,14 @@ Shows how finite beam width affects resonance depth and field enhancement.
 
 ### Second-Harmonic Generation — [ExampleSecondOrderNonlinearTmm.py](Examples/ExampleSecondOrderNonlinearTmm.py)
 
-Second-harmonic generation in a nonlinear crystal, calculated with the
-`SecondOrderNLTMM` class. Supports SHG, SFG, and DFG processes.
+Second-harmonic generation (SHG) in a 1 mm nonlinear crystal with
+χ⁽²⁾ nonlinearity. Two s-polarized pump beams at 1000 nm generate a
+second-harmonic signal at 500 nm. The `SecondOrderNLTMM` class also supports
+sum-frequency generation (SFG) and difference-frequency generation (DFG).
+
+<p align="center">
+  <img src="docs/images/SecondOrderNLTMM-example.png" alt="SHG reflected and transmitted intensity vs beta" width="700">
+</p>
 
 ## References
 
@@ -162,20 +167,20 @@ uv run pytest -v
 [Pre-commit](https://pre-commit.com/) hooks are configured to enforce formatting (ruff, clang-format) and catch common issues. To install the git hook locally:
 
 ```bash
-uvx pre-commit install
+uv run pre-commit install
 ```
 
 To run all checks manually:
 
 ```bash
-uvx pre-commit run --all-files
+uv run pre-commit run --all-files
 ```
 
 ### CI overview
 
 | Workflow | Trigger | What it does |
 |----------|---------|--------------|
-| [Pytest](.github/workflows/pytest.yml) | Push to `master` / PRs | Tests on {ubuntu, windows, macos} × Python 3.10 |
+| [Pytest](.github/workflows/pytest.yml) | Push to `master` / PRs | Tests on {ubuntu, windows, macos} × Python {3.10–3.14} |
 | [Pre-commit](.github/workflows/pre-commit.yml) | Push to `master` / PRs | Runs ruff, clang-format, ty, and other checks |
 | [Publish to PyPI](.github/workflows/publish.yml) | Release published | Builds wheels + sdist via cibuildwheel, uploads to PyPI |
 | [Publish docs](.github/workflows/publish_docs.yml) | Release published | Builds Sphinx docs and deploys to GitHub Pages |
@@ -189,9 +194,9 @@ Versioning is handled automatically by [setuptools-scm](https://github.com/pypa/
    - Go to [Releases](https://github.com/ardiloot/NonlinearTMM/releases) → **Draft a new release**
    - Create a new tag following [PEP 440](https://peps.python.org/pep-0440/) (e.g. `v1.2.0`)
    - Target the `master` branch (or a specific commit on master)
-   - Click **Generate release notes** for auto-generated changelog
+   - Click **Generate release notes** for an auto-generated changelog
    - For pre-releases (e.g. `v1.2.0rc1`), check **Set as a pre-release** — these upload to TestPyPI instead of PyPI
-3. **Publish the release** — the workflow builds wheels for Linux (x86_64), Windows (x64, ARM64), and macOS (ARM64) and uploads to [PyPI](https://pypi.org/project/NonlinearTMM/).
+3. **Publish the release** — the workflow builds wheels for Linux (x86_64), Windows (x64, ARM64), and macOS (ARM64), and uploads to [PyPI](https://pypi.org/project/NonlinearTMM/).
 
 ## License
 

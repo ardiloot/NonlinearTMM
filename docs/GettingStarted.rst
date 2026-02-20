@@ -133,3 +133,9 @@ As an example, second-harmonic generation (SHG) in a nonlinear crystal is
 calculated. The example code is shown below.
 
 .. literalinclude:: ../Examples/ExampleSecondOrderNonlinearTmm.py
+
+The results show the reflected and transmitted SHG intensity as a function
+of the propagation parameter β. Two s-polarized pump beams at 1000 nm
+generate a second-harmonic signal at 500 nm in a 1 mm nonlinear crystal.
+
+.. image:: images/SecondOrderNLTMM-example.png
