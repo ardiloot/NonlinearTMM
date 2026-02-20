@@ -41,7 +41,7 @@ jobs:
           CIBW_ARCHS: ${{ matrix.cibw_archs }}
           CIBW_BUILD: ${{ matrix.cibw_build || env.CIBW_BUILD }}
 
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@v6
         with:
           name: wheels-${{ matrix.os }}-${{ matrix.cibw_archs }}
           path: ./wheelhouse/*.whl
@@ -61,7 +61,7 @@ jobs:
       - name: Build sdist
         run: uv build --sdist
 
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@v6
         with:
           name: sdist
           path: dist/*.tar.gz
@@ -96,7 +96,7 @@ jobs:
             fi
           fi
 
-      - uses: actions/download-artifact@v7
+      - uses: actions/download-artifact@v6
         with:
           path: dist
           merge-multiple: true
@@ -110,7 +110,7 @@ jobs:
     permissions:
       id-token: write
     steps:
-      - uses: actions/download-artifact@v7
+      - uses: actions/download-artifact@v6
         with:
           path: dist
           merge-multiple: true
