@@ -10,7 +10,7 @@ Main class
    :members:
    :inherited-members:
    :show-inheritance:
-   
+
 Helper classes
 **************
 
@@ -18,4 +18,3 @@ Helper classes
    :members:
    :inherited-members:
    :show-inheritance:
-

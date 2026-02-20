@@ -1,25 +1,26 @@
-
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="./">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Second-order NLTMM &#8212; NonlinearTMM 0.1.dev1+g5129163 documentation</title>
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
-    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-    <script src="_static/doctools.js"></script>
-    <script src="_static/sphinx_highlight.js"></script>
+    <title>Second-order NLTMM &#8212; NonlinearTMM 1.4.0rc1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=0ca6144b" />
+    <script src="_static/documentation_options.js?v=67589dc7"></script>
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="prev" title="TMM" href="TMM.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
+
   
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+  
 
   </head><body>
   
@@ -32,12 +33,12 @@
           <div class="body" role="main">
             
   <section id="second-order-nltmm">
-<h1>Second-order NLTMM<a class="headerlink" href="#second-order-nltmm" title="Permalink to this heading">¶</a></h1>
+<h1>Second-order NLTMM<a class="headerlink" href="#second-order-nltmm" title="Link to this heading">¶</a></h1>
 <section id="main-class">
-<h2>Main class<a class="headerlink" href="#main-class" title="Permalink to this heading">¶</a></h2>
+<h2>Main class<a class="headerlink" href="#main-class" title="Link to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="NonlinearTMM.SecondOrderNLTMM">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">NonlinearTMM.</span></span><span class="sig-name descname"><span class="pre">SecondOrderNLTMM</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NonlinearTMM.SecondOrderNLTMM" title="Permalink to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">NonlinearTMM.</span></span><span class="sig-name descname"><span class="pre">SecondOrderNLTMM</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NonlinearTMM.SecondOrderNLTMM" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>This class calculates second-order nonliner processes (e.g. sum-frequency,
 difference frequency generation and SPDC) in layered structures. Relies on the
@@ -56,16 +57,16 @@ functionality of <cite>NonlinearTMM</cite> class.</p>
 </dd>
 <dt><strong>Gen</strong><span class="classifier"><a class="reference internal" href="TMM.html#NonlinearTMM.NonlinearTMM" title="NonlinearTMM.NonlinearTMM"><code class="xref any py py-class docutils literal notranslate"><span class="pre">NonlinearTMM</span></code></a></span></dt><dd><p>The inctance of the generated wave TMM.</p>
 </dd>
-<dt><strong>deltaWlSpdc</strong><span class="classifier">float</span></dt><dd><p>The spectral collection window (in nanometers) of the SPDC signal. 
+<dt><strong>deltaWlSpdc</strong><span class="classifier">float</span></dt><dd><p>The spectral collection window (in nanometers) of the SPDC signal.
 Only used if <code class="xref any docutils literal notranslate"><span class="pre">mode</span></code> is set to <code class="xref any docutils literal notranslate"><span class="pre">SPDC</span></code>
 Default: NaN.</p>
 </dd>
-<dt><strong>solidAngleSpdc</strong><span class="classifier">float</span></dt><dd><p>The collection solid angle (srad) of the detector (given in vacuum). 
+<dt><strong>solidAngleSpdc</strong><span class="classifier">float</span></dt><dd><p>The collection solid angle (srad) of the detector (given in vacuum).
 Only used if <code class="xref any docutils literal notranslate"><span class="pre">mode</span></code> is set to <code class="xref any docutils literal notranslate"><span class="pre">SPDC</span></code>
 Default: NaN.</p>
 </dd>
 <dt><strong>deltaThetaSpdc</strong><span class="classifier">float</span></dt><dd><p>The horizontal collection window (rad) of the detector (given in vacuum).
-It is used to calculate the vertical span of the detector. 
+It is used to calculate the vertical span of the detector.
 Only used if <code class="xref any docutils literal notranslate"><span class="pre">mode</span></code> is set to <code class="xref any docutils literal notranslate"><span class="pre">SPDC</span></code>
 Default: NaN.</p>
 </dd>
@@ -106,7 +107,7 @@ Default: NaN.</p>
 </table>
 <dl class="py method">
 <dt class="sig sig-object py" id="NonlinearTMM.SecondOrderNLTMM.AddLayer">
-<span class="sig-name descname"><span class="pre">AddLayer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">material</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NonlinearTMM.SecondOrderNLTMM.AddLayer" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">AddLayer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">material</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NonlinearTMM.SecondOrderNLTMM.AddLayer" title="Link to this definition">¶</a></dt>
 <dd><p>Adds layer to SecondOrderNLTMM. Equivalent of adding layer to P1, P2
 and Gen.</p>
 <dl class="field-list">
@@ -123,7 +124,7 @@ and Gen.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="NonlinearTMM.SecondOrderNLTMM.GetIntensities">
-<span class="sig-name descname"><span class="pre">GetIntensities</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#NonlinearTMM.SecondOrderNLTMM.GetIntensities" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">GetIntensities</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#NonlinearTMM.SecondOrderNLTMM.GetIntensities" title="Link to this definition">¶</a></dt>
 <dd><p>Returns the intensities and amplitutes of incident, reflected and
 transmitted wave for <code class="xref any docutils literal notranslate"><span class="pre">P1</span></code>, <code class="xref any docutils literal notranslate"><span class="pre">P2</span></code> and <code class="xref any docutils literal notranslate"><span class="pre">Gen</span></code>.
 The structure must be solved first.</p>
@@ -139,20 +140,20 @@ The structure must be solved first.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="NonlinearTMM.SecondOrderNLTMM.SetParams">
-<span class="sig-name descname"><span class="pre">SetParams</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NonlinearTMM.SecondOrderNLTMM.SetParams" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">SetParams</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NonlinearTMM.SecondOrderNLTMM.SetParams" title="Link to this definition">¶</a></dt>
 <dd><p>Helper method to set the values of all the attributes. See the docstring
 of <a class="reference internal" href="#"><span class="doc">Second-order NLTMM</span></a>.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="NonlinearTMM.SecondOrderNLTMM.Solve">
-<span class="sig-name descname"><span class="pre">Solve</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#NonlinearTMM.SecondOrderNLTMM.Solve" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">Solve</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#NonlinearTMM.SecondOrderNLTMM.Solve" title="Link to this definition">¶</a></dt>
 <dd><p>Solves the structure.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="NonlinearTMM.SecondOrderNLTMM.Sweep">
-<span class="sig-name descname"><span class="pre">Sweep</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">paramStr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">valuesP1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">valuesP2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layerNr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layerZ</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outPwr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outAbs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outEnh</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outP1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outP2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outGen</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NonlinearTMM.SecondOrderNLTMM.Sweep" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">Sweep</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">paramStr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">valuesP1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">valuesP2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layerNr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layerZ</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outPwr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outAbs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outEnh</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outP1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outP2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outGen</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NonlinearTMM.SecondOrderNLTMM.Sweep" title="Link to this definition">¶</a></dt>
 <dd><p>Solves the structure for series of <code class="xref any docutils literal notranslate"><span class="pre">valuesP1</span></code> and <code class="xref any docutils literal notranslate"><span class="pre">valuesP2</span></code>
 of param <code class="xref any docutils literal notranslate"><span class="pre">paramStr</span></code>. Using this function is more confortable and
 faster than just changing params and solving the structure (parallelized
@@ -204,13 +205,13 @@ with OpenMP).</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="NonlinearTMM.SecondOrderNLTMM.UpdateGenParams">
-<span class="sig-name descname"><span class="pre">UpdateGenParams</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#NonlinearTMM.SecondOrderNLTMM.UpdateGenParams" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">UpdateGenParams</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#NonlinearTMM.SecondOrderNLTMM.UpdateGenParams" title="Link to this definition">¶</a></dt>
 <dd><p>Forces the update of the wavelength and beta of the generated beam <code class="xref any docutils literal notranslate"><span class="pre">Gen</span></code>.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="NonlinearTMM.SecondOrderNLTMM.WaveGetFields2D">
-<span class="sig-name descname"><span class="pre">WaveGetFields2D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">zs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dirStr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'total'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NonlinearTMM.SecondOrderNLTMM.WaveGetFields2D" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">WaveGetFields2D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">zs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dirStr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'total'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NonlinearTMM.SecondOrderNLTMM.WaveGetFields2D" title="Link to this definition">¶</a></dt>
 <dd><p>Calculates 2D electric and magnetic fields of beam propagating in the
 structure. Analogous to the <a class="reference internal" href="TMM.html#NonlinearTMM.NonlinearTMM.GetFields2D" title="NonlinearTMM.NonlinearTMM.GetFields2D"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">GetFields2D</span></code></a> of plane waves. Only for the
 calculation of the power of generated beam. For pump beams use the
@@ -238,7 +239,7 @@ first layer is at z = 0.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="NonlinearTMM.SecondOrderNLTMM.WaveGetPowerFlows">
-<span class="sig-name descname"><span class="pre">WaveGetPowerFlows</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">layerNr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">float('nan')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">float('nan')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NonlinearTMM.SecondOrderNLTMM.WaveGetPowerFlows" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">WaveGetPowerFlows</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">layerNr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">float('nan')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">float('nan')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NonlinearTMM.SecondOrderNLTMM.WaveGetPowerFlows" title="Link to this definition">¶</a></dt>
 <dd><p>Analogous to the <a class="reference internal" href="#NonlinearTMM.SecondOrderNLTMM.GetIntensities" title="NonlinearTMM.SecondOrderNLTMM.GetIntensities"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">GetIntensities</span></code></a>, but calculates the powers of the
 beams instead of the intensities of the plane-waves. Only for the
 calculation of the power of generated beam. For pump beams use the
@@ -273,7 +274,7 @@ the power propagation to the positive direction of z-axis.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="NonlinearTMM.SecondOrderNLTMM.WaveSweep">
-<span class="sig-name descname"><span class="pre">WaveSweep</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">paramStr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">valuesP1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">valuesP2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layerNr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layerZ</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outPwr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outR</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outT</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outEnh</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outP1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outP2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outGen</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NonlinearTMM.SecondOrderNLTMM.WaveSweep" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">WaveSweep</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">paramStr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">valuesP1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">valuesP2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layerNr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layerZ</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outPwr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outR</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outT</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outEnh</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outP1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outP2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outGen</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#NonlinearTMM.SecondOrderNLTMM.WaveSweep" title="Link to this definition">¶</a></dt>
 <dd><p>Solves the structure for waves for series of <code class="xref any docutils literal notranslate"><span class="pre">valuesP1</span></code> and <code class="xref any docutils literal notranslate"><span class="pre">valuesP2</span></code> of param
 <code class="xref any docutils literal notranslate"><span class="pre">paramStr</span></code>. Using this function is more confortable and faster than just
 changing the params and solving the structure. Analogous to <a class="reference internal" href="#NonlinearTMM.SecondOrderNLTMM.Sweep" title="NonlinearTMM.SecondOrderNLTMM.Sweep"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">Sweep</span></code></a>.</p>
@@ -331,10 +332,10 @@ changing the params and solving the structure. Analogous to <a class="reference 
 
 </section>
 <section id="helper-classes">
-<h2>Helper classes<a class="headerlink" href="#helper-classes" title="Permalink to this heading">¶</a></h2>
+<h2>Helper classes<a class="headerlink" href="#helper-classes" title="Link to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="NonlinearTMM._WaveSweepResultSecondOrderNLTMM">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">NonlinearTMM.</span></span><span class="sig-name descname"><span class="pre">_WaveSweepResultSecondOrderNLTMM</span></span><a class="headerlink" href="#NonlinearTMM._WaveSweepResultSecondOrderNLTMM" title="Permalink to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">NonlinearTMM.</span></span><span class="sig-name descname"><span class="pre">_WaveSweepResultSecondOrderNLTMM</span></span><a class="headerlink" href="#NonlinearTMM._WaveSweepResultSecondOrderNLTMM" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Helper class for <cite>SecondOrderNLTMM</cite>. Stores the results of <cite>WaveSweep</cite>
 method.</p>
@@ -358,7 +359,7 @@ method.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="NonlinearTMM._SweepResultSecondOrderNLTMM">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">NonlinearTMM.</span></span><span class="sig-name descname"><span class="pre">_SweepResultSecondOrderNLTMM</span></span><a class="headerlink" href="#NonlinearTMM._SweepResultSecondOrderNLTMM" title="Permalink to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">NonlinearTMM.</span></span><span class="sig-name descname"><span class="pre">_SweepResultSecondOrderNLTMM</span></span><a class="headerlink" href="#NonlinearTMM._SweepResultSecondOrderNLTMM" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Helper class for <cite>SecondOrderNLTMM</cite>. Stores the results of <cite>Sweep</cite> method.</p>
 <dl class="field-list">
@@ -381,7 +382,7 @@ method.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="NonlinearTMM._SecondOrderNLIntensities">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">NonlinearTMM.</span></span><span class="sig-name descname"><span class="pre">_SecondOrderNLIntensities</span></span><a class="headerlink" href="#NonlinearTMM._SecondOrderNLIntensities" title="Permalink to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">NonlinearTMM.</span></span><span class="sig-name descname"><span class="pre">_SecondOrderNLIntensities</span></span><a class="headerlink" href="#NonlinearTMM._SecondOrderNLIntensities" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>This is a helper class for <cite>SecondOrderNLTMM</cite>. It stores the results of
 <cite>GetIntensities</cite>.</p>
@@ -410,7 +411,7 @@ wave.</p>
           
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
 <h1 class="logo"><a href="index.html">NonlinearTMM</a></h1>
 
@@ -421,7 +422,16 @@ wave.</p>
 
 
 
-<h3>Navigation</h3>
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="Introduction.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="GettingStarted.html">Getting started</a></li>
@@ -447,16 +457,6 @@ wave.</p>
   </ul></li>
 </ul>
 </div>
-<div id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</div>
-<script>document.getElementById('searchbox').style.display = "block"</script>
 
 
 
@@ -470,11 +470,11 @@ wave.</p>
       <div class="clearer"></div>
     </div>
     <div class="footer">
-      &copy;2017, Ardi Loot.
+      &#169;2017-2025, Ardi Loot.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 6.1.3</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 9.1.0</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
       
       |
       <a href="_sources/SecondOrderNLTMM.rst.txt"

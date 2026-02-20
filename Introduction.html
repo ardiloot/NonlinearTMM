@@ -1,17 +1,17 @@
-
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="./">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Introduction &#8212; NonlinearTMM 0.1.dev1+g5129163 documentation</title>
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
-    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-    <script src="_static/doctools.js"></script>
-    <script src="_static/sphinx_highlight.js"></script>
+    <title>Introduction &#8212; NonlinearTMM 1.4.0rc1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=0ca6144b" />
+    <script src="_static/documentation_options.js?v=67589dc7"></script>
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Getting started" href="GettingStarted.html" />
@@ -19,8 +19,9 @@
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
+
   
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+  
 
   </head><body>
   
@@ -33,9 +34,9 @@
           <div class="body" role="main">
             
   <section id="introduction">
-<h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this heading">¶</a></h1>
+<h1>Introduction<a class="headerlink" href="#introduction" title="Link to this heading">¶</a></h1>
 <section id="overview">
-<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this heading">¶</a></h2>
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading">¶</a></h2>
 <p>Transfer-matrix method (TMM) is powerful analytical method to solve Maxwell
 equations in layered structures. However, standard TMM is limited by infinite
 plane waves (e.g no Gaussian beam excitation) and it is only limited to linear
@@ -49,7 +50,7 @@ and the second extends to the beams with arbritary profiles.</p>
 <li><p>TPB</p></li>
 </ol>
 <section id="main-features">
-<h3>Main features<a class="headerlink" href="#main-features" title="Permalink to this heading">¶</a></h3>
+<h3>Main features<a class="headerlink" href="#main-features" title="Link to this heading">¶</a></h3>
 <p>In addition to the standard TMM features this package also supports:</p>
 <ul class="simple">
 <li><p>Calculation of Gaussian beam (or any other beam) propagartion inside layered structures</p></li>
@@ -57,7 +58,7 @@ and the second extends to the beams with arbritary profiles.</p>
 </ul>
 </section>
 <section id="technical-features">
-<h3>Technical features<a class="headerlink" href="#technical-features" title="Permalink to this heading">¶</a></h3>
+<h3>Technical features<a class="headerlink" href="#technical-features" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>Written in C++</p></li>
 <li><p>Python wrappers written in Cython</p></li>
@@ -73,7 +74,7 @@ and the second extends to the beams with arbritary profiles.</p>
           
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
 <h1 class="logo"><a href="index.html">NonlinearTMM</a></h1>
 
@@ -84,7 +85,16 @@ and the second extends to the beams with arbritary profiles.</p>
 
 
 
-<h3>Navigation</h3>
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Introduction</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#overview">Overview</a><ul>
@@ -107,16 +117,6 @@ and the second extends to the beams with arbritary profiles.</p>
   </ul></li>
 </ul>
 </div>
-<div id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</div>
-<script>document.getElementById('searchbox').style.display = "block"</script>
 
 
 
@@ -130,11 +130,11 @@ and the second extends to the beams with arbritary profiles.</p>
       <div class="clearer"></div>
     </div>
     <div class="footer">
-      &copy;2017, Ardi Loot.
+      &#169;2017-2025, Ardi Loot.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 6.1.3</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 9.1.0</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
       
       |
       <a href="_sources/Introduction.rst.txt"

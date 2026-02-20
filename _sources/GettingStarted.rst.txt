@@ -15,7 +15,7 @@ Requirements:
 
 Dependencies:
 
-* C++ code depends on `Eigen library <http://eigen.tuxfamily.org/>`_ (already included in package) 
+* C++ code depends on `Eigen library <http://eigen.tuxfamily.org/>`_ (already included in package)
 
 Installation through pip is done like:
 
@@ -28,7 +28,7 @@ Alternatively, it is possible to install the package form the source code by
 .. code-block:: bash
 
 	pip install .
-	
+
 in the source code folder.
 
 
@@ -67,7 +67,7 @@ The interface for the calculations with arbritarty beams is similar to standard 
 Finally, :class:`SecondOrderNLTMM` class ic capable of calculating second-order
 nonlinear processes like second-harmonic generation, sum-frequency generation and
 difference frequency generation. This has similar interface as :any:`TMM` - it
-supports both the plane waves and beams. 
+supports both the plane waves and beams.
 
 Standard TMM
 ************
@@ -88,10 +88,10 @@ following steps:
 5. Calculate 1D fields at plasmonic resonance by :any:`GetFields <NonlinearTMM.GetFields>`.
 6. Calculate 2D fields at plasmonic resonance by :any:`GetFields2D <NonlinearTMM.GetFields2D>`.
 7. Plot all results
- 
+
 .. literalinclude:: ../Examples/ExampleTMM.py
 
-The results of the calculations are shown bellow. Indeed there is a sharrp dip 
+The results of the calculations are shown bellow. Indeed there is a sharrp dip
 in the reflection (R) near the angle of incidence ca 44 degrees. At the same angle
 the field enhancement factor is maximum and is more than 12 times. In the second
 the results of the fields calculations at plasmonic resonance is presented. Indeed,
@@ -119,7 +119,7 @@ the right side, the electrical field norm is shown. It is clearly visible, that
 Gaussian beam is incident form the left, and it gets reflected from the metal film (z = 0).
 Part of the energy is transmitted to excite SPPs at the metal-air interface. The
 excited SPPs are propagating on the metal film and are absorbe after ca 20 μm of
-propagation. 
+propagation.
 
 .. image:: images/TMMForWaves-example.png
 
@@ -135,4 +135,3 @@ Gaussian wave example
 =====================
 
 Will be added in near future.
-
