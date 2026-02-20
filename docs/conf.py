@@ -56,7 +56,7 @@ root_doc = "index"
 
 # General information about the project.
 project = "NonlinearTMM"
-copyright = "2017-2025, Ardi Loot"
+copyright = "2017-2026, Ardi Loot"
 author = "Ardi Loot"
 
 # The version info for the project you're documenting, acts as replacement for
@@ -80,7 +80,7 @@ language = "en"
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
-# This patterns also effect to html_static_path and html_extra_path
+# These patterns also affect html_static_path and html_extra_path
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
 # The name of the Pygments (syntax highlighting) style to use.
@@ -162,7 +162,7 @@ texinfo_documents = [
         "NonlinearTMM Documentation",
         author,
         "NonlinearTMM",
-        "One line description of project.",
+        "Nonlinear transfer-matrix method.",
         "Miscellaneous",
     ),
 ]
