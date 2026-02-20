@@ -66,7 +66,7 @@ The interface for the calculations with arbitrary beams is similar to standard T
 
 Finally, :class:`SecondOrderNLTMM` class is capable of calculating second-order
 nonlinear processes like second-harmonic generation, sum-frequency generation and
-difference frequency generation. This has a similar interface to :any:`TMM` - it
+difference frequency generation. This has a similar interface to :class:`TMM` - it
 supports both plane waves and beams.
 
 Standard TMM

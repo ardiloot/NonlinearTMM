@@ -307,6 +307,7 @@ cdef class _Wave:
             is given by :any:`w0` and the tapered region is determined by :any:`a`.
         'spdc':
             Wave used to represent vacuum fluctuations in case of SPDC calculation.
+
         Default is 'planewave'.
     pwr : float
         Power of the wave (in watts). Default 1.0. The area of the beam is
@@ -965,7 +966,7 @@ cdef class NonlinearTMM:
     This class is mainly used to calculate linear propagation of plane waves
     in stratified medium. It can work like ordinary TMM and calculate the propagation
     of the input waves. It is also capable of nonlinear calculations, but
-    for this purpose use specialized class :any:`SecondOrderNLTMM`.
+    for this purpose use specialized class :class:`SecondOrderNLTMM`.
 
     Default constructor takes no arguments.
 
@@ -989,7 +990,7 @@ cdef class NonlinearTMM:
         Allows to access layers by index.
     mode : str
         By default "incident" which corresponds to Ordinary TMM. Other mode is,
-        "nonlinear" but it is automatically set by :any:`SecondOrderNLTMM` (i.e, this
+        "nonlinear" but it is automatically set by :class:`SecondOrderNLTMM` (i.e, this
         parameter has to be modified only in special cases).
     overrideE0 : bool
         If True, then parameter :any:`E0` is used, otherwise intensity :any:`I0` is used.
@@ -1049,8 +1050,8 @@ cdef class NonlinearTMM:
         d : float
             Thickness of the layer in meters. First and the last medium have
             infinite thickness.
-        material : :any:`Material`
-            Instance of the helper class :any:`Material`
+        material : :class:`Material`
+            Instance of the helper class :class:`Material`
 
         Examples
         --------
@@ -1146,7 +1147,8 @@ cdef class NonlinearTMM:
                 normalized tangential wavevector
             'I0':
                 intensity of the wave
-            'd_i': thikness of layer i (0..N-1)
+            'd_i':
+                thickness of layer i (0..N-1)
         values : ndarray of floats
             Correspondig values of param :any:`paramStr`.
         layerNr : int
@@ -1728,7 +1730,7 @@ cdef class SecondOrderNLTMM:
         """SetParams(**kwargs)
 
         Helper method to set the values of all the attributes. See the docstring
-        of :any:`SecondOrderNLTMM`.
+        of :class:`SecondOrderNLTMM`.
 
         """
         for name, value in kwargs.items():
@@ -1746,7 +1748,7 @@ cdef class SecondOrderNLTMM:
         ----------
         d : float
             layer thickness (m)
-        material : :any:`Material`
+        material : :class:`Material`
             The class containing the material parameters.
 
         """
@@ -1810,7 +1812,8 @@ cdef class SecondOrderNLTMM:
                 normalized tangential wavevector
             'I0':
                 intensity of the wave
-            'd_i': thikness of layer i (0..N-1)
+            'd_i':
+                thickness of layer i (0..N-1)
         valuesP1 : ndarray of floats
             Correspondig values of param :any:`paramStr` for :any:`P1`.
         valuesP2 : ndarray of floats

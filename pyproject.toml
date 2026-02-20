@@ -36,7 +36,7 @@ dependencies = [
 ]
 
 [dependency-groups]
-dev = ["pyyaml", "pytest", "pre-commit", "ty", "matplotlib", "sphinx", "numpydoc"]
+dev = ["pyyaml", "pytest", "pre-commit", "ty", "matplotlib", "sphinx", "furo", "numpydoc"]
 
 [project.urls]
 Homepage = "https://github.com/ardiloot/NonlinearTMM"
