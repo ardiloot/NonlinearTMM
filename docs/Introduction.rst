@@ -10,7 +10,7 @@ equations in layered structures. However, standard TMM is limited to infinite
 plane waves (e.g. no Gaussian beam excitation) and to linear processes (i.e.
 calculation of second-harmonic, sum-frequency, and difference-frequency
 generation is not possible). The aim of this package is to extend standard TMM to
-include those features. The physics of these extensions are described in the
+include those features. The physics of these extensions is described in the
 following publications:
 
 1. `A. Loot and V. Hizhnyakov, "Extension of standard transfer-matrix method for three-wave mixing for plasmonic structures," Appl. Phys. A, vol. 123, no. 3, p. 152, 2017. <https://link.springer.com/article/10.1007%2Fs00339-016-0733-0>`_

@@ -67,7 +67,7 @@ The interface for the calculations with arbitrary beams is similar to standard T
 Finally, :class:`SecondOrderNLTMM` class is capable of calculating second-order
 nonlinear processes like second-harmonic generation, sum-frequency generation and
 difference frequency generation. This has a similar interface to :any:`TMM` - it
-supports both the plane waves and beams.
+supports both plane waves and beams.
 
 Standard TMM
 ************
@@ -77,7 +77,7 @@ Plane waves example
 
 As an example, a three-layer structure consisting of a prism (z < 0), a 50-nm-thick silver
 film and air is studied. Such a structure supports surface plasmon
-resonance (SPR) if excited by p-polarized light and is named Kretschmann
+resonance (SPR) if excited by p-polarized light and is known as the Kretschmann
 configuration. The example code is shown below and could be divided into
 the following steps:
 
