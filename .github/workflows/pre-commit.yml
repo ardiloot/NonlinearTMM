@@ -16,5 +16,4 @@ jobs:
       - uses: astral-sh/setup-uv@v7
       - run: uv python install
       - run: uv sync
-      - run: uv tool install pre-commit --with pre-commit-uv
-      - run: pre-commit run --all-files
+      - run: uv run pre-commit run --all-files
