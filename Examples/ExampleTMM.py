@@ -89,6 +89,7 @@ def CalcSpp() -> None:
     plt.colorbar(label=r"$E_z$ (V/m)")
 
     plt.tight_layout()
+    plt.savefig("docs/images/TMM-example.png", dpi=100)
     plt.show()
 
 
