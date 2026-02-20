@@ -49,20 +49,20 @@ Class :class:`TMM` (alias of :class:`NonlinearTMM`) has all the standard TMM fea
 
 * Both p- and s-polarization
 * Arbitrary angle of incidence
-* Calculation of reflection, transmission and absorption of plane waves (:any:`GetIntensities <NonlinearTMM.GetIntensities>` and :any:`GetAbsorbedIntensity <NonlinearTMM.GetAbsorbedIntensity>`)
-* Calculation of electric and magnetic fields inside structure (:any:`GetFields <NonlinearTMM.GetFields>` and :any:`GetFields2D <NonlinearTMM.GetFields2D>`)
-* Calculation of field enhancement (:any:`GetEnhancement <NonlinearTMM.GetEnhancement>`)
-* Sweep over any parameter (:any:`Sweep <NonlinearTMM.Sweep>`)
+* Calculation of reflection, transmission and absorption of plane waves (:meth:`GetIntensities <NonlinearTMM.GetIntensities>` and :meth:`GetAbsorbedIntensity <NonlinearTMM.GetAbsorbedIntensity>`)
+* Calculation of electric and magnetic fields inside structure (:meth:`GetFields <NonlinearTMM.GetFields>` and :meth:`GetFields2D <NonlinearTMM.GetFields2D>`)
+* Calculation of field enhancement (:meth:`GetEnhancement <NonlinearTMM.GetEnhancement>`)
+* Sweep over any parameter (:meth:`Sweep <NonlinearTMM.Sweep>`)
 
 In addition to those standard features, the class has similar functionality to
 work with waves with arbitrary profile (e.g. Gaussian beam). The configuration
-of the beam is done through attribute :any:`wave <NonlinearTMM.wave>` (see class :any:`_Wave`).
+of the beam is done through attribute :attr:`wave <NonlinearTMM.wave>` (see class :class:`_Wave`).
 The interface for the calculations with arbitrary beams is similar to standard TMM:
 
-* Calculation of reflection, transmission and absorption of beams (:any:`WaveGetPowerFlows <NonlinearTMM.WaveGetPowerFlows>`)
-* Calculation of electric and magnetic fields inside structure (:any:`WaveGetFields2D <NonlinearTMM.WaveGetFields2D>`)
-* Calculation of field enhancement (:any:`WaveGetEnhancement <NonlinearTMM.WaveGetEnhancement>`)
-* Sweep over any parameter (:any:`WaveSweep <NonlinearTMM.WaveSweep>`)
+* Calculation of reflection, transmission and absorption of beams (:meth:`WaveGetPowerFlows <NonlinearTMM.WaveGetPowerFlows>`)
+* Calculation of electric and magnetic fields inside structure (:meth:`WaveGetFields2D <NonlinearTMM.WaveGetFields2D>`)
+* Calculation of field enhancement (:meth:`WaveGetEnhancement <NonlinearTMM.WaveGetEnhancement>`)
+* Sweep over any parameter (:meth:`WaveSweep <NonlinearTMM.WaveSweep>`)
 
 Finally, :class:`SecondOrderNLTMM` class is capable of calculating second-order
 nonlinear processes like second-harmonic generation, sum-frequency generation and
@@ -83,10 +83,10 @@ the following steps:
 
 1. Specifying material refractive indices.
 2. Initializing :class:`TMM`, setting params and adding layers.
-3. By using :any:`Sweep <NonlinearTMM.Sweep>` calculate the dependence of reflection, transmission and enhancement factor on the angle of incidence.
+3. By using :meth:`Sweep <NonlinearTMM.Sweep>` calculate the dependence of reflection, transmission and enhancement factor on the angle of incidence.
 4. Find the plasmonic resonance from the maximum enhancement.
-5. Calculate 1D fields at plasmonic resonance by :any:`GetFields <NonlinearTMM.GetFields>`.
-6. Calculate 2D fields at plasmonic resonance by :any:`GetFields2D <NonlinearTMM.GetFields2D>`.
+5. Calculate 1D fields at plasmonic resonance by :meth:`GetFields <NonlinearTMM.GetFields>`.
+6. Calculate 2D fields at plasmonic resonance by :meth:`GetFields2D <NonlinearTMM.GetFields2D>`.
 7. Plot all results
 
 .. literalinclude:: ../Examples/ExampleTMM.py
@@ -106,7 +106,7 @@ Gaussian wave example
 The previous example was entirely about standard TMM. Now, the calculations are
 extended to beams, in this case a Gaussian beam. The steps of the calculations
 remain the same, except :class:`_Wave` parameters must be set (:class:`TMM` has
-attribute :any:`TMM.wave`). The Gaussian beam power is set to 10 mW and the waist size
+attribute :attr:`TMM.wave`). The Gaussian beam power is set to 10 mW and the waist size
 to 10 μm.
 
 .. literalinclude:: ../Examples/ExampleTMMForWaves.py
