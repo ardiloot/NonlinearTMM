@@ -4,7 +4,8 @@ requires = [
     "setuptools_scm",
     "numpy>=2",
     "Cython>=3.0,<4",
-    "eigency>=3.4.0.0",
+    "eigency==3.4.0.7",  # must match [project] dependencies (ABI compatibility)
+
 ]
 build-backend = "setuptools.build_meta"
 
@@ -32,7 +33,7 @@ dynamic = ["version"]
 dependencies = [
     "numpy>=2",
     "scipy>=1.14",
-    "eigency>=3.4.0.0",
+    "eigency==3.4.0.7",  # must match [build-system] requires (ABI compatibility)
 ]
 
 [dependency-groups]
