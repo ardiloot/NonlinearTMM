@@ -20,7 +20,8 @@ def chi2s():
     materialCpp = Material.FromLabPy(LabPy.Material("Static", n=1.0))
     chi2Cpp = materialCpp.chi2
     chi2Cpp.Update(**dValues)
-    chi2Py = LabPy.Chi2Tensor(**dValues)  # type: ignore[reportArgumentType]
+    chi2Py = LabPy.Chi2Tensor()
+    chi2Py.Update(**dValues)
     return chi2Cpp, chi2Py
 
 
