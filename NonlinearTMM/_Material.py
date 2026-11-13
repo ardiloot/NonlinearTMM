@@ -12,6 +12,8 @@ __all__ = ["Material"]
 class Material(_SecondOrderNLTMMCython.Material):
     __doc__ = _SecondOrderNLTMMCython.Material.__doc__
 
+    _materialLabPy: Any
+
     @staticmethod
     def Static(n: complex | float) -> Material:
         """Helper method to make material with constant refractive index.
@@ -65,5 +67,5 @@ class Material(_SecondOrderNLTMMCython.Material):
                 ns = np.ascontiguousarray(materialLabPy.nExp + 1.0j * materialLabPy.kExp)
             ns += 1.0j * materialLabPy.kAdditional
         res = Material(wls, ns)
-        res._materialLabPy = materialLabPy  # type: ignore[reportAttributeAccessIssue]
+        res._materialLabPy = materialLabPy
         return res
